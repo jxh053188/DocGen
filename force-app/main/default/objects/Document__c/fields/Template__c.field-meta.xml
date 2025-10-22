@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Template__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>The template used to generate this document.</description>
+    <externalId>false</externalId>
+    <label>Template</label>
+    <referenceTo>Document_Template__c</referenceTo>
+    <relationshipLabel>Documents</relationshipLabel>
+    <relationshipName>Documents</relationshipName>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

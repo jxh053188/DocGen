@@ -1,0 +1,74 @@
+<template>
+    <lightning-card title={template.Name} icon-name="custom:custom55">
+        <div class="slds-p-around_medium">
+            <!-- Editor Section -->
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                    <lightning-textarea label="HTML Template" value={htmlBody} onchange={handleHtmlChange} rows="25"
+                        class="editor-textarea"></lightning-textarea>
+
+                    <div class="slds-m-top_small">
+                        <lightning-button label="Save Template" variant="brand" onclick={handleSave}
+                            disabled={isLoading} class="slds-m-right_small"></lightning-button>
+                        <lightning-button label="Discover Fields" variant="neutral" onclick={handleDiscoverFields}
+                            disabled={isLoading}></lightning-button>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                    <div class="slds-box">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Template Info</h3>
+                        <p><strong>Primary Object:</strong> {template.Primary_Object__c}</p>
+                        <p><strong>Version:</strong> {template.Version__c}</p>
+                        <p><strong>Status:</strong> {template.Status__c}</p>
+                    </div>
+
+                    <div class="slds-box slds-m-top_small">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Preview</h3>
+                        <lightning-input label="Sample Record ID" value={sampleRecordId}
+                            onchange={handleSampleRecordChange}
+                            placeholder="Enter a record ID to preview"></lightning-input>
+
+                        <lightning-button label="Preview" variant="brand" onclick={handlePreview} disabled={isLoading}
+                            class="slds-m-top_small"></lightning-button>
+                    </div>
+
+                    <template if:true={discoveredFields.length}>
+                        <div class="slds-box slds-m-top_small">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Discovered Fields</h3>
+                            <lightning-datatable key-field="path" data={discoveredFields}
+                                columns={discoveredFieldsColumns} hide-checkbox-column></lightning-datatable>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+
+    <!-- Preview Modal -->
+    <template if:true={showPreview}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">HTML Preview</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium" style="min-height: 400px;">
+                    <div class="preview-container">
+                        <lightning-formatted-rich-text value={previewHtml}></lightning-formatted-rich-text>
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Close" onclick={handleClosePreview}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- Loading Spinner -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Processing..."></lightning-spinner>
+    </template>
+</template>

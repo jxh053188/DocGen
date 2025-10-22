@@ -152,16 +152,16 @@
     <enableSearch>false</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <externalSharingModel>Private</externalSharingModel>
+    <externalSharingModel>ControlledByParent</externalSharingModel>
     <gender>Feminine</gender>
-    <label>Dynamic Template Variable</label>
+    <label>Template Variable</label>
     <nameField>
-        <displayFormat>DTV-{000000}</displayFormat>
-        <label>Dynamic Template Variable Name</label>
+        <displayFormat>TV-{000000}</displayFormat>
+        <label>Template Variable Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>Dynamic Template Variables</pluralLabel>
+    <pluralLabel>Template Variables</pluralLabel>
     <searchLayouts></searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

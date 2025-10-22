@@ -1,0 +1,63 @@
+<template>
+    <lightning-card title="Template Manager" icon-name="custom:custom55">
+        <div slot="actions">
+            <lightning-button label="New Template" variant="brand" onclick={handleNewTemplate}
+                icon-name="utility:add"></lightning-button>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <lightning-datatable key-field="Id" data={templates} columns={columns} onrowaction={handleRowAction}
+                hide-checkbox-column></lightning-datatable>
+        </div>
+    </lightning-card>
+
+    <!-- Modal for Create/Edit -->
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">{modalTitle}</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-input label="Template Name" value={templateName} data-field="name"
+                        onchange={handleInputChange} required></lightning-input>
+
+                    <lightning-input label="Primary Object API Name" value={primaryObject} data-field="primaryObject"
+                        onchange={handleInputChange} placeholder="e.g., Account, Opportunity"
+                        required></lightning-input>
+
+                    <lightning-combobox label="Source Type" value={sourceType} options={sourceTypeOptions}
+                        data-field="sourceType" onchange={handleInputChange}></lightning-combobox>
+
+                    <lightning-combobox label="Status" value={status} options={statusOptions} data-field="status"
+                        onchange={handleInputChange}></lightning-combobox>
+
+                    <template if:true={showFileUpload}>
+                        <lightning-input type="file" label="Upload DOCX File" accept=".docx"
+                            onchange={handleFileUpload}></lightning-input>
+                    </template>
+
+                    <lightning-textarea label="HTML Body" value={htmlBody} data-field="htmlBody"
+                        onchange={handleInputChange} rows="10" required></lightning-textarea>
+
+                    <lightning-textarea label="Allowed Fields (optional)" value={allowedFields}
+                        data-field="allowedFields" onchange={handleInputChange} rows="5"
+                        placeholder="JSON array or newline-separated field paths"></lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+                    <lightning-button label="Save" variant="brand" onclick={handleSave}
+                        disabled={isLoading}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- Loading Spinner -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading..."></lightning-spinner>
+    </template>
+</template>

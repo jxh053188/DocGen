@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Enables the use of triple-stache {{{ }}} sections in templates for unescaped HTML. Should only be granted to trusted users who understand the security implications.</description>
+    <label>PDF SafeHtml</label>
+</CustomPermission>

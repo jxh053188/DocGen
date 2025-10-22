@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source_Type__c</fullName>
+    <description>The type of source file used for this template.</description>
+    <externalId>false</externalId>
+    <label>Source Type</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Word</fullName>
+                <default>false</default>
+                <label>Word</label>
+            </value>
+            <value>
+                <fullName>HTML</fullName>
+                <default>true</default>
+                <label>HTML</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

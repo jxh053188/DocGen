@@ -1,0 +1,40 @@
+<template>
+    <lightning-card title="Generate PDF Document">
+        <!-- Template Selection -->
+        <template if:true={showTemplateSelect}>
+            <div class="slds-p-around_medium">
+                <lightning-combobox label="Select Template" value={selectedTemplateId} options={templateOptions}
+                    onchange={handleTemplateChange} placeholder="Choose a template..."></lightning-combobox>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button label="Generate Preview" variant="brand" onclick={handleGenerate}
+                        disabled={isLoading} class="slds-m-right_small"></lightning-button>
+                    <lightning-button label="Cancel" onclick={handleClose}></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- PDF Preview -->
+        <template if:true={showPreview}>
+            <div class="slds-p-around_medium">
+                <div class="pdf-preview-container">
+                    <iframe src={pdfUrl} width="100%" height="600px" frameborder="0"></iframe>
+                </div>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button label="Save & Attach" variant="brand" onclick={handleSave} disabled={isLoading}
+                        class="slds-m-right_small"></lightning-button>
+                    <lightning-button label="Download" variant="neutral" onclick={handleDownload}
+                        class="slds-m-right_small"></lightning-button>
+                    <lightning-button label="Back" onclick={handleBack} class="slds-m-right_small"></lightning-button>
+                    <lightning-button label="Discard" onclick={handleClose}></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Processing..."></lightning-spinner>
+        </template>
+    </lightning-card>
+</template>

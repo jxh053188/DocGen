@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Renderer_Strategy__c</fullName>
+    <description>The rendering strategy to use for PDF generation. Default is Function (Salesforce Function with Playwright).</description>
+    <externalId>false</externalId>
+    <label>Renderer Strategy</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Function</fullName>
+                <default>true</default>
+                <label>Function</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
