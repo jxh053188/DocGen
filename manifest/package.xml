@@ -60,5 +60,5 @@
         <members>docx_preview</members>
         <name>StaticResource</name>
     </types>
-    <version>64.0</version>
+    <version>50.0</version>
 </Package>
