@@ -1,11 +1,11 @@
 /**
  * Locker Service-compliant template engine for DocGen
- * Supports basic Mustache-like syntax without eval() or Function()
+ * Aligned with docxtemplater syntax: {variable}, {#collection}, {/collection}
  */
 
 /**
  * Render a template with data
- * @param {string} template - Template string with {{variable}} syntax
+ * @param {string} template - Template string with {variable} syntax (docxtemplater-compatible)
  * @param {object} data - Data object to render
  * @returns {string} Rendered HTML
  */
@@ -19,13 +19,13 @@ export function render(template, data) {
 
     let result = template;
 
-    // Process {{#each collection [where="..."] [orderBy="..."] [limit="..."] [offset="..."]}} blocks
+    // Process {#collectionName [where="..."] [orderBy="..."] [limit="..."] [offset="..."]}...{/collectionName} blocks
     result = processEach(result, data);
 
-    // Process {{#if condition}} blocks
+    // Process {#condition}...{/condition} blocks
     result = processIf(result, data);
 
-    // Process simple variables {{variable}} and {{nested.path}}
+    // Process simple variables {variable} and {nested.path}
     result = processVariables(result, data);
 
     return result;
@@ -306,15 +306,25 @@ function applySorting(collection, orderByStr) {
 }
 
 /**
- * Process {{#each collection [where="..."] [orderBy="..."] [limit="..."] [offset="..."]}}...{{/each}} blocks
+ * Process collection blocks with both syntaxes:
+ * 1. Docxtemplater: {#CollectionName [params]}...{/CollectionName}
+ * 2. Handlebars: {{#each CollectionName [params]}}...{{/each}}
  * Supports optional client-side filtering, ordering, and limiting
  */
 function processEach(template, data) {
-    // Match: {{#each CollectionName [params]}}...{{/each}}
-    // Capture collection name and optional parameters
-    const eachRegex = /\{\{#each\s+(\w+)\s*([^}]*?)\}\}([\s\S]*?)\{\{\/each\}\}/g;
+    // First, normalize Handlebars syntax to docxtemplater syntax for processing
+    // Convert {{#each CollectionName}}...{{/each}} to {#CollectionName}...{/CollectionName}
+    let normalized = template.replace(/\{\{#each\s+(\w+)\s*([^}]*?)\}\}([\s\S]*?)\{\{\/each\}\}/g, 
+        (match, collectionName, params, blockContent) => {
+            return `{#${collectionName} ${params}}${blockContent}{/${collectionName}}`;
+        }
+    );
+    
+    // Now process using docxtemplater syntax
+    // Match: {#CollectionName [params]}...{/CollectionName}
+    const eachRegex = /\{#(\w+)\s*([^}]*?)\}([\s\S]*?)\{\/\1\}/g;
 
-    return template.replace(eachRegex, (match, collectionName, params, blockContent) => {
+    return normalized.replace(eachRegex, (match, collectionName, params, blockContent) => {
         let collection = getValue(data, collectionName);
 
         // Handle Salesforce child relationship structure
@@ -395,27 +405,48 @@ function processEach(template, data) {
 }
 
 /**
- * Process {{#if condition}}...{{/if}} and {{#if condition}}...{{else}}...{{/if}}
+ * Process conditionals with both syntaxes:
+ * 1. Docxtemplater: {?condition}...{/}
+ * 2. Handlebars: {{#if condition}}...{{/if}}
  */
 function processIf(template, data) {
-    const ifRegex = /\{\{#if\s+(\w+(?:\.\w+)*)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
+    // First normalize Handlebars {{#if}} to docxtemplater {?}
+    let normalized = template.replace(/\{\{#if\s+(\w+(?:\.\w+)*)\}\}([\s\S]*?)(?:\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g,
+        (match, condition, ifBlock, elseBlock) => {
+            if (elseBlock) {
+                return `{?${condition}}${ifBlock}{/}{?NOT_${condition}}${elseBlock}{/}`;
+            }
+            return `{?${condition}}${ifBlock}{/}`;
+        }
+    );
+    
+    // Process docxtemplater syntax: {?condition}...{/}
+    const ifRegex = /\{\?(\w+(?:\.\w+)*)\}([\s\S]*?)\{\/\}/g;
 
-    return template.replace(ifRegex, (match, condition, trueBlock, falseBlock = '') => {
-        const value = getValue(data, condition);
+    return normalized.replace(ifRegex, (match, condition, block) => {
+        // Handle NOT_ prefix for else blocks
+        const actualCondition = condition.startsWith('NOT_') ? condition.substring(4) : condition;
+        const value = getValue(data, actualCondition);
         const isTruthy = value !== null && value !== undefined && value !== false && value !== '' && value !== 0;
+        const shouldRender = condition.startsWith('NOT_') ? !isTruthy : isTruthy;
 
-        return isTruthy ? trueBlock : falseBlock;
+        return shouldRender ? block : '';
     });
 }
 
 /**
- * Process simple variables {{variable}} and {{nested.path}}
+ * Process simple variables with both syntaxes:
+ * 1. Docxtemplater: {variable} and {nested.path}
+ * 2. Handlebars: {{variable}} and {{nested.path}}
  */
 function processVariables(template, data) {
-    // Match {{variable}} or {{nested.path}} but not {{#helper}} or {{/helper}}
-    const varRegex = /\{\{(?!#|\/)([\w.@]+)\}\}/g;
+    // First normalize Handlebars {{variable}} to {variable}
+    let normalized = template.replace(/\{\{([^#\/][\w.@]+)\}\}/g, '{$1}');
+    
+    // Match {variable} or {nested.path} but not {#helper}, {?condition} or {/helper}
+    const varRegex = /\{(?![#?\/])([\w.@]+)\}/g;
 
-    return template.replace(varRegex, (match, path) => {
+    return normalized.replace(varRegex, (match, path) => {
         const value = getValue(data, path);
         return formatValue(value);
     });

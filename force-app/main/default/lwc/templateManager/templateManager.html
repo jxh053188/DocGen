@@ -34,12 +34,28 @@
                         onchange={handleInputChange}></lightning-combobox>
 
                     <template if:true={showFileUpload}>
-                        <lightning-input type="file" label="Upload DOCX File" accept=".docx"
-                            onchange={handleFileUpload}></lightning-input>
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Upload DOCX Template</label>
+                            <div class="slds-form-element__control">
+                                <lightning-input type="file" label="" accept=".docx"
+                                    onchange={handleFileUpload}></lightning-input>
+                                <template if:true={uploadedFileName}>
+                                    <div class="slds-text-body_small slds-m-top_x-small">
+                                        Selected file: <strong>{uploadedFileName}</strong>
+                                    </div>
+                                </template>
+                                <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
+                                    Upload a Word document with template syntax
+                                </div>
+                            </div>
+                        </div>
                     </template>
 
-                    <lightning-textarea label="HTML Body" value={htmlBody} data-field="htmlBody"
-                        onchange={handleInputChange} rows="10" required></lightning-textarea>
+                    <template if:true={showHtmlEditor}>
+                        <lightning-textarea label="HTML Body" value={htmlBody} data-field="htmlBody"
+                            onchange={handleInputChange} rows="10" required
+                            placeholder="Enter HTML template with template syntax"></lightning-textarea>
+                    </template>
 
                     <lightning-textarea label="Allowed Fields (optional)" value={allowedFields}
                         data-field="allowedFields" onchange={handleInputChange} rows="5"

@@ -4,8 +4,53 @@
             <!-- Editor Section -->
             <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
-                    <lightning-textarea label="HTML Template" value={htmlBody} onchange={handleHtmlChange} rows="25"
-                        class="editor-textarea"></lightning-textarea>
+                    <!-- Word Template: File Upload/Management -->
+                    <template if:true={isWordTemplate}>
+                        <!-- File Upload Section (if no file exists) -->
+                        <template if:true={showFileUpload}>
+                            <div class="slds-box slds-m-bottom_small">
+                                <h3 class="slds-text-heading_small slds-m-bottom_x-small">Upload Word Template</h3>
+                                <p class="slds-text-body_small slds-m-bottom_small">
+                                    Upload a .docx file with docxtemplater syntax (e.g., Name, Opportunities with StageName)
+                                </p>
+                                <lightning-input type="file" accept=".docx" label="Word Document" 
+                                    onchange={handleFileUpload} disabled={isLoading}>
+                                </lightning-input>
+                                <template if:true={uploadedFileName}>
+                                    <p class="slds-text-body_small slds-m-top_x-small slds-text-color_success">
+                                        ✓ File ready: {uploadedFileName}
+                                    </p>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- File Info Section (if file exists) -->
+                        <template if:true={showFileInfo}>
+                            <div class="slds-box slds-m-bottom_small">
+                                <h3 class="slds-text-heading_small slds-m-bottom_x-small">Word Template File</h3>
+                                <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+                                    <div>
+                                        <lightning-icon icon-name="doctype:word" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                        <span class="slds-text-body_regular">{templateFileName}</span>
+                                    </div>
+                                    <lightning-button-icon icon-name="utility:delete" variant="destructive" 
+                                        alternative-text="Delete file" onclick={handleDeleteFile} disabled={isLoading}>
+                                    </lightning-button-icon>
+                                </div>
+                                <p class="slds-text-body_small slds-text-color_weak">
+                                    To replace this file, delete it first and upload a new one.
+                                </p>
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- HTML Template: HTML Editor -->
+                    <template if:true={showHtmlEditor}>
+                        <lightning-textarea label="HTML Template" value={htmlBody} onchange={handleHtmlChange} rows="20"
+                            class="editor-textarea"
+                            placeholder="Enter HTML template with docxtemplater syntax (e.g., Name, Opportunities with StageName)">
+                        </lightning-textarea>
+                    </template>
 
                     <div class="slds-m-top_small">
                         <lightning-button label="Save Template" variant="brand" onclick={handleSave}
@@ -18,6 +63,7 @@
                 <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
                     <div class="slds-box">
                         <h3 class="slds-text-heading_small slds-m-bottom_small">Template Info</h3>
+                        <p><strong>Source Type:</strong> {template.Source_Type__c}</p>
                         <p><strong>Primary Object:</strong> {template.Primary_Object__c}</p>
                         <p><strong>Version:</strong> {template.Version__c}</p>
                         <p><strong>Status:</strong> {template.Status__c}</p>

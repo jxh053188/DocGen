@@ -1,12 +1,13 @@
 import { LightningElement, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
-import { loadScript } from 'lightning/platformResourceLoader';
-import mammoth from '@salesforce/resourceUrl/mammoth';
 import getAllTemplates from '@salesforce/apex/TemplateController.getAllTemplates';
 import saveTemplate from '@salesforce/apex/TemplateController.saveTemplate';
 import deleteTemplate from '@salesforce/apex/TemplateController.deleteTemplate';
 import validateSObject from '@salesforce/apex/TemplateController.validateSObject';
+import uploadTemplateFile from '@salesforce/apex/TemplateController.uploadTemplateFile';
+import getTemplateFile from '@salesforce/apex/TemplateController.getTemplateFile';
+import deleteTemplateFile from '@salesforce/apex/TemplateController.deleteTemplateFile';
 
 const COLUMNS = [
     { label: 'Name', fieldName: 'Name', type: 'text' },
@@ -32,10 +33,10 @@ export default class TemplateManager extends LightningElement {
     @track isLoading = false;
     @track currentTemplate = {};
     @track uploadedFile = null;
+    @track uploadedFileName = '';
 
     columns = COLUMNS;
     wiredTemplatesResult;
-    mammothLoaded = false;
 
     // Form fields
     templateName = '';
@@ -68,16 +69,8 @@ export default class TemplateManager extends LightningElement {
         return this.sourceType === 'Word';
     }
 
-    async connectedCallback() {
-        // Load mammoth library for DOCX conversion
-        try {
-            await loadScript(this, mammoth);
-            this.mammothLoaded = true;
-            console.log('✅ Mammoth.js loaded successfully');
-        } catch (error) {
-            console.error('❌ Failed to load Mammoth.js:', error);
-            this.showToast('Error', 'Failed to load DOCX converter library', 'error');
-        }
+    get showHtmlEditor() {
+        return this.sourceType === 'HTML';
     }
 
     @wire(getAllTemplates)
@@ -163,47 +156,42 @@ export default class TemplateManager extends LightningElement {
         }
     }
 
-    async handleFileUpload(event) {
+    handleFileUpload(event) {
         const files = event.target.files;
         if (!files || files.length === 0) {
             return;
         }
 
         const file = files[0];
-        this.uploadedFile = file;
 
-        // If Word file, convert to HTML using Mammoth
-        if (this.sourceType === 'Word') {
-            await this.convertDocxToHtml(file);
+        // Validate file type
+        if (!file.name.endsWith('.docx')) {
+            this.showToast('Error', 'Please upload a .docx file', 'error');
+            return;
         }
+
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            this.showToast('Error', 'File size must be less than 10MB', 'error');
+            return;
+        }
+
+        this.uploadedFile = file;
+        this.uploadedFileName = file.name;
+        this.showToast('Success', `File "${file.name}" ready for upload`, 'success');
     }
 
-    async convertDocxToHtml(file) {
-        this.isLoading = true;
-        try {
-            // Check if Mammoth is loaded
-            if (!this.mammothLoaded || !window.mammoth) {
-                this.showToast('Error', 'DOCX converter library not loaded. Please refresh the page.', 'error');
-                this.isLoading = false;
-                return;
-            }
-
-            const mammoth = window.mammoth;
-
-            const arrayBuffer = await file.arrayBuffer();
-            const result = await mammoth.convertToHtml({ arrayBuffer });
-
-            this.htmlBody = result.value;
-            this.showToast('Success', 'DOCX converted to HTML successfully', 'success');
-
-            if (result.messages.length > 0) {
-                console.warn('Conversion warnings:', result.messages);
-            }
-        } catch (error) {
-            this.showToast('Error', 'Failed to convert DOCX: ' + error.message, 'error');
-        } finally {
-            this.isLoading = false;
-        }
+    async readFileAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
     }
 
     async handleSave() {
@@ -231,8 +219,25 @@ export default class TemplateManager extends LightningElement {
                 Renderer_Strategy__c: 'Function'
             };
 
-            await saveTemplate({ template });
-            this.showToast('Success', 'Template saved successfully', 'success');
+            const savedTemplateId = await saveTemplate({ template });
+
+            // If Word template and file is uploaded, upload the file
+            if (this.sourceType === 'Word' && this.uploadedFile) {
+                try {
+                    const base64Data = await this.readFileAsBase64(this.uploadedFile);
+                    await uploadTemplateFile({
+                        templateId: savedTemplateId || this.currentTemplate.Id,
+                        fileName: this.uploadedFileName,
+                        base64Data
+                    });
+                    this.showToast('Success', 'Template and file saved successfully', 'success');
+                } catch (fileError) {
+                    this.showToast('Warning', 'Template saved but file upload failed: ' + fileError.body?.message, 'warning');
+                }
+            } else {
+                this.showToast('Success', 'Template saved successfully', 'success');
+            }
+
             this.handleCancel();
             await refreshApex(this.wiredTemplatesResult);
         } catch (error) {
@@ -258,8 +263,15 @@ export default class TemplateManager extends LightningElement {
             return false;
         }
 
-        if (!this.htmlBody) {
-            this.showToast('Error', 'HTML body is required', 'error');
+        // For HTML templates, htmlBody is required
+        // For Word templates, either htmlBody or uploadedFile is required
+        if (this.sourceType === 'HTML' && !this.htmlBody) {
+            this.showToast('Error', 'HTML body is required for HTML templates', 'error');
+            return false;
+        }
+
+        if (this.sourceType === 'Word' && !this.uploadedFile && !this.currentTemplate.Id) {
+            this.showToast('Error', 'Please upload a DOCX file for Word templates', 'error');
             return false;
         }
 
@@ -275,6 +287,7 @@ export default class TemplateManager extends LightningElement {
         this.htmlBody = '';
         this.allowedFields = '';
         this.uploadedFile = null;
+        this.uploadedFileName = '';
     }
 
     showToast(title, message, variant) {

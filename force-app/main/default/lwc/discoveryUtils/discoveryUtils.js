@@ -22,32 +22,52 @@ export function discoverFields(htmlTemplate, primaryObject) {
     console.log('🔍 Starting field discovery...');
     console.log('📄 Original template length:', htmlTemplate.length);
 
-    // First, extract and process {{#each}} blocks to avoid double-counting fields
-    // Updated regex to capture optional parameters (where, orderBy, limit, offset)
-    const eachRegex = /\{\{#each\s+(\w+)\s*([^}]*?)\}\}([\s\S]*?)\{\{\/each\}\}/g;
+    // First, extract and process collection blocks to avoid double-counting fields
+    // Support both syntaxes:
+    // 1. Docxtemplater: {#CollectionName}...{/CollectionName}
+    // 2. Handlebars: {{#each CollectionName}}...{{/each}}
+    
+    // Docxtemplater syntax: {#CollectionName params}...{/CollectionName}
+    const docxEachRegex = /\{#(\w+)\s*([^}]*?)\}([\s\S]*?)\{\/\1\}/g;
+    
+    // Handlebars syntax: {{#each CollectionName params}}...{{/each}}
+    const handlebarsEachRegex = /\{\{#each\s+(\w+)\s*([^}]*?)\}\}([\s\S]*?)\{\{\/each\}\}/g;
+    
     let match;
-
-    // Extract all {{#each}} blocks
     let templateWithoutCollections = htmlTemplate;
     const eachMatches = [];
-    while ((match = eachRegex.exec(htmlTemplate)) !== null) {
+    
+    // Extract docxtemplater syntax blocks
+    while ((match = docxEachRegex.exec(htmlTemplate)) !== null) {
         eachMatches.push({
             fullMatch: match[0],
             relationshipName: match[1].trim(),
-            params: match[2].trim(),  // Capture parameters but don't process them (client-side filtering)
+            params: match[2].trim(),
             innerTemplate: match[3]
         });
     }
-    console.log(`📦 Found ${eachMatches.length} {{#each}} blocks:`, eachMatches.map(m => m.relationshipName));
+    
+    // Extract Handlebars syntax blocks
+    while ((match = handlebarsEachRegex.exec(htmlTemplate)) !== null) {
+        eachMatches.push({
+            fullMatch: match[0],
+            relationshipName: match[1].trim(),  // Collection name comes after "each"
+            params: match[2].trim(),
+            innerTemplate: match[3]
+        });
+    }
+    
+    console.log(`📦 Found ${eachMatches.length} collection blocks:`, eachMatches.map(m => m.relationshipName));
 
-    // Remove {{#each}} blocks from template for scalar discovery
+    // Remove {#collection} blocks from template for scalar discovery
     for (const eachMatch of eachMatches) {
         templateWithoutCollections = templateWithoutCollections.replace(eachMatch.fullMatch, '');
     }
-    console.log('📄 Template after removing {{#each}} blocks, length:', templateWithoutCollections.length);
+    console.log('📄 Template after removing {#collection} blocks, length:', templateWithoutCollections.length);
 
-    // Find scalar tokens: {{fieldPath}} (excluding those in {{#each}} blocks)
-    const scalarRegex = /\{\{(?!\#|\/)([\w.]+)\}\}/g;
+    // Find scalar tokens: {fieldPath} or {{fieldPath}} (excluding those in collection blocks)
+    // Support both docxtemplater {field} and Handlebars {{field}} syntax
+    const scalarRegex = /\{\{?(?![#?\/])([\w.@]+)\}?\}/g;
     const scalarMatches = [];
     while ((match = scalarRegex.exec(templateWithoutCollections)) !== null) {
         const path = match[1].trim();
@@ -59,10 +79,10 @@ export function discoverFields(htmlTemplate, primaryObject) {
     console.log(`✅ Found ${scalarMatches.length} scalar field references:`, scalarMatches);
     console.log(`✅ After filtering, ${payload.scalarPaths.size} unique scalar paths:`, Array.from(payload.scalarPaths));
 
-    // Process {{#each}} blocks separately
-    console.log(`🔄 Processing ${eachMatches.length} {{#each}} collections...`);
+    // Process {#collection} blocks separately
+    console.log(`🔄 Processing ${eachMatches.length} {#collection} collections...`);
     for (const eachMatch of eachMatches) {
-        console.log(`  📦 Processing {{#each ${eachMatch.relationshipName}}}`);
+        console.log(`  📦 Processing {#${eachMatch.relationshipName}}`);
         const collection = {
             relationshipName: eachMatch.relationshipName,
             fieldPaths: new Set(),
@@ -72,8 +92,8 @@ export function discoverFields(htmlTemplate, primaryObject) {
             offsetVal: null
         };
 
-        // Find fields within the collection block
-        const innerRegex = /\{\{([\w.]+)\}\}/g;
+        // Find fields within the collection block (support both {field} and {{field}})
+        const innerRegex = /\{\{?(?![#?\/])([\w.@]+)\}?\}/g;
         let innerMatch;
         while ((innerMatch = innerRegex.exec(eachMatch.innerTemplate)) !== null) {
             const path = innerMatch[1].trim();

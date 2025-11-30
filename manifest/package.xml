@@ -32,6 +32,7 @@
     </types>
     <types>
         <members>DocGen_UtilityBar</members>
+        <members>Template_Layout</members>
         <name>FlexiPage</name>
     </types>
     <types>
@@ -48,11 +49,15 @@
         <members>templateManager</members>
         <members>templateEditor</members>
         <members>generateDocumentAction</members>
+        <members>resourceLoader</members>
         <name>LightningComponentBundle</name>
     </types>
     <types>
         <members>mammoth</members>
         <members>html2pdf</members>
+        <members>docxtemplater</members>
+        <members>pizzip</members>
+        <members>docx_preview</members>
         <name>StaticResource</name>
     </types>
     <version>64.0</version>
