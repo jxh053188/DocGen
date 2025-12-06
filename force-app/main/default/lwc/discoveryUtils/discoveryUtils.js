@@ -26,37 +26,70 @@ export function discoverFields(htmlTemplate, primaryObject) {
     // Support both syntaxes:
     // 1. Docxtemplater: {#CollectionName}...{/CollectionName}
     // 2. Handlebars: {{#each CollectionName}}...{{/each}}
-    
+
     // Docxtemplater syntax: {#CollectionName params}...{/CollectionName}
     const docxEachRegex = /\{#(\w+)\s*([^}]*?)\}([\s\S]*?)\{\/\1\}/g;
-    
+
     // Handlebars syntax: {{#each CollectionName params}}...{{/each}}
-    const handlebarsEachRegex = /\{\{#each\s+(\w+)\s*([^}]*?)\}\}([\s\S]*?)\{\{\/each\}\}/g;
-    
+    // More robust regex that handles various parameter formats
+    // Match: {{#each RelationshipName [params]}}...{{/each}}
+    // This regex explicitly requires whitespace after "each" and captures the relationship name
+    const handlebarsEachRegex = /\{\{#each\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+([^}]*?))?\}\}([\s\S]*?)\{\{\/each\}\}/g;
+
     let match;
     let templateWithoutCollections = htmlTemplate;
     const eachMatches = [];
-    
+
     // Extract docxtemplater syntax blocks
     while ((match = docxEachRegex.exec(htmlTemplate)) !== null) {
-        eachMatches.push({
-            fullMatch: match[0],
-            relationshipName: match[1].trim(),
-            params: match[2].trim(),
-            innerTemplate: match[3]
-        });
+        const relationshipName = match[1].trim();
+        if (relationshipName && relationshipName !== 'each') {
+            eachMatches.push({
+                fullMatch: match[0],
+                relationshipName: relationshipName,
+                params: match[2].trim(),
+                innerTemplate: match[3]
+            });
+        }
     }
-    
+
+    // Reset regex lastIndex for global regex
+    handlebarsEachRegex.lastIndex = 0;
+
     // Extract Handlebars syntax blocks
-    while ((match = handlebarsEachRegex.exec(htmlTemplate)) !== null) {
-        eachMatches.push({
-            fullMatch: match[0],
-            relationshipName: match[1].trim(),  // Collection name comes after "each"
-            params: match[2].trim(),
-            innerTemplate: match[3]
-        });
-    }
+    // Use a more explicit approach to ensure we're matching correctly
+    const handlebarsPattern = /\{\{#each\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+([^}]*?))?\}\}([\s\S]*?)\{\{\/each\}\}/g;
+    let handlebarsMatch;
     
+    while ((handlebarsMatch = handlebarsPattern.exec(htmlTemplate)) !== null) {
+        const relationshipName = handlebarsMatch[1].trim();
+        const fullMatch = handlebarsMatch[0];
+        const params = (handlebarsMatch[2] || '').trim();
+        const innerTemplate = handlebarsMatch[3];
+        
+        console.log(`  🔍 Found potential Handlebars block:`, {
+            fullMatch: fullMatch.substring(0, 100) + '...',
+            relationshipName: relationshipName,
+            paramsLength: params.length
+        });
+        
+        // Validate that we captured a relationship name (not "each" itself or other keywords)
+        const invalidKeywords = ['each', 'if', 'unless', 'with', 'eachRelated', 'this', 'root'];
+        if (relationshipName && 
+            !invalidKeywords.includes(relationshipName.toLowerCase()) &&
+            /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(relationshipName)) {
+            eachMatches.push({
+                fullMatch: fullMatch,
+                relationshipName: relationshipName,
+                params: params,
+                innerTemplate: innerTemplate
+            });
+            console.log(`  ✅ Extracted Handlebars collection: ${relationshipName}`);
+        } else {
+            console.warn(`  ⚠️ Skipping invalid relationship name: ${relationshipName} (full match: ${fullMatch.substring(0, 80)}...)`);
+        }
+    }
+
     console.log(`📦 Found ${eachMatches.length} collection blocks:`, eachMatches.map(m => m.relationshipName));
 
     // Remove {#collection} blocks from template for scalar discovery
@@ -67,10 +100,15 @@ export function discoverFields(htmlTemplate, primaryObject) {
 
     // Find scalar tokens: {fieldPath} or {{fieldPath}} (excluding those in collection blocks)
     // Support both docxtemplater {field} and Handlebars {{field}} syntax
-    const scalarRegex = /\{\{?(?![#?\/])([\w.@]+)\}?\}/g;
+    // Exclude Handlebars block helpers like {{#each}}, {{#if}}, {{/each}}, etc.
+    const scalarRegex = /\{\{?(?![#\/])([\w.@]+)\}?\}/g;
     const scalarMatches = [];
     while ((match = scalarRegex.exec(templateWithoutCollections)) !== null) {
         const path = match[1].trim();
+        // Skip Handlebars helpers and block keywords
+        if (path === 'each' || path === 'if' || path === 'unless' || path === 'with' || path === 'eachRelated') {
+            continue;
+        }
         scalarMatches.push(path);
         if (path && !isHelperCall(path) && !isSpecialToken(path)) {
             payload.scalarPaths.add(path);
@@ -153,18 +191,57 @@ export function discoverFields(htmlTemplate, primaryObject) {
     payload.collections = Array.from(collectionMap.values());
     console.log(`  ✅ Reduced ${collectionMap.size} unique collections from duplicates`);
 
+    // Final safety check: Filter out invalid relationship names
+    const invalidNames = ['each', 'if', 'unless', 'with', 'eachRelated', 'this', 'root'];
+    console.log(`🔍 Before filtering: ${payload.collections.length} collections`);
+    payload.collections = payload.collections.filter(c => {
+        const relationshipName = c.relationshipName ? c.relationshipName.trim() : '';
+        const isValid = relationshipName &&
+            !invalidNames.includes(relationshipName.toLowerCase()) &&
+            /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(relationshipName) &&
+            relationshipName.toLowerCase() !== 'each';
+        
+        if (!isValid) {
+            console.error(`  ❌ FILTERING OUT INVALID RELATIONSHIP NAME: "${relationshipName}" (type: ${typeof relationshipName})`);
+            console.error(`     Collection object:`, JSON.stringify(c, null, 2));
+        }
+        return isValid;
+    });
+    console.log(`✅ After filtering: ${payload.collections.length} collections`);
+
     // Convert Sets to Arrays for serialization
     // NOTE: We send collections WITHOUT filtering/ordering to Apex - filtering happens client-side
     // This allows multiple filtered views of the same relationship in one template
     payload.scalarPaths = Array.from(payload.scalarPaths);
-    payload.collections = payload.collections.map(c => ({
-        relationshipName: c.relationshipName,
-        fieldPaths: Array.from(c.fieldPaths),
-        wherePredicate: null,  // No server-side filtering
-        orderBy: [],           // No server-side ordering
-        limitVal: null,        // No server-side limiting
-        offsetVal: null
-    }));
+    payload.collections = payload.collections.map(c => {
+        // Double-check relationship name one more time
+        const relationshipName = c.relationshipName ? String(c.relationshipName).trim() : '';
+        if (!relationshipName || relationshipName.toLowerCase() === 'each' || invalidNames.includes(relationshipName.toLowerCase())) {
+            console.error(`  ❌ CRITICAL: Found invalid relationship name in final mapping: "${relationshipName}"`);
+            throw new Error(`Invalid relationship name detected: "${relationshipName}"`);
+        }
+        return {
+            relationshipName: relationshipName,
+            fieldPaths: Array.from(c.fieldPaths),
+            wherePredicate: null,  // No server-side filtering
+            orderBy: [],           // No server-side ordering
+            limitVal: null,        // No server-side limiting
+            offsetVal: null
+        };
+    });
+
+    // Final validation before returning
+    const hasInvalidCollection = payload.collections.some(c => 
+        !c.relationshipName || 
+        c.relationshipName.toLowerCase() === 'each' ||
+        invalidNames.includes(c.relationshipName.toLowerCase())
+    );
+    
+    if (hasInvalidCollection) {
+        console.error('❌ CRITICAL ERROR: Invalid collection found in final payload!');
+        console.error('Collections:', JSON.stringify(payload.collections, null, 2));
+        throw new Error('Invalid relationship names detected in discovery payload');
+    }
 
     console.log('🎯 FINAL DISCOVERY PAYLOAD:');
     console.log('  📝 Scalar Paths:', payload.scalarPaths);

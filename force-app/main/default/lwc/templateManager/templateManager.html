@@ -1,4 +1,14 @@
 <template>
+    <!-- Hidden resource loaders - workaround for known Salesforce issue -->
+    <!-- https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
+    <c-resource-loader resource-url={pizzipUrl} onresourceloaded={handlePizzipLoaded}
+        onresourceerror={handleResourceError}></c-resource-loader>
+    <!-- Load docxtemplater only after PizZip is loaded (dependency) -->
+    <template if:true={pizzipLoaded}>
+        <c-resource-loader resource-url={docxtemplaterUrl} onresourceloaded={handleDocxtemplaterLoaded}
+            onresourceerror={handleResourceError}></c-resource-loader>
+    </template>
+
     <lightning-card title="Template Manager" icon-name="custom:custom55">
         <div slot="actions">
             <lightning-button label="New Template" variant="brand" onclick={handleNewTemplate}

@@ -1,321 +1,3299 @@
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-/******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./es6/arrayReader.js":
-/*!****************************!*\
-  !*** ./es6/arrayReader.js ***!
-  \****************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar DataReader = __webpack_require__(/*! ./dataReader.js */ \"./es6/dataReader.js\");\nfunction ArrayReader(data) {\n  if (data) {\n    this.data = data;\n    this.length = this.data.length;\n    this.index = 0;\n    this.zero = 0;\n    for (var i = 0; i < this.data.length; i++) {\n      data[i] &= data[i];\n    }\n  }\n}\nArrayReader.prototype = new DataReader();\n/**\n * @see DataReader.byteAt\n */\nArrayReader.prototype.byteAt = function (i) {\n  return this.data[this.zero + i];\n};\n/**\n * @see DataReader.lastIndexOfSignature\n */\nArrayReader.prototype.lastIndexOfSignature = function (sig) {\n  var sig0 = sig.charCodeAt(0),\n    sig1 = sig.charCodeAt(1),\n    sig2 = sig.charCodeAt(2),\n    sig3 = sig.charCodeAt(3);\n  for (var i = this.length - 4; i >= 0; --i) {\n    if (this.data[i] === sig0 && this.data[i + 1] === sig1 && this.data[i + 2] === sig2 && this.data[i + 3] === sig3) {\n      return i - this.zero;\n    }\n  }\n  return -1;\n};\n/**\n * @see DataReader.readData\n */\nArrayReader.prototype.readData = function (size) {\n  this.checkOffset(size);\n  if (size === 0) {\n    return [];\n  }\n  var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);\n  this.index += size;\n  return result;\n};\nmodule.exports = ArrayReader;\n\n//# sourceURL=webpack://PizZip/./es6/arrayReader.js?");
-
-/***/ }),
-
-/***/ "./es6/base64.js":
-/*!***********************!*\
-  !*** ./es6/base64.js ***!
-  \***********************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-eval("\n\n// private property\nvar _keyStr = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\";\n\n// public method for encoding\nexports.encode = function (input) {\n  var output = \"\";\n  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;\n  var i = 0;\n  while (i < input.length) {\n    chr1 = input.charCodeAt(i++);\n    chr2 = input.charCodeAt(i++);\n    chr3 = input.charCodeAt(i++);\n    enc1 = chr1 >> 2;\n    enc2 = (chr1 & 3) << 4 | chr2 >> 4;\n    enc3 = (chr2 & 15) << 2 | chr3 >> 6;\n    enc4 = chr3 & 63;\n    if (isNaN(chr2)) {\n      enc3 = enc4 = 64;\n    } else if (isNaN(chr3)) {\n      enc4 = 64;\n    }\n    output = output + _keyStr.charAt(enc1) + _keyStr.charAt(enc2) + _keyStr.charAt(enc3) + _keyStr.charAt(enc4);\n  }\n  return output;\n};\n\n// public method for decoding\nexports.decode = function (input) {\n  var output = \"\";\n  var chr1, chr2, chr3;\n  var enc1, enc2, enc3, enc4;\n  var i = 0;\n  input = input.replace(/[^A-Za-z0-9\\+\\/\\=]/g, \"\");\n  while (i < input.length) {\n    enc1 = _keyStr.indexOf(input.charAt(i++));\n    enc2 = _keyStr.indexOf(input.charAt(i++));\n    enc3 = _keyStr.indexOf(input.charAt(i++));\n    enc4 = _keyStr.indexOf(input.charAt(i++));\n    chr1 = enc1 << 2 | enc2 >> 4;\n    chr2 = (enc2 & 15) << 4 | enc3 >> 2;\n    chr3 = (enc3 & 3) << 6 | enc4;\n    output += String.fromCharCode(chr1);\n    if (enc3 !== 64) {\n      output += String.fromCharCode(chr2);\n    }\n    if (enc4 !== 64) {\n      output += String.fromCharCode(chr3);\n    }\n  }\n  return output;\n};\n\n//# sourceURL=webpack://PizZip/./es6/base64.js?");
-
-/***/ }),
-
-/***/ "./es6/compressedObject.js":
-/*!*********************************!*\
-  !*** ./es6/compressedObject.js ***!
-  \*********************************/
-/***/ ((module) => {
-
-"use strict";
-eval("\n\nfunction CompressedObject() {\n  this.compressedSize = 0;\n  this.uncompressedSize = 0;\n  this.crc32 = 0;\n  this.compressionMethod = null;\n  this.compressedContent = null;\n}\nCompressedObject.prototype = {\n  /**\n   * Return the decompressed content in an unspecified format.\n   * The format will depend on the decompressor.\n   * @return {Object} the decompressed content.\n   */\n  getContent: function getContent() {\n    return null; // see implementation\n  },\n  /**\n   * Return the compressed content in an unspecified format.\n   * The format will depend on the compressed conten source.\n   * @return {Object} the compressed content.\n   */\n  getCompressedContent: function getCompressedContent() {\n    return null; // see implementation\n  }\n};\n\nmodule.exports = CompressedObject;\n\n//# sourceURL=webpack://PizZip/./es6/compressedObject.js?");
-
-/***/ }),
-
-/***/ "./es6/compressions.js":
-/*!*****************************!*\
-  !*** ./es6/compressions.js ***!
-  \*****************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nexports.STORE = {\n  magic: \"\\x00\\x00\",\n  compress: function compress(content) {\n    return content; // no compression\n  },\n  uncompress: function uncompress(content) {\n    return content; // no compression\n  },\n\n  compressInputType: null,\n  uncompressInputType: null\n};\nexports.DEFLATE = __webpack_require__(/*! ./flate.js */ \"./es6/flate.js\");\n\n//# sourceURL=webpack://PizZip/./es6/compressions.js?");
-
-/***/ }),
-
-/***/ "./es6/crc32.js":
-/*!**********************!*\
-  !*** ./es6/crc32.js ***!
-  \**********************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\n\n// prettier-ignore\nvar table = [0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91, 0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7, 0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC, 0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5, 0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172, 0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B, 0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940, 0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59, 0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116, 0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F, 0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924, 0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D, 0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A, 0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433, 0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818, 0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01, 0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E, 0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457, 0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C, 0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65, 0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2, 0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB, 0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0, 0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9, 0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086, 0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F, 0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4, 0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD, 0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A, 0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683, 0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8, 0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1, 0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE, 0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7, 0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC, 0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5, 0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252, 0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B, 0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60, 0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79, 0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236, 0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F, 0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04, 0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D, 0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A, 0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713, 0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38, 0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21, 0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E, 0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777, 0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C, 0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45, 0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2, 0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB, 0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9, 0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D];\n\n/**\n *\n *  Javascript crc32\n *  http://www.webtoolkit.info/\n *\n */\nmodule.exports = function crc32(input, crc) {\n  if (typeof input === \"undefined\" || !input.length) {\n    return 0;\n  }\n  var isArray = utils.getTypeOf(input) !== \"string\";\n  if (typeof crc == \"undefined\") {\n    crc = 0;\n  }\n  var x = 0;\n  var y = 0;\n  var b = 0;\n  crc ^= -1;\n  for (var i = 0, iTop = input.length; i < iTop; i++) {\n    b = isArray ? input[i] : input.charCodeAt(i);\n    y = (crc ^ b) & 0xff;\n    x = table[y];\n    crc = crc >>> 8 ^ x;\n  }\n  return crc ^ -1;\n};\n\n//# sourceURL=webpack://PizZip/./es6/crc32.js?");
-
-/***/ }),
-
-/***/ "./es6/dataReader.js":
-/*!***************************!*\
-  !*** ./es6/dataReader.js ***!
-  \***************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nfunction DataReader() {\n  this.data = null; // type : see implementation\n  this.length = 0;\n  this.index = 0;\n  this.zero = 0;\n}\nDataReader.prototype = {\n  /**\n   * Check that the offset will not go too far.\n   * @param {string} offset the additional offset to check.\n   * @throws {Error} an Error if the offset is out of bounds.\n   */\n  checkOffset: function checkOffset(offset) {\n    this.checkIndex(this.index + offset);\n  },\n  /**\n   * Check that the specifed index will not be too far.\n   * @param {string} newIndex the index to check.\n   * @throws {Error} an Error if the index is out of bounds.\n   */\n  checkIndex: function checkIndex(newIndex) {\n    if (this.length < this.zero + newIndex || newIndex < 0) {\n      throw new Error(\"End of data reached (data length = \" + this.length + \", asked index = \" + newIndex + \"). Corrupted zip ?\");\n    }\n  },\n  /**\n   * Change the index.\n   * @param {number} newIndex The new index.\n   * @throws {Error} if the new index is out of the data.\n   */\n  setIndex: function setIndex(newIndex) {\n    this.checkIndex(newIndex);\n    this.index = newIndex;\n  },\n  /**\n   * Skip the next n bytes.\n   * @param {number} n the number of bytes to skip.\n   * @throws {Error} if the new index is out of the data.\n   */\n  skip: function skip(n) {\n    this.setIndex(this.index + n);\n  },\n  /**\n   * Get the byte at the specified index.\n   * @param {number} i the index to use.\n   * @return {number} a byte.\n   */\n  byteAt: function byteAt() {\n    // see implementations\n  },\n  /**\n   * Get the next number with a given byte size.\n   * @param {number} size the number of bytes to read.\n   * @return {number} the corresponding number.\n   */\n  readInt: function readInt(size) {\n    var result = 0,\n      i;\n    this.checkOffset(size);\n    for (i = this.index + size - 1; i >= this.index; i--) {\n      result = (result << 8) + this.byteAt(i);\n    }\n    this.index += size;\n    return result;\n  },\n  /**\n   * Get the next string with a given byte size.\n   * @param {number} size the number of bytes to read.\n   * @return {string} the corresponding string.\n   */\n  readString: function readString(size) {\n    return utils.transformTo(\"string\", this.readData(size));\n  },\n  /**\n   * Get raw data without conversion, <size> bytes.\n   * @param {number} size the number of bytes to read.\n   * @return {Object} the raw data, implementation specific.\n   */\n  readData: function readData() {\n    // see implementations\n  },\n  /**\n   * Find the last occurence of a zip signature (4 bytes).\n   * @param {string} sig the signature to find.\n   * @return {number} the index of the last occurence, -1 if not found.\n   */\n  lastIndexOfSignature: function lastIndexOfSignature() {\n    // see implementations\n  },\n  /**\n   * Get the next date.\n   * @return {Date} the date.\n   */\n  readDate: function readDate() {\n    var dostime = this.readInt(4);\n    return new Date((dostime >> 25 & 0x7f) + 1980,\n    // year\n    (dostime >> 21 & 0x0f) - 1,\n    // month\n    dostime >> 16 & 0x1f,\n    // day\n    dostime >> 11 & 0x1f,\n    // hour\n    dostime >> 5 & 0x3f,\n    // minute\n    (dostime & 0x1f) << 1); // second\n  }\n};\n\nmodule.exports = DataReader;\n\n//# sourceURL=webpack://PizZip/./es6/dataReader.js?");
-
-/***/ }),
-
-/***/ "./es6/defaults.js":
-/*!*************************!*\
-  !*** ./es6/defaults.js ***!
-  \*************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-eval("\n\nexports.base64 = false;\nexports.binary = false;\nexports.dir = false;\nexports.createFolders = false;\nexports.date = null;\nexports.compression = null;\nexports.compressionOptions = null;\nexports.comment = null;\nexports.unixPermissions = null;\nexports.dosPermissions = null;\n\n//# sourceURL=webpack://PizZip/./es6/defaults.js?");
-
-/***/ }),
-
-/***/ "./es6/deprecatedPublicUtils.js":
-/*!**************************************!*\
-  !*** ./es6/deprecatedPublicUtils.js ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.string2binary = function (str) {\n  return utils.string2binary(str);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.string2Uint8Array = function (str) {\n  return utils.transformTo(\"uint8array\", str);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.uint8Array2String = function (array) {\n  return utils.transformTo(\"string\", array);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.string2Blob = function (str) {\n  var buffer = utils.transformTo(\"arraybuffer\", str);\n  return utils.arrayBuffer2Blob(buffer);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.arrayBuffer2Blob = function (buffer) {\n  return utils.arrayBuffer2Blob(buffer);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.transformTo = function (outputType, input) {\n  return utils.transformTo(outputType, input);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.getTypeOf = function (input) {\n  return utils.getTypeOf(input);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.checkSupport = function (type) {\n  return utils.checkSupport(type);\n};\n\n/**\n * @deprecated\n * This value will be removed in a future version without replacement.\n */\nexports.MAX_VALUE_16BITS = utils.MAX_VALUE_16BITS;\n\n/**\n * @deprecated\n * This value will be removed in a future version without replacement.\n */\nexports.MAX_VALUE_32BITS = utils.MAX_VALUE_32BITS;\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.pretty = function (str) {\n  return utils.pretty(str);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.findCompression = function (compressionMethod) {\n  return utils.findCompression(compressionMethod);\n};\n\n/**\n * @deprecated\n * This function will be removed in a future version without replacement.\n */\nexports.isRegExp = function (object) {\n  return utils.isRegExp(object);\n};\n\n//# sourceURL=webpack://PizZip/./es6/deprecatedPublicUtils.js?");
-
-/***/ }),
-
-/***/ "./es6/flate.js":
-/*!**********************!*\
-  !*** ./es6/flate.js ***!
-  \**********************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar USE_TYPEDARRAY = typeof Uint8Array !== \"undefined\" && typeof Uint16Array !== \"undefined\" && typeof Uint32Array !== \"undefined\";\nvar pako = __webpack_require__(/*! pako/dist/pako.es5.js */ \"./node_modules/pako/dist/pako.es5.js\");\nexports.uncompressInputType = USE_TYPEDARRAY ? \"uint8array\" : \"array\";\nexports.compressInputType = USE_TYPEDARRAY ? \"uint8array\" : \"array\";\nexports.magic = \"\\x08\\x00\";\nexports.compress = function (input, compressionOptions) {\n  return pako.deflateRaw(input, {\n    level: compressionOptions.level || -1 // default compression\n  });\n};\n\nexports.uncompress = function (input) {\n  return pako.inflateRaw(input);\n};\n\n//# sourceURL=webpack://PizZip/./es6/flate.js?");
-
-/***/ }),
-
-/***/ "./es6/index.js":
-/*!**********************!*\
-  !*** ./es6/index.js ***!
-  \**********************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar base64 = __webpack_require__(/*! ./base64.js */ \"./es6/base64.js\");\n\n/**\nUsage:\n   zip = new PizZip();\n   zip.file(\"hello.txt\", \"Hello, World!\").file(\"tempfile\", \"nothing\");\n   zip.folder(\"images\").file(\"smile.gif\", base64Data, {base64: true});\n   zip.file(\"Xmas.txt\", \"Ho ho ho !\", {date : new Date(\"December 25, 2007 00:00:01\")});\n   zip.remove(\"tempfile\");\n\n   base64zip = zip.generate();\n\n**/\n\n/**\n * Representation a of zip file in js\n * @constructor\n * @param {String=|ArrayBuffer=|Uint8Array=} data the data to load, if any (optional).\n * @param {Object=} options the options for creating this objects (optional).\n */\nfunction PizZip(data, options) {\n  // if this constructor is used without `new`, it adds `new` before itself:\n  if (!(this instanceof PizZip)) {\n    return new PizZip(data, options);\n  }\n\n  // object containing the files :\n  // {\n  //   \"folder/\" : {...},\n  //   \"folder/data.txt\" : {...}\n  // }\n  this.files = {};\n  this.comment = null;\n\n  // Where we are in the hierarchy\n  this.root = \"\";\n  if (data) {\n    this.load(data, options);\n  }\n  this.clone = function () {\n    var _this = this;\n    var newObj = new PizZip();\n    Object.keys(this.files).forEach(function (file) {\n      newObj.file(file, _this.files[file].asUint8Array());\n    });\n    return newObj;\n  };\n  this.shallowClone = function () {\n    var newObj = new PizZip();\n    for (var i in this) {\n      if (typeof this[i] !== \"function\") {\n        newObj[i] = this[i];\n      }\n    }\n    return newObj;\n  };\n}\nPizZip.prototype = __webpack_require__(/*! ./object.js */ \"./es6/object.js\");\nPizZip.prototype.load = __webpack_require__(/*! ./load.js */ \"./es6/load.js\");\nPizZip.support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\nPizZip.defaults = __webpack_require__(/*! ./defaults.js */ \"./es6/defaults.js\");\n\n/**\n * @deprecated\n * This namespace will be removed in a future version without replacement.\n */\nPizZip.utils = __webpack_require__(/*! ./deprecatedPublicUtils.js */ \"./es6/deprecatedPublicUtils.js\");\nPizZip.base64 = {\n  /**\n   * @deprecated\n   * This method will be removed in a future version without replacement.\n   */\n  encode: function encode(input) {\n    return base64.encode(input);\n  },\n  /**\n   * @deprecated\n   * This method will be removed in a future version without replacement.\n   */\n  decode: function decode(input) {\n    return base64.decode(input);\n  }\n};\nPizZip.compressions = __webpack_require__(/*! ./compressions.js */ \"./es6/compressions.js\");\nmodule.exports = PizZip;\n\n//# sourceURL=webpack://PizZip/./es6/index.js?");
-
-/***/ }),
-
-/***/ "./es6/load.js":
-/*!*********************!*\
-  !*** ./es6/load.js ***!
-  \*********************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar base64 = __webpack_require__(/*! ./base64.js */ \"./es6/base64.js\");\nvar utf8 = __webpack_require__(/*! ./utf8.js */ \"./es6/utf8.js\");\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nvar ZipEntries = __webpack_require__(/*! ./zipEntries.js */ \"./es6/zipEntries.js\");\nmodule.exports = function (data, options) {\n  var i, input;\n  options = utils.extend(options || {}, {\n    base64: false,\n    checkCRC32: false,\n    optimizedBinaryString: false,\n    createFolders: false,\n    decodeFileName: utf8.utf8decode\n  });\n  if (options.base64) {\n    data = base64.decode(data);\n  }\n  var zipEntries = new ZipEntries(data, options);\n  var files = zipEntries.files;\n  for (i = 0; i < files.length; i++) {\n    input = files[i];\n    this.file(input.fileNameStr, input.decompressed, {\n      binary: true,\n      optimizedBinaryString: true,\n      date: input.date,\n      dir: input.dir,\n      comment: input.fileCommentStr.length ? input.fileCommentStr : null,\n      unixPermissions: input.unixPermissions,\n      dosPermissions: input.dosPermissions,\n      createFolders: options.createFolders\n    });\n  }\n  if (zipEntries.zipComment.length) {\n    this.comment = zipEntries.zipComment;\n  }\n  return this;\n};\n\n//# sourceURL=webpack://PizZip/./es6/load.js?");
-
-/***/ }),
-
-/***/ "./es6/nodeBuffer.js":
-/*!***************************!*\
-  !*** ./es6/nodeBuffer.js ***!
-  \***************************/
-/***/ ((module) => {
-
-"use strict";
-eval("\n\nmodule.exports = function (data, encoding) {\n  if (typeof data === \"number\") {\n    return Buffer.alloc(data);\n  }\n  return Buffer.from(data, encoding);\n};\nmodule.exports.test = function (b) {\n  return Buffer.isBuffer(b);\n};\n\n//# sourceURL=webpack://PizZip/./es6/nodeBuffer.js?");
-
-/***/ }),
-
-/***/ "./es6/nodeBufferReader.js":
-/*!*********************************!*\
-  !*** ./es6/nodeBufferReader.js ***!
-  \*********************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar Uint8ArrayReader = __webpack_require__(/*! ./uint8ArrayReader.js */ \"./es6/uint8ArrayReader.js\");\nfunction NodeBufferReader(data) {\n  this.data = data;\n  this.length = this.data.length;\n  this.index = 0;\n  this.zero = 0;\n}\nNodeBufferReader.prototype = new Uint8ArrayReader();\n\n/**\n * @see DataReader.readData\n */\nNodeBufferReader.prototype.readData = function (size) {\n  this.checkOffset(size);\n  var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);\n  this.index += size;\n  return result;\n};\nmodule.exports = NodeBufferReader;\n\n//# sourceURL=webpack://PizZip/./es6/nodeBufferReader.js?");
-
-/***/ }),
-
-/***/ "./es6/object.js":
-/*!***********************!*\
-  !*** ./es6/object.js ***!
-  \***********************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nvar _crc = __webpack_require__(/*! ./crc32.js */ \"./es6/crc32.js\");\nvar signature = __webpack_require__(/*! ./signature.js */ \"./es6/signature.js\");\nvar defaults = __webpack_require__(/*! ./defaults.js */ \"./es6/defaults.js\");\nvar base64 = __webpack_require__(/*! ./base64.js */ \"./es6/base64.js\");\nvar compressions = __webpack_require__(/*! ./compressions.js */ \"./es6/compressions.js\");\nvar CompressedObject = __webpack_require__(/*! ./compressedObject.js */ \"./es6/compressedObject.js\");\nvar nodeBuffer = __webpack_require__(/*! ./nodeBuffer.js */ \"./es6/nodeBuffer.js\");\nvar utf8 = __webpack_require__(/*! ./utf8.js */ \"./es6/utf8.js\");\nvar StringWriter = __webpack_require__(/*! ./stringWriter.js */ \"./es6/stringWriter.js\");\nvar Uint8ArrayWriter = __webpack_require__(/*! ./uint8ArrayWriter.js */ \"./es6/uint8ArrayWriter.js\");\n\n/**\n * Returns the raw data of a ZipObject, decompress the content if necessary.\n * @param {ZipObject} file the file to use.\n * @return {String|ArrayBuffer|Uint8Array|Buffer} the data.\n */\nfunction getRawData(file) {\n  if (file._data instanceof CompressedObject) {\n    file._data = file._data.getContent();\n    file.options.binary = true;\n    file.options.base64 = false;\n    if (utils.getTypeOf(file._data) === \"uint8array\") {\n      var copy = file._data;\n      // when reading an arraybuffer, the CompressedObject mechanism will keep it and subarray() a Uint8Array.\n      // if we request a file in the same format, we might get the same Uint8Array or its ArrayBuffer (the original zip file).\n      file._data = new Uint8Array(copy.length);\n      // with an empty Uint8Array, Opera fails with a \"Offset larger than array size\"\n      if (copy.length !== 0) {\n        file._data.set(copy, 0);\n      }\n    }\n  }\n  return file._data;\n}\n\n/**\n * Returns the data of a ZipObject in a binary form. If the content is an unicode string, encode it.\n * @param {ZipObject} file the file to use.\n * @return {String|ArrayBuffer|Uint8Array|Buffer} the data.\n */\nfunction getBinaryData(file) {\n  var result = getRawData(file),\n    type = utils.getTypeOf(result);\n  if (type === \"string\") {\n    if (!file.options.binary) {\n      // unicode text !\n      // unicode string => binary string is a painful process, check if we can avoid it.\n      if (support.nodebuffer) {\n        return nodeBuffer(result, \"utf-8\");\n      }\n    }\n    return file.asBinary();\n  }\n  return result;\n}\n\n// return the actual prototype of PizZip\nvar out = {\n  /**\n   * Read an existing zip and merge the data in the current PizZip object.\n   * The implementation is in pizzip-load.js, don't forget to include it.\n   * @param {String|ArrayBuffer|Uint8Array|Buffer} stream  The stream to load\n   * @param {Object} options Options for loading the stream.\n   *  options.base64 : is the stream in base64 ? default : false\n   * @return {PizZip} the current PizZip object\n   */\n  load: function load() {\n    throw new Error(\"Load method is not defined. Is the file pizzip-load.js included ?\");\n  },\n  /**\n   * Filter nested files/folders with the specified function.\n   * @param {Function} search the predicate to use :\n   * function (relativePath, file) {...}\n   * It takes 2 arguments : the relative path and the file.\n   * @return {Array} An array of matching elements.\n   */\n  filter: function filter(search) {\n    var result = [];\n    var filename, relativePath, file, fileClone;\n    for (filename in this.files) {\n      if (!this.files.hasOwnProperty(filename)) {\n        continue;\n      }\n      file = this.files[filename];\n      // return a new object, don't let the user mess with our internal objects :)\n      fileClone = new ZipObject(file.name, file._data, utils.extend(file.options));\n      relativePath = filename.slice(this.root.length, filename.length);\n      if (filename.slice(0, this.root.length) === this.root &&\n      // the file is in the current root\n      search(relativePath, fileClone)) {\n        // and the file matches the function\n        result.push(fileClone);\n      }\n    }\n    return result;\n  },\n  /**\n   * Add a file to the zip file, or search a file.\n   * @param   {string|RegExp} name The name of the file to add (if data is defined),\n   * the name of the file to find (if no data) or a regex to match files.\n   * @param   {String|ArrayBuffer|Uint8Array|Buffer} data  The file data, either raw or base64 encoded\n   * @param   {Object} o     File options\n   * @return  {PizZip|Object|Array} this PizZip object (when adding a file),\n   * a file (when searching by string) or an array of files (when searching by regex).\n   */\n  file: function file(name, data, o) {\n    if (arguments.length === 1) {\n      if (utils.isRegExp(name)) {\n        var regexp = name;\n        return this.filter(function (relativePath, file) {\n          return !file.dir && regexp.test(relativePath);\n        });\n      }\n      // text\n      return this.filter(function (relativePath, file) {\n        return !file.dir && relativePath === name;\n      })[0] || null;\n    }\n    // more than one argument : we have data !\n    name = this.root + name;\n    fileAdd.call(this, name, data, o);\n    return this;\n  },\n  /**\n   * Add a directory to the zip file, or search.\n   * @param   {String|RegExp} arg The name of the directory to add, or a regex to search folders.\n   * @return  {PizZip} an object with the new directory as the root, or an array containing matching folders.\n   */\n  folder: function folder(arg) {\n    if (!arg) {\n      return this;\n    }\n    if (utils.isRegExp(arg)) {\n      return this.filter(function (relativePath, file) {\n        return file.dir && arg.test(relativePath);\n      });\n    }\n\n    // else, name is a new folder\n    var name = this.root + arg;\n    var newFolder = folderAdd.call(this, name);\n\n    // Allow chaining by returning a new object with this folder as the root\n    var ret = this.shallowClone();\n    ret.root = newFolder.name;\n    return ret;\n  },\n  /**\n   * Delete a file, or a directory and all sub-files, from the zip\n   * @param {string} name the name of the file to delete\n   * @return {PizZip} this PizZip object\n   */\n  remove: function remove(name) {\n    name = this.root + name;\n    var file = this.files[name];\n    if (!file) {\n      // Look for any folders\n      if (name.slice(-1) !== \"/\") {\n        name += \"/\";\n      }\n      file = this.files[name];\n    }\n    if (file && !file.dir) {\n      // file\n      delete this.files[name];\n    } else {\n      // maybe a folder, delete recursively\n      var kids = this.filter(function (relativePath, file) {\n        return file.name.slice(0, name.length) === name;\n      });\n      for (var i = 0; i < kids.length; i++) {\n        delete this.files[kids[i].name];\n      }\n    }\n    return this;\n  },\n  /**\n   * Generate the complete zip file\n   * @param {Object} options the options to generate the zip file :\n   * - base64, (deprecated, use type instead) true to generate base64.\n   * - compression, \"STORE\" by default.\n   * - type, \"base64\" by default. Values are : string, base64, uint8array, arraybuffer, blob.\n   * @return {String|Uint8Array|ArrayBuffer|Buffer|Blob} the zip file\n   */\n  generate: function generate(options) {\n    options = utils.extend(options || {}, {\n      base64: true,\n      compression: \"STORE\",\n      compressionOptions: null,\n      type: \"base64\",\n      platform: \"DOS\",\n      comment: null,\n      mimeType: \"application/zip\",\n      encodeFileName: utf8.utf8encode\n    });\n    utils.checkSupport(options.type);\n\n    // accept nodejs `process.platform`\n    if (options.platform === \"darwin\" || options.platform === \"freebsd\" || options.platform === \"linux\" || options.platform === \"sunos\") {\n      options.platform = \"UNIX\";\n    }\n    if (options.platform === \"win32\") {\n      options.platform = \"DOS\";\n    }\n    var zipData = [],\n      encodedComment = utils.transformTo(\"string\", options.encodeFileName(options.comment || this.comment || \"\"));\n    var localDirLength = 0,\n      centralDirLength = 0,\n      writer,\n      i;\n\n    // first, generate all the zip parts.\n    for (var name in this.files) {\n      if (!this.files.hasOwnProperty(name)) {\n        continue;\n      }\n      var file = this.files[name];\n      var compressionName = file.options.compression || options.compression.toUpperCase();\n      var compression = compressions[compressionName];\n      if (!compression) {\n        throw new Error(compressionName + \" is not a valid compression method !\");\n      }\n      var compressionOptions = file.options.compressionOptions || options.compressionOptions || {};\n      var compressedObject = generateCompressedObjectFrom.call(this, file, compression, compressionOptions);\n      var zipPart = generateZipParts.call(this, name, file, compressedObject, localDirLength, options.platform, options.encodeFileName);\n      localDirLength += zipPart.fileRecord.length + compressedObject.compressedSize;\n      centralDirLength += zipPart.dirRecord.length;\n      zipData.push(zipPart);\n    }\n    var dirEnd = \"\";\n\n    // end of central dir signature\n    dirEnd = signature.CENTRAL_DIRECTORY_END +\n    // number of this disk\n    \"\\x00\\x00\" +\n    // number of the disk with the start of the central directory\n    \"\\x00\\x00\" +\n    // total number of entries in the central directory on this disk\n    decToHex(zipData.length, 2) +\n    // total number of entries in the central directory\n    decToHex(zipData.length, 2) +\n    // size of the central directory   4 bytes\n    decToHex(centralDirLength, 4) +\n    // offset of start of central directory with respect to the starting disk number\n    decToHex(localDirLength, 4) +\n    // .ZIP file comment length\n    decToHex(encodedComment.length, 2) +\n    // .ZIP file comment\n    encodedComment;\n\n    // we have all the parts (and the total length)\n    // time to create a writer !\n    var typeName = options.type.toLowerCase();\n    if (typeName === \"uint8array\" || typeName === \"arraybuffer\" || typeName === \"blob\" || typeName === \"nodebuffer\") {\n      writer = new Uint8ArrayWriter(localDirLength + centralDirLength + dirEnd.length);\n    } else {\n      writer = new StringWriter(localDirLength + centralDirLength + dirEnd.length);\n    }\n    for (i = 0; i < zipData.length; i++) {\n      writer.append(zipData[i].fileRecord);\n      writer.append(zipData[i].compressedObject.compressedContent);\n    }\n    for (i = 0; i < zipData.length; i++) {\n      writer.append(zipData[i].dirRecord);\n    }\n    writer.append(dirEnd);\n    var zip = writer.finalize();\n    switch (options.type.toLowerCase()) {\n      // case \"zip is an Uint8Array\"\n      case \"uint8array\":\n      case \"arraybuffer\":\n      case \"nodebuffer\":\n        return utils.transformTo(options.type.toLowerCase(), zip);\n      case \"blob\":\n        return utils.arrayBuffer2Blob(utils.transformTo(\"arraybuffer\", zip), options.mimeType);\n      // case \"zip is a string\"\n      case \"base64\":\n        return options.base64 ? base64.encode(zip) : zip;\n      default:\n        // case \"string\" :\n        return zip;\n    }\n  },\n  /**\n   * @deprecated\n   * This method will be removed in a future version without replacement.\n   */\n  crc32: function crc32(input, crc) {\n    return _crc(input, crc);\n  },\n  /**\n   * @deprecated\n   * This method will be removed in a future version without replacement.\n   */\n  utf8encode: function utf8encode(string) {\n    return utils.transformTo(\"string\", utf8.utf8encode(string));\n  },\n  /**\n   * @deprecated\n   * This method will be removed in a future version without replacement.\n   */\n  utf8decode: function utf8decode(input) {\n    return utf8.utf8decode(input);\n  }\n};\n/**\n * Transform this._data into a string.\n * @param {function} filter a function String -> String, applied if not null on the result.\n * @return {String} the string representing this._data.\n */\nfunction dataToString(asUTF8) {\n  var result = getRawData(this);\n  if (result === null || typeof result === \"undefined\") {\n    return \"\";\n  }\n  // if the data is a base64 string, we decode it before checking the encoding !\n  if (this.options.base64) {\n    result = base64.decode(result);\n  }\n  if (asUTF8 && this.options.binary) {\n    // PizZip.prototype.utf8decode supports arrays as input\n    // skip to array => string step, utf8decode will do it.\n    result = out.utf8decode(result);\n  } else {\n    // no utf8 transformation, do the array => string step.\n    result = utils.transformTo(\"string\", result);\n  }\n  if (!asUTF8 && !this.options.binary) {\n    result = utils.transformTo(\"string\", out.utf8encode(result));\n  }\n  return result;\n}\n/**\n * A simple object representing a file in the zip file.\n * @constructor\n * @param {string} name the name of the file\n * @param {String|ArrayBuffer|Uint8Array|Buffer} data the data\n * @param {Object} options the options of the file\n */\nfunction ZipObject(name, data, options) {\n  this.name = name;\n  this.dir = options.dir;\n  this.date = options.date;\n  this.comment = options.comment;\n  this.unixPermissions = options.unixPermissions;\n  this.dosPermissions = options.dosPermissions;\n  this._data = data;\n  this.options = options;\n\n  /*\n   * This object contains initial values for dir and date.\n   * With them, we can check if the user changed the deprecated metadata in\n   * `ZipObject#options` or not.\n   */\n  this._initialMetadata = {\n    dir: options.dir,\n    date: options.date\n  };\n}\nZipObject.prototype = {\n  /**\n   * Return the content as UTF8 string.\n   * @return {string} the UTF8 string.\n   */\n  asText: function asText() {\n    return dataToString.call(this, true);\n  },\n  /**\n   * Returns the binary content.\n   * @return {string} the content as binary.\n   */\n  asBinary: function asBinary() {\n    return dataToString.call(this, false);\n  },\n  /**\n   * Returns the content as a nodejs Buffer.\n   * @return {Buffer} the content as a Buffer.\n   */\n  asNodeBuffer: function asNodeBuffer() {\n    var result = getBinaryData(this);\n    return utils.transformTo(\"nodebuffer\", result);\n  },\n  /**\n   * Returns the content as an Uint8Array.\n   * @return {Uint8Array} the content as an Uint8Array.\n   */\n  asUint8Array: function asUint8Array() {\n    var result = getBinaryData(this);\n    return utils.transformTo(\"uint8array\", result);\n  },\n  /**\n   * Returns the content as an ArrayBuffer.\n   * @return {ArrayBuffer} the content as an ArrayBufer.\n   */\n  asArrayBuffer: function asArrayBuffer() {\n    return this.asUint8Array().buffer;\n  }\n};\n\n/**\n * Transform an integer into a string in hexadecimal.\n * @private\n * @param {number} dec the number to convert.\n * @param {number} bytes the number of bytes to generate.\n * @returns {string} the result.\n */\nfunction decToHex(dec, bytes) {\n  var hex = \"\",\n    i;\n  for (i = 0; i < bytes; i++) {\n    hex += String.fromCharCode(dec & 0xff);\n    dec >>>= 8;\n  }\n  return hex;\n}\n\n/**\n * Transforms the (incomplete) options from the user into the complete\n * set of options to create a file.\n * @private\n * @param {Object} o the options from the user.\n * @return {Object} the complete set of options.\n */\nfunction prepareFileAttrs(o) {\n  o = o || {};\n  if (o.base64 === true && (o.binary === null || o.binary === undefined)) {\n    o.binary = true;\n  }\n  o = utils.extend(o, defaults);\n  o.date = o.date || new Date();\n  if (o.compression !== null) {\n    o.compression = o.compression.toUpperCase();\n  }\n  return o;\n}\n\n/**\n * Add a file in the current folder.\n * @private\n * @param {string} name the name of the file\n * @param {String|ArrayBuffer|Uint8Array|Buffer} data the data of the file\n * @param {Object} o the options of the file\n * @return {Object} the new file.\n */\nfunction fileAdd(name, data, o) {\n  // be sure sub folders exist\n  var dataType = utils.getTypeOf(data),\n    parent;\n  o = prepareFileAttrs(o);\n  if (typeof o.unixPermissions === \"string\") {\n    o.unixPermissions = parseInt(o.unixPermissions, 8);\n  }\n\n  // UNX_IFDIR  0040000 see zipinfo.c\n  if (o.unixPermissions && o.unixPermissions & 0x4000) {\n    o.dir = true;\n  }\n  // Bit 4    Directory\n  if (o.dosPermissions && o.dosPermissions & 0x0010) {\n    o.dir = true;\n  }\n  if (o.dir) {\n    name = forceTrailingSlash(name);\n  }\n  if (o.createFolders && (parent = parentFolder(name))) {\n    folderAdd.call(this, parent, true);\n  }\n  if (o.dir || data === null || typeof data === \"undefined\") {\n    o.base64 = false;\n    o.binary = false;\n    data = null;\n    dataType = null;\n  } else if (dataType === \"string\") {\n    if (o.binary && !o.base64) {\n      // optimizedBinaryString == true means that the file has already been filtered with a 0xFF mask\n      if (o.optimizedBinaryString !== true) {\n        // this is a string, not in a base64 format.\n        // Be sure that this is a correct \"binary string\"\n        data = utils.string2binary(data);\n      }\n    }\n  } else {\n    // arraybuffer, uint8array, ...\n    o.base64 = false;\n    o.binary = true;\n    if (!dataType && !(data instanceof CompressedObject)) {\n      throw new Error(\"The data of '\" + name + \"' is in an unsupported format !\");\n    }\n\n    // special case : it's way easier to work with Uint8Array than with ArrayBuffer\n    if (dataType === \"arraybuffer\") {\n      data = utils.transformTo(\"uint8array\", data);\n    }\n  }\n  var object = new ZipObject(name, data, o);\n  this.files[name] = object;\n  return object;\n}\n\n/**\n * Find the parent folder of the path.\n * @private\n * @param {string} path the path to use\n * @return {string} the parent folder, or \"\"\n */\nfunction parentFolder(path) {\n  if (path.slice(-1) === \"/\") {\n    path = path.substring(0, path.length - 1);\n  }\n  var lastSlash = path.lastIndexOf(\"/\");\n  return lastSlash > 0 ? path.substring(0, lastSlash) : \"\";\n}\n\n/**\n * Returns the path with a slash at the end.\n * @private\n * @param {String} path the path to check.\n * @return {String} the path with a trailing slash.\n */\nfunction forceTrailingSlash(path) {\n  // Check the name ends with a /\n  if (path.slice(-1) !== \"/\") {\n    path += \"/\"; // IE doesn't like substr(-1)\n  }\n\n  return path;\n}\n/**\n * Add a (sub) folder in the current folder.\n * @private\n * @param {string} name the folder's name\n * @param {boolean=} [createFolders] If true, automatically create sub\n *  folders. Defaults to false.\n * @return {Object} the new folder.\n */\nfunction folderAdd(name, createFolders) {\n  createFolders = typeof createFolders !== \"undefined\" ? createFolders : false;\n  name = forceTrailingSlash(name);\n\n  // Does this folder already exist?\n  if (!this.files[name]) {\n    fileAdd.call(this, name, null, {\n      dir: true,\n      createFolders: createFolders\n    });\n  }\n  return this.files[name];\n}\n\n/**\n * Generate a PizZip.CompressedObject for a given zipOject.\n * @param {ZipObject} file the object to read.\n * @param {PizZip.compression} compression the compression to use.\n * @param {Object} compressionOptions the options to use when compressing.\n * @return {PizZip.CompressedObject} the compressed result.\n */\nfunction generateCompressedObjectFrom(file, compression, compressionOptions) {\n  var result = new CompressedObject();\n  var content;\n\n  // the data has not been decompressed, we might reuse things !\n  if (file._data instanceof CompressedObject) {\n    result.uncompressedSize = file._data.uncompressedSize;\n    result.crc32 = file._data.crc32;\n    if (result.uncompressedSize === 0 || file.dir) {\n      compression = compressions.STORE;\n      result.compressedContent = \"\";\n      result.crc32 = 0;\n    } else if (file._data.compressionMethod === compression.magic) {\n      result.compressedContent = file._data.getCompressedContent();\n    } else {\n      content = file._data.getContent();\n      // need to decompress / recompress\n      result.compressedContent = compression.compress(utils.transformTo(compression.compressInputType, content), compressionOptions);\n    }\n  } else {\n    // have uncompressed data\n    content = getBinaryData(file);\n    if (!content || content.length === 0 || file.dir) {\n      compression = compressions.STORE;\n      content = \"\";\n    }\n    result.uncompressedSize = content.length;\n    result.crc32 = _crc(content);\n    result.compressedContent = compression.compress(utils.transformTo(compression.compressInputType, content), compressionOptions);\n  }\n  result.compressedSize = result.compressedContent.length;\n  result.compressionMethod = compression.magic;\n  return result;\n}\n\n/**\n * Generate the UNIX part of the external file attributes.\n * @param {Object} unixPermissions the unix permissions or null.\n * @param {Boolean} isDir true if the entry is a directory, false otherwise.\n * @return {Number} a 32 bit integer.\n *\n * adapted from http://unix.stackexchange.com/questions/14705/the-zip-formats-external-file-attribute :\n *\n * TTTTsstrwxrwxrwx0000000000ADVSHR\n * ^^^^____________________________ file type, see zipinfo.c (UNX_*)\n *     ^^^_________________________ setuid, setgid, sticky\n *        ^^^^^^^^^________________ permissions\n *                 ^^^^^^^^^^______ not used ?\n *                           ^^^^^^ DOS attribute bits : Archive, Directory, Volume label, System file, Hidden, Read only\n */\nfunction generateUnixExternalFileAttr(unixPermissions, isDir) {\n  var result = unixPermissions;\n  if (!unixPermissions) {\n    // I can't use octal values in strict mode, hence the hexa.\n    //  040775 => 0x41fd\n    // 0100664 => 0x81b4\n    result = isDir ? 0x41fd : 0x81b4;\n  }\n  return (result & 0xffff) << 16;\n}\n\n/**\n * Generate the DOS part of the external file attributes.\n * @param {Object} dosPermissions the dos permissions or null.\n * @param {Boolean} isDir true if the entry is a directory, false otherwise.\n * @return {Number} a 32 bit integer.\n *\n * Bit 0     Read-Only\n * Bit 1     Hidden\n * Bit 2     System\n * Bit 3     Volume Label\n * Bit 4     Directory\n * Bit 5     Archive\n */\nfunction generateDosExternalFileAttr(dosPermissions) {\n  // the dir flag is already set for compatibility\n\n  return (dosPermissions || 0) & 0x3f;\n}\n\n/**\n * Generate the various parts used in the construction of the final zip file.\n * @param {string} name the file name.\n * @param {ZipObject} file the file content.\n * @param {PizZip.CompressedObject} compressedObject the compressed object.\n * @param {number} offset the current offset from the start of the zip file.\n * @param {String} platform let's pretend we are this platform (change platform dependents fields)\n * @param {Function} encodeFileName the function to encode the file name / comment.\n * @return {object} the zip parts.\n */\nfunction generateZipParts(name, file, compressedObject, offset, platform, encodeFileName) {\n  var useCustomEncoding = encodeFileName !== utf8.utf8encode,\n    encodedFileName = utils.transformTo(\"string\", encodeFileName(file.name)),\n    utfEncodedFileName = utils.transformTo(\"string\", utf8.utf8encode(file.name)),\n    comment = file.comment || \"\",\n    encodedComment = utils.transformTo(\"string\", encodeFileName(comment)),\n    utfEncodedComment = utils.transformTo(\"string\", utf8.utf8encode(comment)),\n    useUTF8ForFileName = utfEncodedFileName.length !== file.name.length,\n    useUTF8ForComment = utfEncodedComment.length !== comment.length,\n    o = file.options;\n  var dosTime,\n    dosDate,\n    extraFields = \"\",\n    unicodePathExtraField = \"\",\n    unicodeCommentExtraField = \"\",\n    dir,\n    date;\n\n  // handle the deprecated options.dir\n  if (file._initialMetadata.dir !== file.dir) {\n    dir = file.dir;\n  } else {\n    dir = o.dir;\n  }\n\n  // handle the deprecated options.date\n  if (file._initialMetadata.date !== file.date) {\n    date = file.date;\n  } else {\n    date = o.date;\n  }\n  var extFileAttr = 0;\n  var versionMadeBy = 0;\n  if (dir) {\n    // dos or unix, we set the dos dir flag\n    extFileAttr |= 0x00010;\n  }\n  if (platform === \"UNIX\") {\n    versionMadeBy = 0x031e; // UNIX, version 3.0\n    extFileAttr |= generateUnixExternalFileAttr(file.unixPermissions, dir);\n  } else {\n    // DOS or other, fallback to DOS\n    versionMadeBy = 0x0014; // DOS, version 2.0\n    extFileAttr |= generateDosExternalFileAttr(file.dosPermissions, dir);\n  }\n\n  // date\n  // @see http://www.delorie.com/djgpp/doc/rbinter/it/52/13.html\n  // @see http://www.delorie.com/djgpp/doc/rbinter/it/65/16.html\n  // @see http://www.delorie.com/djgpp/doc/rbinter/it/66/16.html\n\n  dosTime = date.getHours();\n  dosTime <<= 6;\n  dosTime |= date.getMinutes();\n  dosTime <<= 5;\n  dosTime |= date.getSeconds() / 2;\n  dosDate = date.getFullYear() - 1980;\n  dosDate <<= 4;\n  dosDate |= date.getMonth() + 1;\n  dosDate <<= 5;\n  dosDate |= date.getDate();\n  if (useUTF8ForFileName) {\n    // set the unicode path extra field. unzip needs at least one extra\n    // field to correctly handle unicode path, so using the path is as good\n    // as any other information. This could improve the situation with\n    // other archive managers too.\n    // This field is usually used without the utf8 flag, with a non\n    // unicode path in the header (winrar, winzip). This helps (a bit)\n    // with the messy Windows' default compressed folders feature but\n    // breaks on p7zip which doesn't seek the unicode path extra field.\n    // So for now, UTF-8 everywhere !\n    unicodePathExtraField =\n    // Version\n    decToHex(1, 1) +\n    // NameCRC32\n    decToHex(_crc(encodedFileName), 4) +\n    // UnicodeName\n    utfEncodedFileName;\n    extraFields +=\n    // Info-ZIP Unicode Path Extra Field\n    \"\\x75\\x70\" +\n    // size\n    decToHex(unicodePathExtraField.length, 2) +\n    // content\n    unicodePathExtraField;\n  }\n  if (useUTF8ForComment) {\n    unicodeCommentExtraField =\n    // Version\n    decToHex(1, 1) +\n    // CommentCRC32\n    decToHex(this.crc32(encodedComment), 4) +\n    // UnicodeName\n    utfEncodedComment;\n    extraFields +=\n    // Info-ZIP Unicode Path Extra Field\n    \"\\x75\\x63\" +\n    // size\n    decToHex(unicodeCommentExtraField.length, 2) +\n    // content\n    unicodeCommentExtraField;\n  }\n  var header = \"\";\n\n  // version needed to extract\n  header += \"\\x0A\\x00\";\n  // general purpose bit flag\n  // set bit 11 if utf8\n  header += !useCustomEncoding && (useUTF8ForFileName || useUTF8ForComment) ? \"\\x00\\x08\" : \"\\x00\\x00\";\n  // compression method\n  header += compressedObject.compressionMethod;\n  // last mod file time\n  header += decToHex(dosTime, 2);\n  // last mod file date\n  header += decToHex(dosDate, 2);\n  // crc-32\n  header += decToHex(compressedObject.crc32, 4);\n  // compressed size\n  header += decToHex(compressedObject.compressedSize, 4);\n  // uncompressed size\n  header += decToHex(compressedObject.uncompressedSize, 4);\n  // file name length\n  header += decToHex(encodedFileName.length, 2);\n  // extra field length\n  header += decToHex(extraFields.length, 2);\n  var fileRecord = signature.LOCAL_FILE_HEADER + header + encodedFileName + extraFields;\n  var dirRecord = signature.CENTRAL_FILE_HEADER +\n  // version made by (00: DOS)\n  decToHex(versionMadeBy, 2) +\n  // file header (common to file and central directory)\n  header +\n  // file comment length\n  decToHex(encodedComment.length, 2) +\n  // disk number start\n  \"\\x00\\x00\" +\n  // internal file attributes\n  \"\\x00\\x00\" +\n  // external file attributes\n  decToHex(extFileAttr, 4) +\n  // relative offset of local header\n  decToHex(offset, 4) +\n  // file name\n  encodedFileName +\n  // extra field\n  extraFields +\n  // file comment\n  encodedComment;\n  return {\n    fileRecord: fileRecord,\n    dirRecord: dirRecord,\n    compressedObject: compressedObject\n  };\n}\nmodule.exports = out;\n\n//# sourceURL=webpack://PizZip/./es6/object.js?");
-
-/***/ }),
-
-/***/ "./es6/signature.js":
-/*!**************************!*\
-  !*** ./es6/signature.js ***!
-  \**************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-eval("\n\nexports.LOCAL_FILE_HEADER = \"PK\\x03\\x04\";\nexports.CENTRAL_FILE_HEADER = \"PK\\x01\\x02\";\nexports.CENTRAL_DIRECTORY_END = \"PK\\x05\\x06\";\nexports.ZIP64_CENTRAL_DIRECTORY_LOCATOR = \"PK\\x06\\x07\";\nexports.ZIP64_CENTRAL_DIRECTORY_END = \"PK\\x06\\x06\";\nexports.DATA_DESCRIPTOR = \"PK\\x07\\x08\";\n\n//# sourceURL=webpack://PizZip/./es6/signature.js?");
-
-/***/ }),
-
-/***/ "./es6/stringReader.js":
-/*!*****************************!*\
-  !*** ./es6/stringReader.js ***!
-  \*****************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar DataReader = __webpack_require__(/*! ./dataReader.js */ \"./es6/dataReader.js\");\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nfunction StringReader(data, optimizedBinaryString) {\n  this.data = data;\n  if (!optimizedBinaryString) {\n    this.data = utils.string2binary(this.data);\n  }\n  this.length = this.data.length;\n  this.index = 0;\n  this.zero = 0;\n}\nStringReader.prototype = new DataReader();\n/**\n * @see DataReader.byteAt\n */\nStringReader.prototype.byteAt = function (i) {\n  return this.data.charCodeAt(this.zero + i);\n};\n/**\n * @see DataReader.lastIndexOfSignature\n */\nStringReader.prototype.lastIndexOfSignature = function (sig) {\n  return this.data.lastIndexOf(sig) - this.zero;\n};\n/**\n * @see DataReader.readData\n */\nStringReader.prototype.readData = function (size) {\n  this.checkOffset(size);\n  // this will work because the constructor applied the \"& 0xff\" mask.\n  var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);\n  this.index += size;\n  return result;\n};\nmodule.exports = StringReader;\n\n//# sourceURL=webpack://PizZip/./es6/stringReader.js?");
-
-/***/ }),
-
-/***/ "./es6/stringWriter.js":
-/*!*****************************!*\
-  !*** ./es6/stringWriter.js ***!
-  \*****************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\n\n/**\n * An object to write any content to a string.\n * @constructor\n */\nfunction StringWriter() {\n  this.data = [];\n}\nStringWriter.prototype = {\n  /**\n   * Append any content to the current string.\n   * @param {Object} input the content to add.\n   */\n  append: function append(input) {\n    input = utils.transformTo(\"string\", input);\n    this.data.push(input);\n  },\n  /**\n   * Finalize the construction an return the result.\n   * @return {string} the generated string.\n   */\n  finalize: function finalize() {\n    return this.data.join(\"\");\n  }\n};\nmodule.exports = StringWriter;\n\n//# sourceURL=webpack://PizZip/./es6/stringWriter.js?");
-
-/***/ }),
-
-/***/ "./es6/support.js":
-/*!************************!*\
-  !*** ./es6/support.js ***!
-  \************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-eval("\n\nexports.base64 = true;\nexports.array = true;\nexports.string = true;\nexports.arraybuffer = typeof ArrayBuffer !== \"undefined\" && typeof Uint8Array !== \"undefined\";\n// contains true if PizZip can read/generate nodejs Buffer, false otherwise.\n// Browserify will provide a Buffer implementation for browsers, which is\n// an augmented Uint8Array (i.e., can be used as either Buffer or U8).\nexports.nodebuffer = typeof Buffer !== \"undefined\";\n// contains true if PizZip can read/generate Uint8Array, false otherwise.\nexports.uint8array = typeof Uint8Array !== \"undefined\";\nif (typeof ArrayBuffer === \"undefined\") {\n  exports.blob = false;\n} else {\n  var buffer = new ArrayBuffer(0);\n  try {\n    exports.blob = new Blob([buffer], {\n      type: \"application/zip\"\n    }).size === 0;\n  } catch (e) {\n    try {\n      var Builder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;\n      var builder = new Builder();\n      builder.append(buffer);\n      exports.blob = builder.getBlob(\"application/zip\").size === 0;\n    } catch (e) {\n      exports.blob = false;\n    }\n  }\n}\n\n//# sourceURL=webpack://PizZip/./es6/support.js?");
-
-/***/ }),
-
-/***/ "./es6/uint8ArrayReader.js":
-/*!*********************************!*\
-  !*** ./es6/uint8ArrayReader.js ***!
-  \*********************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar ArrayReader = __webpack_require__(/*! ./arrayReader.js */ \"./es6/arrayReader.js\");\nfunction Uint8ArrayReader(data) {\n  if (data) {\n    this.data = data;\n    this.length = this.data.length;\n    this.index = 0;\n    this.zero = 0;\n  }\n}\nUint8ArrayReader.prototype = new ArrayReader();\n/**\n * @see DataReader.readData\n */\nUint8ArrayReader.prototype.readData = function (size) {\n  this.checkOffset(size);\n  if (size === 0) {\n    // in IE10, when using subarray(idx, idx), we get the array [0x00] instead of [].\n    return new Uint8Array(0);\n  }\n  var result = this.data.subarray(this.zero + this.index, this.zero + this.index + size);\n  this.index += size;\n  return result;\n};\nmodule.exports = Uint8ArrayReader;\n\n//# sourceURL=webpack://PizZip/./es6/uint8ArrayReader.js?");
-
-/***/ }),
-
-/***/ "./es6/uint8ArrayWriter.js":
-/*!*********************************!*\
-  !*** ./es6/uint8ArrayWriter.js ***!
-  \*********************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\n\n/**\n * An object to write any content to an Uint8Array.\n * @constructor\n * @param {number} length The length of the array.\n */\nfunction Uint8ArrayWriter(length) {\n  this.data = new Uint8Array(length);\n  this.index = 0;\n}\nUint8ArrayWriter.prototype = {\n  /**\n   * Append any content to the current array.\n   * @param {Object} input the content to add.\n   */\n  append: function append(input) {\n    if (input.length !== 0) {\n      // with an empty Uint8Array, Opera fails with a \"Offset larger than array size\"\n      input = utils.transformTo(\"uint8array\", input);\n      this.data.set(input, this.index);\n      this.index += input.length;\n    }\n  },\n  /**\n   * Finalize the construction an return the result.\n   * @return {Uint8Array} the generated array.\n   */\n  finalize: function finalize() {\n    return this.data;\n  }\n};\nmodule.exports = Uint8ArrayWriter;\n\n//# sourceURL=webpack://PizZip/./es6/uint8ArrayWriter.js?");
-
-/***/ }),
-
-/***/ "./es6/utf8.js":
-/*!*********************!*\
-  !*** ./es6/utf8.js ***!
-  \*********************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nvar support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\nvar nodeBuffer = __webpack_require__(/*! ./nodeBuffer.js */ \"./es6/nodeBuffer.js\");\n\n/**\n * The following functions come from pako, from pako/lib/utils/strings\n * released under the MIT license, see pako https://github.com/nodeca/pako/\n */\n\n// Table with utf8 lengths (calculated by first byte of sequence)\n// Note, that 5 & 6-byte values and some 4-byte values can not be represented in JS,\n// because max possible codepoint is 0x10ffff\nvar _utf8len = new Array(256);\nfor (var i = 0; i < 256; i++) {\n  _utf8len[i] = i >= 252 ? 6 : i >= 248 ? 5 : i >= 240 ? 4 : i >= 224 ? 3 : i >= 192 ? 2 : 1;\n}\n_utf8len[254] = _utf8len[254] = 1; // Invalid sequence start\n\n// convert string to array (typed, when possible)\nfunction string2buf(str) {\n  var buf,\n    c,\n    c2,\n    mPos,\n    i,\n    bufLen = 0;\n  var strLen = str.length;\n\n  // count binary size\n  for (mPos = 0; mPos < strLen; mPos++) {\n    c = str.charCodeAt(mPos);\n    if ((c & 0xfc00) === 0xd800 && mPos + 1 < strLen) {\n      c2 = str.charCodeAt(mPos + 1);\n      if ((c2 & 0xfc00) === 0xdc00) {\n        c = 0x10000 + (c - 0xd800 << 10) + (c2 - 0xdc00);\n        mPos++;\n      }\n    }\n    bufLen += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;\n  }\n\n  // allocate buffer\n  if (support.uint8array) {\n    buf = new Uint8Array(bufLen);\n  } else {\n    buf = new Array(bufLen);\n  }\n\n  // convert\n  for (i = 0, mPos = 0; i < bufLen; mPos++) {\n    c = str.charCodeAt(mPos);\n    if ((c & 0xfc00) === 0xd800 && mPos + 1 < strLen) {\n      c2 = str.charCodeAt(mPos + 1);\n      if ((c2 & 0xfc00) === 0xdc00) {\n        c = 0x10000 + (c - 0xd800 << 10) + (c2 - 0xdc00);\n        mPos++;\n      }\n    }\n    if (c < 0x80) {\n      /* one byte */\n      buf[i++] = c;\n    } else if (c < 0x800) {\n      /* two bytes */\n      buf[i++] = 0xc0 | c >>> 6;\n      buf[i++] = 0x80 | c & 0x3f;\n    } else if (c < 0x10000) {\n      /* three bytes */\n      buf[i++] = 0xe0 | c >>> 12;\n      buf[i++] = 0x80 | c >>> 6 & 0x3f;\n      buf[i++] = 0x80 | c & 0x3f;\n    } else {\n      /* four bytes */\n      buf[i++] = 0xf0 | c >>> 18;\n      buf[i++] = 0x80 | c >>> 12 & 0x3f;\n      buf[i++] = 0x80 | c >>> 6 & 0x3f;\n      buf[i++] = 0x80 | c & 0x3f;\n    }\n  }\n  return buf;\n}\n\n// Calculate max possible position in utf8 buffer,\n// that will not break sequence. If that's not possible\n// - (very small limits) return max size as is.\n//\n// buf[] - utf8 bytes array\n// max   - length limit (mandatory);\nfunction utf8border(buf, max) {\n  var pos;\n  max = max || buf.length;\n  if (max > buf.length) {\n    max = buf.length;\n  }\n\n  // go back from last position, until start of sequence found\n  pos = max - 1;\n  while (pos >= 0 && (buf[pos] & 0xc0) === 0x80) {\n    pos--;\n  }\n\n  // Fuckup - very small and broken sequence,\n  // return max, because we should return something anyway.\n  if (pos < 0) {\n    return max;\n  }\n\n  // If we came to start of buffer - that means vuffer is too small,\n  // return max too.\n  if (pos === 0) {\n    return max;\n  }\n  return pos + _utf8len[buf[pos]] > max ? pos : max;\n}\n\n// convert array to string\nfunction buf2string(buf) {\n  var i, out, c, cLen;\n  var len = buf.length;\n\n  // Reserve max possible length (2 words per char)\n  // NB: by unknown reasons, Array is significantly faster for\n  //     String.fromCharCode.apply than Uint16Array.\n  var utf16buf = new Array(len * 2);\n  for (out = 0, i = 0; i < len;) {\n    c = buf[i++];\n    // quick process ascii\n    if (c < 0x80) {\n      utf16buf[out++] = c;\n      continue;\n    }\n    cLen = _utf8len[c];\n    // skip 5 & 6 byte codes\n    if (cLen > 4) {\n      utf16buf[out++] = 0xfffd;\n      i += cLen - 1;\n      continue;\n    }\n\n    // apply mask on first byte\n    c &= cLen === 2 ? 0x1f : cLen === 3 ? 0x0f : 0x07;\n    // join the rest\n    while (cLen > 1 && i < len) {\n      c = c << 6 | buf[i++] & 0x3f;\n      cLen--;\n    }\n\n    // terminated by end of string?\n    if (cLen > 1) {\n      utf16buf[out++] = 0xfffd;\n      continue;\n    }\n    if (c < 0x10000) {\n      utf16buf[out++] = c;\n    } else {\n      c -= 0x10000;\n      utf16buf[out++] = 0xd800 | c >> 10 & 0x3ff;\n      utf16buf[out++] = 0xdc00 | c & 0x3ff;\n    }\n  }\n\n  // shrinkBuf(utf16buf, out)\n  if (utf16buf.length !== out) {\n    if (utf16buf.subarray) {\n      utf16buf = utf16buf.subarray(0, out);\n    } else {\n      utf16buf.length = out;\n    }\n  }\n\n  // return String.fromCharCode.apply(null, utf16buf);\n  return utils.applyFromCharCode(utf16buf);\n}\n\n// That's all for the pako functions.\n\n/**\n * Transform a javascript string into an array (typed if possible) of bytes,\n * UTF-8 encoded.\n * @param {String} str the string to encode\n * @return {Array|Uint8Array|Buffer} the UTF-8 encoded string.\n */\nexports.utf8encode = function utf8encode(str) {\n  if (support.nodebuffer) {\n    return nodeBuffer(str, \"utf-8\");\n  }\n  return string2buf(str);\n};\n\n/**\n * Transform a bytes array (or a representation) representing an UTF-8 encoded\n * string into a javascript string.\n * @param {Array|Uint8Array|Buffer} buf the data de decode\n * @return {String} the decoded string.\n */\nexports.utf8decode = function utf8decode(buf) {\n  if (support.nodebuffer) {\n    return utils.transformTo(\"nodebuffer\", buf).toString(\"utf-8\");\n  }\n  buf = utils.transformTo(support.uint8array ? \"uint8array\" : \"array\", buf);\n\n  // return buf2string(buf);\n  // Chrome prefers to work with \"small\" chunks of data\n  // for the method buf2string.\n  // Firefox and Chrome has their own shortcut, IE doesn't seem to really care.\n  var result = [],\n    len = buf.length,\n    chunk = 65536;\n  var k = 0;\n  while (k < len) {\n    var nextBoundary = utf8border(buf, Math.min(k + chunk, len));\n    if (support.uint8array) {\n      result.push(buf2string(buf.subarray(k, nextBoundary)));\n    } else {\n      result.push(buf2string(buf.slice(k, nextBoundary)));\n    }\n    k = nextBoundary;\n  }\n  return result.join(\"\");\n};\n\n//# sourceURL=webpack://PizZip/./es6/utf8.js?");
-
-/***/ }),
-
-/***/ "./es6/utils.js":
-/*!**********************!*\
-  !*** ./es6/utils.js ***!
-  \**********************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nfunction _typeof(obj) { \"@babel/helpers - typeof\"; return _typeof = \"function\" == typeof Symbol && \"symbol\" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && \"function\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj; }, _typeof(obj); }\nvar support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\nvar compressions = __webpack_require__(/*! ./compressions.js */ \"./es6/compressions.js\");\nvar nodeBuffer = __webpack_require__(/*! ./nodeBuffer.js */ \"./es6/nodeBuffer.js\");\n/**\n * Convert a string to a \"binary string\" : a string containing only char codes between 0 and 255.\n * @param {string} str the string to transform.\n * @return {String} the binary string.\n */\nexports.string2binary = function (str) {\n  var result = \"\";\n  for (var i = 0; i < str.length; i++) {\n    result += String.fromCharCode(str.charCodeAt(i) & 0xff);\n  }\n  return result;\n};\nexports.arrayBuffer2Blob = function (buffer, mimeType) {\n  exports.checkSupport(\"blob\");\n  mimeType = mimeType || \"application/zip\";\n  try {\n    // Blob constructor\n    return new Blob([buffer], {\n      type: mimeType\n    });\n  } catch (e) {\n    try {\n      // deprecated, browser only, old way\n      var Builder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;\n      var builder = new Builder();\n      builder.append(buffer);\n      return builder.getBlob(mimeType);\n    } catch (e) {\n      // well, fuck ?!\n      throw new Error(\"Bug : can't construct the Blob.\");\n    }\n  }\n};\n/**\n * The identity function.\n * @param {Object} input the input.\n * @return {Object} the same input.\n */\nfunction identity(input) {\n  return input;\n}\n\n/**\n * Fill in an array with a string.\n * @param {String} str the string to use.\n * @param {Array|ArrayBuffer|Uint8Array|Buffer} array the array to fill in (will be mutated).\n * @return {Array|ArrayBuffer|Uint8Array|Buffer} the updated array.\n */\nfunction stringToArrayLike(str, array) {\n  for (var i = 0; i < str.length; ++i) {\n    array[i] = str.charCodeAt(i) & 0xff;\n  }\n  return array;\n}\n\n/**\n * Transform an array-like object to a string.\n * @param {Array|ArrayBuffer|Uint8Array|Buffer} array the array to transform.\n * @return {String} the result.\n */\nfunction arrayLikeToString(array) {\n  // Performances notes :\n  // --------------------\n  // String.fromCharCode.apply(null, array) is the fastest, see\n  // see http://jsperf.com/converting-a-uint8array-to-a-string/2\n  // but the stack is limited (and we can get huge arrays !).\n  //\n  // result += String.fromCharCode(array[i]); generate too many strings !\n  //\n  // This code is inspired by http://jsperf.com/arraybuffer-to-string-apply-performance/2\n  var chunk = 65536;\n  var result = [],\n    len = array.length,\n    type = exports.getTypeOf(array);\n  var k = 0,\n    canUseApply = true;\n  try {\n    switch (type) {\n      case \"uint8array\":\n        String.fromCharCode.apply(null, new Uint8Array(0));\n        break;\n      case \"nodebuffer\":\n        String.fromCharCode.apply(null, nodeBuffer(0));\n        break;\n    }\n  } catch (e) {\n    canUseApply = false;\n  }\n\n  // no apply : slow and painful algorithm\n  // default browser on android 4.*\n  if (!canUseApply) {\n    var resultStr = \"\";\n    for (var i = 0; i < array.length; i++) {\n      resultStr += String.fromCharCode(array[i]);\n    }\n    return resultStr;\n  }\n  while (k < len && chunk > 1) {\n    try {\n      if (type === \"array\" || type === \"nodebuffer\") {\n        result.push(String.fromCharCode.apply(null, array.slice(k, Math.min(k + chunk, len))));\n      } else {\n        result.push(String.fromCharCode.apply(null, array.subarray(k, Math.min(k + chunk, len))));\n      }\n      k += chunk;\n    } catch (e) {\n      chunk = Math.floor(chunk / 2);\n    }\n  }\n  return result.join(\"\");\n}\nexports.applyFromCharCode = arrayLikeToString;\n\n/**\n * Copy the data from an array-like to an other array-like.\n * @param {Array|ArrayBuffer|Uint8Array|Buffer} arrayFrom the origin array.\n * @param {Array|ArrayBuffer|Uint8Array|Buffer} arrayTo the destination array which will be mutated.\n * @return {Array|ArrayBuffer|Uint8Array|Buffer} the updated destination array.\n */\nfunction arrayLikeToArrayLike(arrayFrom, arrayTo) {\n  for (var i = 0; i < arrayFrom.length; i++) {\n    arrayTo[i] = arrayFrom[i];\n  }\n  return arrayTo;\n}\n\n// a matrix containing functions to transform everything into everything.\nvar transform = {};\n\n// string to ?\ntransform.string = {\n  string: identity,\n  array: function array(input) {\n    return stringToArrayLike(input, new Array(input.length));\n  },\n  arraybuffer: function arraybuffer(input) {\n    return transform.string.uint8array(input).buffer;\n  },\n  uint8array: function uint8array(input) {\n    return stringToArrayLike(input, new Uint8Array(input.length));\n  },\n  nodebuffer: function nodebuffer(input) {\n    return stringToArrayLike(input, nodeBuffer(input.length));\n  }\n};\n\n// array to ?\ntransform.array = {\n  string: arrayLikeToString,\n  array: identity,\n  arraybuffer: function arraybuffer(input) {\n    return new Uint8Array(input).buffer;\n  },\n  uint8array: function uint8array(input) {\n    return new Uint8Array(input);\n  },\n  nodebuffer: function nodebuffer(input) {\n    return nodeBuffer(input);\n  }\n};\n\n// arraybuffer to ?\ntransform.arraybuffer = {\n  string: function string(input) {\n    return arrayLikeToString(new Uint8Array(input));\n  },\n  array: function array(input) {\n    return arrayLikeToArrayLike(new Uint8Array(input), new Array(input.byteLength));\n  },\n  arraybuffer: identity,\n  uint8array: function uint8array(input) {\n    return new Uint8Array(input);\n  },\n  nodebuffer: function nodebuffer(input) {\n    return nodeBuffer(new Uint8Array(input));\n  }\n};\n\n// uint8array to ?\ntransform.uint8array = {\n  string: arrayLikeToString,\n  array: function array(input) {\n    return arrayLikeToArrayLike(input, new Array(input.length));\n  },\n  arraybuffer: function arraybuffer(input) {\n    return input.buffer;\n  },\n  uint8array: identity,\n  nodebuffer: function nodebuffer(input) {\n    return nodeBuffer(input);\n  }\n};\n\n// nodebuffer to ?\ntransform.nodebuffer = {\n  string: arrayLikeToString,\n  array: function array(input) {\n    return arrayLikeToArrayLike(input, new Array(input.length));\n  },\n  arraybuffer: function arraybuffer(input) {\n    return transform.nodebuffer.uint8array(input).buffer;\n  },\n  uint8array: function uint8array(input) {\n    return arrayLikeToArrayLike(input, new Uint8Array(input.length));\n  },\n  nodebuffer: identity\n};\n\n/**\n * Transform an input into any type.\n * The supported output type are : string, array, uint8array, arraybuffer, nodebuffer.\n * If no output type is specified, the unmodified input will be returned.\n * @param {String} outputType the output type.\n * @param {String|Array|ArrayBuffer|Uint8Array|Buffer} input the input to convert.\n * @throws {Error} an Error if the browser doesn't support the requested output type.\n */\nexports.transformTo = function (outputType, input) {\n  if (!input) {\n    // undefined, null, etc\n    // an empty string won't harm.\n    input = \"\";\n  }\n  if (!outputType) {\n    return input;\n  }\n  exports.checkSupport(outputType);\n  var inputType = exports.getTypeOf(input);\n  var result = transform[inputType][outputType](input);\n  return result;\n};\n\n/**\n * Return the type of the input.\n * The type will be in a format valid for PizZip.utils.transformTo : string, array, uint8array, arraybuffer.\n * @param {Object} input the input to identify.\n * @return {String} the (lowercase) type of the input.\n */\nexports.getTypeOf = function (input) {\n  if (input == null) {\n    return;\n  }\n  if (typeof input === \"string\") {\n    return \"string\";\n  }\n  if (Object.prototype.toString.call(input) === \"[object Array]\") {\n    return \"array\";\n  }\n  if (support.nodebuffer && nodeBuffer.test(input)) {\n    return \"nodebuffer\";\n  }\n  if (support.uint8array && input instanceof Uint8Array) {\n    return \"uint8array\";\n  }\n  if (support.arraybuffer && input instanceof ArrayBuffer) {\n    return \"arraybuffer\";\n  }\n  if (input instanceof Promise) {\n    throw new Error(\"Cannot read data from a promise, you probably are running new PizZip(data) with a promise\");\n  }\n  if (_typeof(input) === \"object\" && typeof input.file === \"function\") {\n    throw new Error(\"Cannot read data from a pizzip instance, you probably are running new PizZip(zip) with a zipinstance\");\n  }\n  if (input instanceof Date) {\n    throw new Error(\"Cannot read data from a Date, you probably are running new PizZip(data) with a date\");\n  }\n  if (_typeof(input) === \"object\" && input.crc32 == null) {\n    throw new Error(\"Unsupported data given to new PizZip(data) (object given)\");\n  }\n};\n\n/**\n * Throw an exception if the type is not supported.\n * @param {String} type the type to check.\n * @throws {Error} an Error if the browser doesn't support the requested type.\n */\nexports.checkSupport = function (type) {\n  var supported = support[type.toLowerCase()];\n  if (!supported) {\n    throw new Error(type + \" is not supported by this browser\");\n  }\n};\nexports.MAX_VALUE_16BITS = 65535;\nexports.MAX_VALUE_32BITS = -1; // well, \"\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\\xFF\" is parsed as -1\n\n/**\n * Prettify a string read as binary.\n * @param {string} str the string to prettify.\n * @return {string} a pretty string.\n */\nexports.pretty = function (str) {\n  var res = \"\",\n    code,\n    i;\n  for (i = 0; i < (str || \"\").length; i++) {\n    code = str.charCodeAt(i);\n    res += \"\\\\x\" + (code < 16 ? \"0\" : \"\") + code.toString(16).toUpperCase();\n  }\n  return res;\n};\n\n/**\n * Find a compression registered in PizZip.\n * @param {string} compressionMethod the method magic to find.\n * @return {Object|null} the PizZip compression object, null if none found.\n */\nexports.findCompression = function (compressionMethod) {\n  for (var method in compressions) {\n    if (!compressions.hasOwnProperty(method)) {\n      continue;\n    }\n    if (compressions[method].magic === compressionMethod) {\n      return compressions[method];\n    }\n  }\n  return null;\n};\n/**\n * Cross-window, cross-Node-context regular expression detection\n * @param  {Object}  object Anything\n * @return {Boolean}        true if the object is a regular expression,\n * false otherwise\n */\nexports.isRegExp = function (object) {\n  return Object.prototype.toString.call(object) === \"[object RegExp]\";\n};\n\n/**\n * Merge the objects passed as parameters into a new one.\n * @private\n * @param {...Object} var_args All objects to merge.\n * @return {Object} a new object with the data of the others.\n */\nexports.extend = function () {\n  var result = {};\n  var i, attr;\n  for (i = 0; i < arguments.length; i++) {\n    // arguments is not enumerable in some browsers\n    for (attr in arguments[i]) {\n      if (arguments[i].hasOwnProperty(attr) && typeof result[attr] === \"undefined\") {\n        result[attr] = arguments[i][attr];\n      }\n    }\n  }\n  return result;\n};\n\n//# sourceURL=webpack://PizZip/./es6/utils.js?");
-
-/***/ }),
-
-/***/ "./es6/zipEntries.js":
-/*!***************************!*\
-  !*** ./es6/zipEntries.js ***!
-  \***************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar StringReader = __webpack_require__(/*! ./stringReader.js */ \"./es6/stringReader.js\");\nvar NodeBufferReader = __webpack_require__(/*! ./nodeBufferReader.js */ \"./es6/nodeBufferReader.js\");\nvar Uint8ArrayReader = __webpack_require__(/*! ./uint8ArrayReader.js */ \"./es6/uint8ArrayReader.js\");\nvar ArrayReader = __webpack_require__(/*! ./arrayReader.js */ \"./es6/arrayReader.js\");\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nvar sig = __webpack_require__(/*! ./signature.js */ \"./es6/signature.js\");\nvar ZipEntry = __webpack_require__(/*! ./zipEntry.js */ \"./es6/zipEntry.js\");\nvar support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\n//  class ZipEntries {{{\n/**\n * All the entries in the zip file.\n * @constructor\n * @param {String|ArrayBuffer|Uint8Array} data the binary stream to load.\n * @param {Object} loadOptions Options for loading the stream.\n */\nfunction ZipEntries(data, loadOptions) {\n  this.files = [];\n  this.loadOptions = loadOptions;\n  if (data) {\n    this.load(data);\n  }\n}\nZipEntries.prototype = {\n  /**\n   * Check that the reader is on the speficied signature.\n   * @param {string} expectedSignature the expected signature.\n   * @throws {Error} if it is an other signature.\n   */\n  checkSignature: function checkSignature(expectedSignature) {\n    var signature = this.reader.readString(4);\n    if (signature !== expectedSignature) {\n      throw new Error(\"Corrupted zip or bug : unexpected signature \" + \"(\" + utils.pretty(signature) + \", expected \" + utils.pretty(expectedSignature) + \")\");\n    }\n  },\n  /**\n   * Check if the given signature is at the given index.\n   * @param {number} askedIndex the index to check.\n   * @param {string} expectedSignature the signature to expect.\n   * @return {boolean} true if the signature is here, false otherwise.\n   */\n  isSignature: function isSignature(askedIndex, expectedSignature) {\n    var currentIndex = this.reader.index;\n    this.reader.setIndex(askedIndex);\n    var signature = this.reader.readString(4);\n    var result = signature === expectedSignature;\n    this.reader.setIndex(currentIndex);\n    return result;\n  },\n  /**\n   * Read the end of the central directory.\n   */\n  readBlockEndOfCentral: function readBlockEndOfCentral() {\n    this.diskNumber = this.reader.readInt(2);\n    this.diskWithCentralDirStart = this.reader.readInt(2);\n    this.centralDirRecordsOnThisDisk = this.reader.readInt(2);\n    this.centralDirRecords = this.reader.readInt(2);\n    this.centralDirSize = this.reader.readInt(4);\n    this.centralDirOffset = this.reader.readInt(4);\n    this.zipCommentLength = this.reader.readInt(2);\n    // warning : the encoding depends of the system locale\n    // On a linux machine with LANG=en_US.utf8, this field is utf8 encoded.\n    // On a windows machine, this field is encoded with the localized windows code page.\n    var zipComment = this.reader.readData(this.zipCommentLength);\n    var decodeParamType = support.uint8array ? \"uint8array\" : \"array\";\n    // To get consistent behavior with the generation part, we will assume that\n    // this is utf8 encoded unless specified otherwise.\n    var decodeContent = utils.transformTo(decodeParamType, zipComment);\n    this.zipComment = this.loadOptions.decodeFileName(decodeContent);\n  },\n  /**\n   * Read the end of the Zip 64 central directory.\n   * Not merged with the method readEndOfCentral :\n   * The end of central can coexist with its Zip64 brother,\n   * I don't want to read the wrong number of bytes !\n   */\n  readBlockZip64EndOfCentral: function readBlockZip64EndOfCentral() {\n    this.zip64EndOfCentralSize = this.reader.readInt(8);\n    this.versionMadeBy = this.reader.readString(2);\n    this.versionNeeded = this.reader.readInt(2);\n    this.diskNumber = this.reader.readInt(4);\n    this.diskWithCentralDirStart = this.reader.readInt(4);\n    this.centralDirRecordsOnThisDisk = this.reader.readInt(8);\n    this.centralDirRecords = this.reader.readInt(8);\n    this.centralDirSize = this.reader.readInt(8);\n    this.centralDirOffset = this.reader.readInt(8);\n    this.zip64ExtensibleData = {};\n    var extraDataSize = this.zip64EndOfCentralSize - 44;\n    var index = 0;\n    var extraFieldId, extraFieldLength, extraFieldValue;\n    while (index < extraDataSize) {\n      extraFieldId = this.reader.readInt(2);\n      extraFieldLength = this.reader.readInt(4);\n      extraFieldValue = this.reader.readString(extraFieldLength);\n      this.zip64ExtensibleData[extraFieldId] = {\n        id: extraFieldId,\n        length: extraFieldLength,\n        value: extraFieldValue\n      };\n    }\n  },\n  /**\n   * Read the end of the Zip 64 central directory locator.\n   */\n  readBlockZip64EndOfCentralLocator: function readBlockZip64EndOfCentralLocator() {\n    this.diskWithZip64CentralDirStart = this.reader.readInt(4);\n    this.relativeOffsetEndOfZip64CentralDir = this.reader.readInt(8);\n    this.disksCount = this.reader.readInt(4);\n    if (this.disksCount > 1) {\n      throw new Error(\"Multi-volumes zip are not supported\");\n    }\n  },\n  /**\n   * Read the local files, based on the offset read in the central part.\n   */\n  readLocalFiles: function readLocalFiles() {\n    var i, file;\n    for (i = 0; i < this.files.length; i++) {\n      file = this.files[i];\n      this.reader.setIndex(file.localHeaderOffset);\n      this.checkSignature(sig.LOCAL_FILE_HEADER);\n      file.readLocalPart(this.reader);\n      file.handleUTF8();\n      file.processAttributes();\n    }\n  },\n  /**\n   * Read the central directory.\n   */\n  readCentralDir: function readCentralDir() {\n    var file;\n    this.reader.setIndex(this.centralDirOffset);\n    while (this.reader.readString(4) === sig.CENTRAL_FILE_HEADER) {\n      file = new ZipEntry({\n        zip64: this.zip64\n      }, this.loadOptions);\n      file.readCentralPart(this.reader);\n      this.files.push(file);\n    }\n    if (this.centralDirRecords !== this.files.length) {\n      if (this.centralDirRecords !== 0 && this.files.length === 0) {\n        // We expected some records but couldn't find ANY.\n        // This is really suspicious, as if something went wrong.\n        throw new Error(\"Corrupted zip or bug: expected \" + this.centralDirRecords + \" records in central dir, got \" + this.files.length);\n      } else {\n        // We found some records but not all.\n        // Something is wrong but we got something for the user: no error here.\n        // console.warn(\"expected\", this.centralDirRecords, \"records in central dir, got\", this.files.length);\n      }\n    }\n  },\n  /**\n   * Read the end of central directory.\n   */\n  readEndOfCentral: function readEndOfCentral() {\n    var offset = this.reader.lastIndexOfSignature(sig.CENTRAL_DIRECTORY_END);\n    if (offset < 0) {\n      // Check if the content is a truncated zip or complete garbage.\n      // A \"LOCAL_FILE_HEADER\" is not required at the beginning (auto\n      // extractible zip for example) but it can give a good hint.\n      // If an ajax request was used without responseType, we will also\n      // get unreadable data.\n      var isGarbage = !this.isSignature(0, sig.LOCAL_FILE_HEADER);\n      if (isGarbage) {\n        throw new Error(\"Can't find end of central directory : is this a zip file ?\");\n      } else {\n        throw new Error(\"Corrupted zip : can't find end of central directory\");\n      }\n    }\n    this.reader.setIndex(offset);\n    var endOfCentralDirOffset = offset;\n    this.checkSignature(sig.CENTRAL_DIRECTORY_END);\n    this.readBlockEndOfCentral();\n\n    /* extract from the zip spec :\n              4)  If one of the fields in the end of central directory\n                  record is too small to hold required data, the field\n                  should be set to -1 (0xFFFF or 0xFFFFFFFF) and the\n                  ZIP64 format record should be created.\n              5)  The end of central directory record and the\n                  Zip64 end of central directory locator record must\n                  reside on the same disk when splitting or spanning\n                  an archive.\n           */\n    if (this.diskNumber === utils.MAX_VALUE_16BITS || this.diskWithCentralDirStart === utils.MAX_VALUE_16BITS || this.centralDirRecordsOnThisDisk === utils.MAX_VALUE_16BITS || this.centralDirRecords === utils.MAX_VALUE_16BITS || this.centralDirSize === utils.MAX_VALUE_32BITS || this.centralDirOffset === utils.MAX_VALUE_32BITS) {\n      this.zip64 = true;\n\n      /*\n               Warning : the zip64 extension is supported, but ONLY if the 64bits integer read from\n               the zip file can fit into a 32bits integer. This cannot be solved : Javascript represents\n               all numbers as 64-bit double precision IEEE 754 floating point numbers.\n               So, we have 53bits for integers and bitwise operations treat everything as 32bits.\n               see https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Operators/Bitwise_Operators\n               and http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf section 8.5\n               */\n\n      // should look for a zip64 EOCD locator\n      offset = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_LOCATOR);\n      if (offset < 0) {\n        throw new Error(\"Corrupted zip : can't find the ZIP64 end of central directory locator\");\n      }\n      this.reader.setIndex(offset);\n      this.checkSignature(sig.ZIP64_CENTRAL_DIRECTORY_LOCATOR);\n      this.readBlockZip64EndOfCentralLocator();\n\n      // now the zip64 EOCD record\n      if (!this.isSignature(this.relativeOffsetEndOfZip64CentralDir, sig.ZIP64_CENTRAL_DIRECTORY_END)) {\n        // console.warn(\"ZIP64 end of central directory not where expected.\");\n        this.relativeOffsetEndOfZip64CentralDir = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);\n        if (this.relativeOffsetEndOfZip64CentralDir < 0) {\n          throw new Error(\"Corrupted zip : can't find the ZIP64 end of central directory\");\n        }\n      }\n      this.reader.setIndex(this.relativeOffsetEndOfZip64CentralDir);\n      this.checkSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);\n      this.readBlockZip64EndOfCentral();\n    }\n    var expectedEndOfCentralDirOffset = this.centralDirOffset + this.centralDirSize;\n    if (this.zip64) {\n      expectedEndOfCentralDirOffset += 20; // end of central dir 64 locator\n      expectedEndOfCentralDirOffset += 12 /* should not include the leading 12 bytes */ + this.zip64EndOfCentralSize;\n    }\n    var extraBytes = endOfCentralDirOffset - expectedEndOfCentralDirOffset;\n    if (extraBytes > 0) {\n      // console.warn(extraBytes, \"extra bytes at beginning or within zipfile\");\n      if (this.isSignature(endOfCentralDirOffset, sig.CENTRAL_FILE_HEADER)) {\n        // The offsets seem wrong, but we have something at the specified offset.\n        // So… we keep it.\n      } else {\n        // the offset is wrong, update the \"zero\" of the reader\n        // this happens if data has been prepended (crx files for example)\n        this.reader.zero = extraBytes;\n      }\n    } else if (extraBytes < 0) {\n      throw new Error(\"Corrupted zip: missing \" + Math.abs(extraBytes) + \" bytes.\");\n    }\n  },\n  prepareReader: function prepareReader(data) {\n    var type = utils.getTypeOf(data);\n    utils.checkSupport(type);\n    if (type === \"string\" && !support.uint8array) {\n      this.reader = new StringReader(data, this.loadOptions.optimizedBinaryString);\n    } else if (type === \"nodebuffer\") {\n      this.reader = new NodeBufferReader(data);\n    } else if (support.uint8array) {\n      this.reader = new Uint8ArrayReader(utils.transformTo(\"uint8array\", data));\n    } else if (support.array) {\n      this.reader = new ArrayReader(utils.transformTo(\"array\", data));\n    } else {\n      throw new Error(\"Unexpected error: unsupported type '\" + type + \"'\");\n    }\n  },\n  /**\n   * Read a zip file and create ZipEntries.\n   * @param {String|ArrayBuffer|Uint8Array|Buffer} data the binary string representing a zip file.\n   */\n  load: function load(data) {\n    this.prepareReader(data);\n    this.readEndOfCentral();\n    this.readCentralDir();\n    this.readLocalFiles();\n  }\n};\n// }}} end of ZipEntries\nmodule.exports = ZipEntries;\n\n//# sourceURL=webpack://PizZip/./es6/zipEntries.js?");
-
-/***/ }),
-
-/***/ "./es6/zipEntry.js":
-/*!*************************!*\
-  !*** ./es6/zipEntry.js ***!
-  \*************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-eval("\n\nvar StringReader = __webpack_require__(/*! ./stringReader.js */ \"./es6/stringReader.js\");\nvar utils = __webpack_require__(/*! ./utils.js */ \"./es6/utils.js\");\nvar CompressedObject = __webpack_require__(/*! ./compressedObject.js */ \"./es6/compressedObject.js\");\nvar pizzipProto = __webpack_require__(/*! ./object.js */ \"./es6/object.js\");\nvar support = __webpack_require__(/*! ./support.js */ \"./es6/support.js\");\nvar MADE_BY_DOS = 0x00;\nvar MADE_BY_UNIX = 0x03;\n\n// class ZipEntry {{{\n/**\n * An entry in the zip file.\n * @constructor\n * @param {Object} options Options of the current file.\n * @param {Object} loadOptions Options for loading the stream.\n */\nfunction ZipEntry(options, loadOptions) {\n  this.options = options;\n  this.loadOptions = loadOptions;\n}\nZipEntry.prototype = {\n  /**\n   * say if the file is encrypted.\n   * @return {boolean} true if the file is encrypted, false otherwise.\n   */\n  isEncrypted: function isEncrypted() {\n    // bit 1 is set\n    return (this.bitFlag & 0x0001) === 0x0001;\n  },\n  /**\n   * say if the file has utf-8 filename/comment.\n   * @return {boolean} true if the filename/comment is in utf-8, false otherwise.\n   */\n  useUTF8: function useUTF8() {\n    // bit 11 is set\n    return (this.bitFlag & 0x0800) === 0x0800;\n  },\n  /**\n   * Prepare the function used to generate the compressed content from this ZipFile.\n   * @param {DataReader} reader the reader to use.\n   * @param {number} from the offset from where we should read the data.\n   * @param {number} length the length of the data to read.\n   * @return {Function} the callback to get the compressed content (the type depends of the DataReader class).\n   */\n  prepareCompressedContent: function prepareCompressedContent(reader, from, length) {\n    return function () {\n      var previousIndex = reader.index;\n      reader.setIndex(from);\n      var compressedFileData = reader.readData(length);\n      reader.setIndex(previousIndex);\n      return compressedFileData;\n    };\n  },\n  /**\n   * Prepare the function used to generate the uncompressed content from this ZipFile.\n   * @param {DataReader} reader the reader to use.\n   * @param {number} from the offset from where we should read the data.\n   * @param {number} length the length of the data to read.\n   * @param {PizZip.compression} compression the compression used on this file.\n   * @param {number} uncompressedSize the uncompressed size to expect.\n   * @return {Function} the callback to get the uncompressed content (the type depends of the DataReader class).\n   */\n  prepareContent: function prepareContent(reader, from, length, compression, uncompressedSize) {\n    return function () {\n      var compressedFileData = utils.transformTo(compression.uncompressInputType, this.getCompressedContent());\n      var uncompressedFileData = compression.uncompress(compressedFileData);\n      if (uncompressedFileData.length !== uncompressedSize) {\n        throw new Error(\"Bug : uncompressed data size mismatch\");\n      }\n      return uncompressedFileData;\n    };\n  },\n  /**\n   * Read the local part of a zip file and add the info in this object.\n   * @param {DataReader} reader the reader to use.\n   */\n  readLocalPart: function readLocalPart(reader) {\n    // we already know everything from the central dir !\n    // If the central dir data are false, we are doomed.\n    // On the bright side, the local part is scary  : zip64, data descriptors, both, etc.\n    // The less data we get here, the more reliable this should be.\n    // Let's skip the whole header and dash to the data !\n    reader.skip(22);\n    // in some zip created on windows, the filename stored in the central dir contains \\ instead of /.\n    // Strangely, the filename here is OK.\n    // I would love to treat these zip files as corrupted (see http://www.info-zip.org/FAQ.html#backslashes\n    // or APPNOTE#4.4.17.1, \"All slashes MUST be forward slashes '/'\") but there are a lot of bad zip generators...\n    // Search \"unzip mismatching \"local\" filename continuing with \"central\" filename version\" on\n    // the internet.\n    //\n    // I think I see the logic here : the central directory is used to display\n    // content and the local directory is used to extract the files. Mixing / and \\\n    // may be used to display \\ to windows users and use / when extracting the files.\n    // Unfortunately, this lead also to some issues : http://seclists.org/fulldisclosure/2009/Sep/394\n    this.fileNameLength = reader.readInt(2);\n    var localExtraFieldsLength = reader.readInt(2); // can't be sure this will be the same as the central dir\n    this.fileName = reader.readData(this.fileNameLength);\n    reader.skip(localExtraFieldsLength);\n    if (this.compressedSize === -1 || this.uncompressedSize === -1) {\n      throw new Error(\"Bug or corrupted zip : didn't get enough informations from the central directory \" + \"(compressedSize == -1 || uncompressedSize == -1)\");\n    }\n    var compression = utils.findCompression(this.compressionMethod);\n    if (compression === null) {\n      // no compression found\n      throw new Error(\"Corrupted zip : compression \" + utils.pretty(this.compressionMethod) + \" unknown (inner file : \" + utils.transformTo(\"string\", this.fileName) + \")\");\n    }\n    this.decompressed = new CompressedObject();\n    this.decompressed.compressedSize = this.compressedSize;\n    this.decompressed.uncompressedSize = this.uncompressedSize;\n    this.decompressed.crc32 = this.crc32;\n    this.decompressed.compressionMethod = this.compressionMethod;\n    this.decompressed.getCompressedContent = this.prepareCompressedContent(reader, reader.index, this.compressedSize, compression);\n    this.decompressed.getContent = this.prepareContent(reader, reader.index, this.compressedSize, compression, this.uncompressedSize);\n\n    // we need to compute the crc32...\n    if (this.loadOptions.checkCRC32) {\n      this.decompressed = utils.transformTo(\"string\", this.decompressed.getContent());\n      if (pizzipProto.crc32(this.decompressed) !== this.crc32) {\n        throw new Error(\"Corrupted zip : CRC32 mismatch\");\n      }\n    }\n  },\n  /**\n   * Read the central part of a zip file and add the info in this object.\n   * @param {DataReader} reader the reader to use.\n   */\n  readCentralPart: function readCentralPart(reader) {\n    this.versionMadeBy = reader.readInt(2);\n    this.versionNeeded = reader.readInt(2);\n    this.bitFlag = reader.readInt(2);\n    this.compressionMethod = reader.readString(2);\n    this.date = reader.readDate();\n    this.crc32 = reader.readInt(4);\n    this.compressedSize = reader.readInt(4);\n    this.uncompressedSize = reader.readInt(4);\n    this.fileNameLength = reader.readInt(2);\n    this.extraFieldsLength = reader.readInt(2);\n    this.fileCommentLength = reader.readInt(2);\n    this.diskNumberStart = reader.readInt(2);\n    this.internalFileAttributes = reader.readInt(2);\n    this.externalFileAttributes = reader.readInt(4);\n    this.localHeaderOffset = reader.readInt(4);\n    if (this.isEncrypted()) {\n      throw new Error(\"Encrypted zip are not supported\");\n    }\n    this.fileName = reader.readData(this.fileNameLength);\n    this.readExtraFields(reader);\n    this.parseZIP64ExtraField(reader);\n    this.fileComment = reader.readData(this.fileCommentLength);\n  },\n  /**\n   * Parse the external file attributes and get the unix/dos permissions.\n   */\n  processAttributes: function processAttributes() {\n    this.unixPermissions = null;\n    this.dosPermissions = null;\n    var madeBy = this.versionMadeBy >> 8;\n\n    // Check if we have the DOS directory flag set.\n    // We look for it in the DOS and UNIX permissions\n    // but some unknown platform could set it as a compatibility flag.\n    this.dir = !!(this.externalFileAttributes & 0x0010);\n    if (madeBy === MADE_BY_DOS) {\n      // first 6 bits (0 to 5)\n      this.dosPermissions = this.externalFileAttributes & 0x3f;\n    }\n    if (madeBy === MADE_BY_UNIX) {\n      this.unixPermissions = this.externalFileAttributes >> 16 & 0xffff;\n      // the octal permissions are in (this.unixPermissions & 0x01FF).toString(8);\n    }\n\n    // fail safe : if the name ends with a / it probably means a folder\n    if (!this.dir && this.fileNameStr.slice(-1) === \"/\") {\n      this.dir = true;\n    }\n  },\n  /**\n   * Parse the ZIP64 extra field and merge the info in the current ZipEntry.\n   */\n  parseZIP64ExtraField: function parseZIP64ExtraField() {\n    if (!this.extraFields[0x0001]) {\n      return;\n    }\n\n    // should be something, preparing the extra reader\n    var extraReader = new StringReader(this.extraFields[0x0001].value);\n\n    // I really hope that these 64bits integer can fit in 32 bits integer, because js\n    // won't let us have more.\n    if (this.uncompressedSize === utils.MAX_VALUE_32BITS) {\n      this.uncompressedSize = extraReader.readInt(8);\n    }\n    if (this.compressedSize === utils.MAX_VALUE_32BITS) {\n      this.compressedSize = extraReader.readInt(8);\n    }\n    if (this.localHeaderOffset === utils.MAX_VALUE_32BITS) {\n      this.localHeaderOffset = extraReader.readInt(8);\n    }\n    if (this.diskNumberStart === utils.MAX_VALUE_32BITS) {\n      this.diskNumberStart = extraReader.readInt(4);\n    }\n  },\n  /**\n   * Read the central part of a zip file and add the info in this object.\n   * @param {DataReader} reader the reader to use.\n   */\n  readExtraFields: function readExtraFields(reader) {\n    var start = reader.index;\n    var extraFieldId, extraFieldLength, extraFieldValue;\n    this.extraFields = this.extraFields || {};\n    while (reader.index < start + this.extraFieldsLength) {\n      extraFieldId = reader.readInt(2);\n      extraFieldLength = reader.readInt(2);\n      extraFieldValue = reader.readString(extraFieldLength);\n      this.extraFields[extraFieldId] = {\n        id: extraFieldId,\n        length: extraFieldLength,\n        value: extraFieldValue\n      };\n    }\n  },\n  /**\n   * Apply an UTF8 transformation if needed.\n   */\n  handleUTF8: function handleUTF8() {\n    var decodeParamType = support.uint8array ? \"uint8array\" : \"array\";\n    if (this.useUTF8()) {\n      this.fileNameStr = pizzipProto.utf8decode(this.fileName);\n      this.fileCommentStr = pizzipProto.utf8decode(this.fileComment);\n    } else {\n      var upath = this.findExtraFieldUnicodePath();\n      if (upath !== null) {\n        this.fileNameStr = upath;\n      } else {\n        var fileNameByteArray = utils.transformTo(decodeParamType, this.fileName);\n        this.fileNameStr = this.loadOptions.decodeFileName(fileNameByteArray);\n      }\n      var ucomment = this.findExtraFieldUnicodeComment();\n      if (ucomment !== null) {\n        this.fileCommentStr = ucomment;\n      } else {\n        var commentByteArray = utils.transformTo(decodeParamType, this.fileComment);\n        this.fileCommentStr = this.loadOptions.decodeFileName(commentByteArray);\n      }\n    }\n  },\n  /**\n   * Find the unicode path declared in the extra field, if any.\n   * @return {String} the unicode path, null otherwise.\n   */\n  findExtraFieldUnicodePath: function findExtraFieldUnicodePath() {\n    var upathField = this.extraFields[0x7075];\n    if (upathField) {\n      var extraReader = new StringReader(upathField.value);\n\n      // wrong version\n      if (extraReader.readInt(1) !== 1) {\n        return null;\n      }\n\n      // the crc of the filename changed, this field is out of date.\n      if (pizzipProto.crc32(this.fileName) !== extraReader.readInt(4)) {\n        return null;\n      }\n      return pizzipProto.utf8decode(extraReader.readString(upathField.length - 5));\n    }\n    return null;\n  },\n  /**\n   * Find the unicode comment declared in the extra field, if any.\n   * @return {String} the unicode comment, null otherwise.\n   */\n  findExtraFieldUnicodeComment: function findExtraFieldUnicodeComment() {\n    var ucommentField = this.extraFields[0x6375];\n    if (ucommentField) {\n      var extraReader = new StringReader(ucommentField.value);\n\n      // wrong version\n      if (extraReader.readInt(1) !== 1) {\n        return null;\n      }\n\n      // the crc of the comment changed, this field is out of date.\n      if (pizzipProto.crc32(this.fileComment) !== extraReader.readInt(4)) {\n        return null;\n      }\n      return pizzipProto.utf8decode(extraReader.readString(ucommentField.length - 5));\n    }\n    return null;\n  }\n};\nmodule.exports = ZipEntry;\n\n//# sourceURL=webpack://PizZip/./es6/zipEntry.js?");
-
-/***/ }),
-
-/***/ "./node_modules/pako/dist/pako.es5.js":
-/*!********************************************!*\
-  !*** ./node_modules/pako/dist/pako.es5.js ***!
-  \********************************************/
-/***/ (function(__unused_webpack_module, exports) {
-
-eval("\n/*! pako 2.1.0 https://github.com/nodeca/pako @license (MIT AND Zlib) */\n(function (global, factory) {\n   true ? factory(exports) :\n  0;\n})(this, (function (exports) { 'use strict';\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n\n  /* eslint-disable space-unary-ops */\n\n  /* Public constants ==========================================================*/\n  /* ===========================================================================*/\n\n  //const Z_FILTERED          = 1;\n  //const Z_HUFFMAN_ONLY      = 2;\n  //const Z_RLE               = 3;\n  var Z_FIXED$1 = 4;\n  //const Z_DEFAULT_STRATEGY  = 0;\n\n  /* Possible values of the data_type field (though see inflate()) */\n  var Z_BINARY = 0;\n  var Z_TEXT = 1;\n  //const Z_ASCII             = 1; // = Z_TEXT\n  var Z_UNKNOWN$1 = 2;\n\n  /*============================================================================*/\n\n  function zero$1(buf) {\n    var len = buf.length;\n    while (--len >= 0) {\n      buf[len] = 0;\n    }\n  }\n\n  // From zutil.h\n\n  var STORED_BLOCK = 0;\n  var STATIC_TREES = 1;\n  var DYN_TREES = 2;\n  /* The three kinds of block type */\n\n  var MIN_MATCH$1 = 3;\n  var MAX_MATCH$1 = 258;\n  /* The minimum and maximum match lengths */\n\n  // From deflate.h\n  /* ===========================================================================\n   * Internal compression state.\n   */\n\n  var LENGTH_CODES$1 = 29;\n  /* number of length codes, not counting the special END_BLOCK code */\n\n  var LITERALS$1 = 256;\n  /* number of literal bytes 0..255 */\n\n  var L_CODES$1 = LITERALS$1 + 1 + LENGTH_CODES$1;\n  /* number of Literal or Length codes, including the END_BLOCK code */\n\n  var D_CODES$1 = 30;\n  /* number of distance codes */\n\n  var BL_CODES$1 = 19;\n  /* number of codes used to transfer the bit lengths */\n\n  var HEAP_SIZE$1 = 2 * L_CODES$1 + 1;\n  /* maximum heap size */\n\n  var MAX_BITS$1 = 15;\n  /* All codes must not exceed MAX_BITS bits */\n\n  var Buf_size = 16;\n  /* size of bit buffer in bi_buf */\n\n  /* ===========================================================================\n   * Constants\n   */\n\n  var MAX_BL_BITS = 7;\n  /* Bit length codes must not exceed MAX_BL_BITS bits */\n\n  var END_BLOCK = 256;\n  /* end of block literal code */\n\n  var REP_3_6 = 16;\n  /* repeat previous bit length 3-6 times (2 bits of repeat count) */\n\n  var REPZ_3_10 = 17;\n  /* repeat a zero length 3-10 times  (3 bits of repeat count) */\n\n  var REPZ_11_138 = 18;\n  /* repeat a zero length 11-138 times  (7 bits of repeat count) */\n\n  /* eslint-disable comma-spacing,array-bracket-spacing */\n  var extra_lbits = /* extra bits for each length code */\n  new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]);\n  var extra_dbits = /* extra bits for each distance code */\n  new Uint8Array([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]);\n  var extra_blbits = /* extra bits for each bit length code */\n  new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7]);\n  var bl_order = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);\n  /* eslint-enable comma-spacing,array-bracket-spacing */\n\n  /* The lengths of the bit length codes are sent in order of decreasing\n   * probability, to avoid transmitting the lengths for unused bit length codes.\n   */\n\n  /* ===========================================================================\n   * Local data. These are initialized only once.\n   */\n\n  // We pre-fill arrays with 0 to avoid uninitialized gaps\n\n  var DIST_CODE_LEN = 512; /* see definition of array dist_code below */\n\n  // !!!! Use flat array instead of structure, Freq = i*2, Len = i*2+1\n  var static_ltree = new Array((L_CODES$1 + 2) * 2);\n  zero$1(static_ltree);\n  /* The static literal tree. Since the bit lengths are imposed, there is no\n   * need for the L_CODES extra codes used during heap construction. However\n   * The codes 286 and 287 are needed to build a canonical tree (see _tr_init\n   * below).\n   */\n\n  var static_dtree = new Array(D_CODES$1 * 2);\n  zero$1(static_dtree);\n  /* The static distance tree. (Actually a trivial tree since all codes use\n   * 5 bits.)\n   */\n\n  var _dist_code = new Array(DIST_CODE_LEN);\n  zero$1(_dist_code);\n  /* Distance codes. The first 256 values correspond to the distances\n   * 3 .. 258, the last 256 values correspond to the top 8 bits of\n   * the 15 bit distances.\n   */\n\n  var _length_code = new Array(MAX_MATCH$1 - MIN_MATCH$1 + 1);\n  zero$1(_length_code);\n  /* length code for each normalized match length (0 == MIN_MATCH) */\n\n  var base_length = new Array(LENGTH_CODES$1);\n  zero$1(base_length);\n  /* First normalized length for each code (0 = MIN_MATCH) */\n\n  var base_dist = new Array(D_CODES$1);\n  zero$1(base_dist);\n  /* First normalized distance for each code (0 = distance of 1) */\n\n  function StaticTreeDesc(static_tree, extra_bits, extra_base, elems, max_length) {\n    this.static_tree = static_tree; /* static tree or NULL */\n    this.extra_bits = extra_bits; /* extra bits for each code or NULL */\n    this.extra_base = extra_base; /* base index for extra_bits */\n    this.elems = elems; /* max number of elements in the tree */\n    this.max_length = max_length; /* max bit length for the codes */\n\n    // show if `static_tree` has data or dummy - needed for monomorphic objects\n    this.has_stree = static_tree && static_tree.length;\n  }\n  var static_l_desc;\n  var static_d_desc;\n  var static_bl_desc;\n  function TreeDesc(dyn_tree, stat_desc) {\n    this.dyn_tree = dyn_tree; /* the dynamic tree */\n    this.max_code = 0; /* largest code with non zero frequency */\n    this.stat_desc = stat_desc; /* the corresponding static tree */\n  }\n\n  var d_code = function d_code(dist) {\n    return dist < 256 ? _dist_code[dist] : _dist_code[256 + (dist >>> 7)];\n  };\n\n  /* ===========================================================================\n   * Output a short LSB first on the stream.\n   * IN assertion: there is enough room in pendingBuf.\n   */\n  var put_short = function put_short(s, w) {\n    //    put_byte(s, (uch)((w) & 0xff));\n    //    put_byte(s, (uch)((ush)(w) >> 8));\n    s.pending_buf[s.pending++] = w & 0xff;\n    s.pending_buf[s.pending++] = w >>> 8 & 0xff;\n  };\n\n  /* ===========================================================================\n   * Send a value on a given number of bits.\n   * IN assertion: length <= 16 and value fits in length bits.\n   */\n  var send_bits = function send_bits(s, value, length) {\n    if (s.bi_valid > Buf_size - length) {\n      s.bi_buf |= value << s.bi_valid & 0xffff;\n      put_short(s, s.bi_buf);\n      s.bi_buf = value >> Buf_size - s.bi_valid;\n      s.bi_valid += length - Buf_size;\n    } else {\n      s.bi_buf |= value << s.bi_valid & 0xffff;\n      s.bi_valid += length;\n    }\n  };\n  var send_code = function send_code(s, c, tree) {\n    send_bits(s, tree[c * 2] /*.Code*/, tree[c * 2 + 1] /*.Len*/);\n  };\n\n  /* ===========================================================================\n   * Reverse the first len bits of a code, using straightforward code (a faster\n   * method would use a table)\n   * IN assertion: 1 <= len <= 15\n   */\n  var bi_reverse = function bi_reverse(code, len) {\n    var res = 0;\n    do {\n      res |= code & 1;\n      code >>>= 1;\n      res <<= 1;\n    } while (--len > 0);\n    return res >>> 1;\n  };\n\n  /* ===========================================================================\n   * Flush the bit buffer, keeping at most 7 bits in it.\n   */\n  var bi_flush = function bi_flush(s) {\n    if (s.bi_valid === 16) {\n      put_short(s, s.bi_buf);\n      s.bi_buf = 0;\n      s.bi_valid = 0;\n    } else if (s.bi_valid >= 8) {\n      s.pending_buf[s.pending++] = s.bi_buf & 0xff;\n      s.bi_buf >>= 8;\n      s.bi_valid -= 8;\n    }\n  };\n\n  /* ===========================================================================\n   * Compute the optimal bit lengths for a tree and update the total bit length\n   * for the current block.\n   * IN assertion: the fields freq and dad are set, heap[heap_max] and\n   *    above are the tree nodes sorted by increasing frequency.\n   * OUT assertions: the field len is set to the optimal bit length, the\n   *     array bl_count contains the frequencies for each bit length.\n   *     The length opt_len is updated; static_len is also updated if stree is\n   *     not null.\n   */\n  var gen_bitlen = function gen_bitlen(s, desc) {\n    //    deflate_state *s;\n    //    tree_desc *desc;    /* the tree descriptor */\n\n    var tree = desc.dyn_tree;\n    var max_code = desc.max_code;\n    var stree = desc.stat_desc.static_tree;\n    var has_stree = desc.stat_desc.has_stree;\n    var extra = desc.stat_desc.extra_bits;\n    var base = desc.stat_desc.extra_base;\n    var max_length = desc.stat_desc.max_length;\n    var h; /* heap index */\n    var n, m; /* iterate over the tree elements */\n    var bits; /* bit length */\n    var xbits; /* extra bits */\n    var f; /* frequency */\n    var overflow = 0; /* number of elements with bit length too large */\n\n    for (bits = 0; bits <= MAX_BITS$1; bits++) {\n      s.bl_count[bits] = 0;\n    }\n\n    /* In a first pass, compute the optimal bit lengths (which may\n     * overflow in the case of the bit length tree).\n     */\n    tree[s.heap[s.heap_max] * 2 + 1] /*.Len*/ = 0; /* root of the heap */\n\n    for (h = s.heap_max + 1; h < HEAP_SIZE$1; h++) {\n      n = s.heap[h];\n      bits = tree[tree[n * 2 + 1] /*.Dad*/ * 2 + 1] /*.Len*/ + 1;\n      if (bits > max_length) {\n        bits = max_length;\n        overflow++;\n      }\n      tree[n * 2 + 1] /*.Len*/ = bits;\n      /* We overwrite tree[n].Dad which is no longer needed */\n\n      if (n > max_code) {\n        continue;\n      } /* not a leaf node */\n\n      s.bl_count[bits]++;\n      xbits = 0;\n      if (n >= base) {\n        xbits = extra[n - base];\n      }\n      f = tree[n * 2] /*.Freq*/;\n      s.opt_len += f * (bits + xbits);\n      if (has_stree) {\n        s.static_len += f * (stree[n * 2 + 1] /*.Len*/ + xbits);\n      }\n    }\n    if (overflow === 0) {\n      return;\n    }\n\n    // Tracev((stderr,\"\\nbit length overflow\\n\"));\n    /* This happens for example on obj2 and pic of the Calgary corpus */\n\n    /* Find the first bit length which could increase: */\n    do {\n      bits = max_length - 1;\n      while (s.bl_count[bits] === 0) {\n        bits--;\n      }\n      s.bl_count[bits]--; /* move one leaf down the tree */\n      s.bl_count[bits + 1] += 2; /* move one overflow item as its brother */\n      s.bl_count[max_length]--;\n      /* The brother of the overflow item also moves one step up,\n       * but this does not affect bl_count[max_length]\n       */\n      overflow -= 2;\n    } while (overflow > 0);\n\n    /* Now recompute all bit lengths, scanning in increasing frequency.\n     * h is still equal to HEAP_SIZE. (It is simpler to reconstruct all\n     * lengths instead of fixing only the wrong ones. This idea is taken\n     * from 'ar' written by Haruhiko Okumura.)\n     */\n    for (bits = max_length; bits !== 0; bits--) {\n      n = s.bl_count[bits];\n      while (n !== 0) {\n        m = s.heap[--h];\n        if (m > max_code) {\n          continue;\n        }\n        if (tree[m * 2 + 1] /*.Len*/ !== bits) {\n          // Tracev((stderr,\"code %d bits %d->%d\\n\", m, tree[m].Len, bits));\n          s.opt_len += (bits - tree[m * 2 + 1] /*.Len*/) * tree[m * 2] /*.Freq*/;\n          tree[m * 2 + 1] /*.Len*/ = bits;\n        }\n        n--;\n      }\n    }\n  };\n\n  /* ===========================================================================\n   * Generate the codes for a given tree and bit counts (which need not be\n   * optimal).\n   * IN assertion: the array bl_count contains the bit length statistics for\n   * the given tree and the field len is set for all tree elements.\n   * OUT assertion: the field code is set for all tree elements of non\n   *     zero code length.\n   */\n  var gen_codes = function gen_codes(tree, max_code, bl_count) {\n    //    ct_data *tree;             /* the tree to decorate */\n    //    int max_code;              /* largest code with non zero frequency */\n    //    ushf *bl_count;            /* number of codes at each bit length */\n\n    var next_code = new Array(MAX_BITS$1 + 1); /* next code value for each bit length */\n    var code = 0; /* running code value */\n    var bits; /* bit index */\n    var n; /* code index */\n\n    /* The distribution counts are first used to generate the code values\n     * without bit reversal.\n     */\n    for (bits = 1; bits <= MAX_BITS$1; bits++) {\n      code = code + bl_count[bits - 1] << 1;\n      next_code[bits] = code;\n    }\n    /* Check that the bit counts in bl_count are consistent. The last code\n     * must be all ones.\n     */\n    //Assert (code + bl_count[MAX_BITS]-1 == (1<<MAX_BITS)-1,\n    //        \"inconsistent bit counts\");\n    //Tracev((stderr,\"\\ngen_codes: max_code %d \", max_code));\n\n    for (n = 0; n <= max_code; n++) {\n      var len = tree[n * 2 + 1] /*.Len*/;\n      if (len === 0) {\n        continue;\n      }\n      /* Now reverse the bits */\n      tree[n * 2] /*.Code*/ = bi_reverse(next_code[len]++, len);\n\n      //Tracecv(tree != static_ltree, (stderr,\"\\nn %3d %c l %2d c %4x (%x) \",\n      //     n, (isgraph(n) ? n : ' '), len, tree[n].Code, next_code[len]-1));\n    }\n  };\n\n  /* ===========================================================================\n   * Initialize the various 'constant' tables.\n   */\n  var tr_static_init = function tr_static_init() {\n    var n; /* iterates over tree elements */\n    var bits; /* bit counter */\n    var length; /* length value */\n    var code; /* code value */\n    var dist; /* distance index */\n    var bl_count = new Array(MAX_BITS$1 + 1);\n    /* number of codes at each bit length for an optimal tree */\n\n    // do check in _tr_init()\n    //if (static_init_done) return;\n\n    /* For some embedded targets, global variables are not initialized: */\n    /*#ifdef NO_INIT_GLOBAL_POINTERS\n      static_l_desc.static_tree = static_ltree;\n      static_l_desc.extra_bits = extra_lbits;\n      static_d_desc.static_tree = static_dtree;\n      static_d_desc.extra_bits = extra_dbits;\n      static_bl_desc.extra_bits = extra_blbits;\n    #endif*/\n\n    /* Initialize the mapping length (0..255) -> length code (0..28) */\n    length = 0;\n    for (code = 0; code < LENGTH_CODES$1 - 1; code++) {\n      base_length[code] = length;\n      for (n = 0; n < 1 << extra_lbits[code]; n++) {\n        _length_code[length++] = code;\n      }\n    }\n    //Assert (length == 256, \"tr_static_init: length != 256\");\n    /* Note that the length 255 (match length 258) can be represented\n     * in two different ways: code 284 + 5 bits or code 285, so we\n     * overwrite length_code[255] to use the best encoding:\n     */\n    _length_code[length - 1] = code;\n\n    /* Initialize the mapping dist (0..32K) -> dist code (0..29) */\n    dist = 0;\n    for (code = 0; code < 16; code++) {\n      base_dist[code] = dist;\n      for (n = 0; n < 1 << extra_dbits[code]; n++) {\n        _dist_code[dist++] = code;\n      }\n    }\n    //Assert (dist == 256, \"tr_static_init: dist != 256\");\n    dist >>= 7; /* from now on, all distances are divided by 128 */\n    for (; code < D_CODES$1; code++) {\n      base_dist[code] = dist << 7;\n      for (n = 0; n < 1 << extra_dbits[code] - 7; n++) {\n        _dist_code[256 + dist++] = code;\n      }\n    }\n    //Assert (dist == 256, \"tr_static_init: 256+dist != 512\");\n\n    /* Construct the codes of the static literal tree */\n    for (bits = 0; bits <= MAX_BITS$1; bits++) {\n      bl_count[bits] = 0;\n    }\n    n = 0;\n    while (n <= 143) {\n      static_ltree[n * 2 + 1] /*.Len*/ = 8;\n      n++;\n      bl_count[8]++;\n    }\n    while (n <= 255) {\n      static_ltree[n * 2 + 1] /*.Len*/ = 9;\n      n++;\n      bl_count[9]++;\n    }\n    while (n <= 279) {\n      static_ltree[n * 2 + 1] /*.Len*/ = 7;\n      n++;\n      bl_count[7]++;\n    }\n    while (n <= 287) {\n      static_ltree[n * 2 + 1] /*.Len*/ = 8;\n      n++;\n      bl_count[8]++;\n    }\n    /* Codes 286 and 287 do not exist, but we must include them in the\n     * tree construction to get a canonical Huffman tree (longest code\n     * all ones)\n     */\n    gen_codes(static_ltree, L_CODES$1 + 1, bl_count);\n\n    /* The static distance tree is trivial: */\n    for (n = 0; n < D_CODES$1; n++) {\n      static_dtree[n * 2 + 1] /*.Len*/ = 5;\n      static_dtree[n * 2] /*.Code*/ = bi_reverse(n, 5);\n    }\n\n    // Now data ready and we can init static trees\n    static_l_desc = new StaticTreeDesc(static_ltree, extra_lbits, LITERALS$1 + 1, L_CODES$1, MAX_BITS$1);\n    static_d_desc = new StaticTreeDesc(static_dtree, extra_dbits, 0, D_CODES$1, MAX_BITS$1);\n    static_bl_desc = new StaticTreeDesc(new Array(0), extra_blbits, 0, BL_CODES$1, MAX_BL_BITS);\n\n    //static_init_done = true;\n  };\n\n  /* ===========================================================================\n   * Initialize a new block.\n   */\n  var init_block = function init_block(s) {\n    var n; /* iterates over tree elements */\n\n    /* Initialize the trees. */\n    for (n = 0; n < L_CODES$1; n++) {\n      s.dyn_ltree[n * 2] /*.Freq*/ = 0;\n    }\n    for (n = 0; n < D_CODES$1; n++) {\n      s.dyn_dtree[n * 2] /*.Freq*/ = 0;\n    }\n    for (n = 0; n < BL_CODES$1; n++) {\n      s.bl_tree[n * 2] /*.Freq*/ = 0;\n    }\n    s.dyn_ltree[END_BLOCK * 2] /*.Freq*/ = 1;\n    s.opt_len = s.static_len = 0;\n    s.sym_next = s.matches = 0;\n  };\n\n  /* ===========================================================================\n   * Flush the bit buffer and align the output on a byte boundary\n   */\n  var bi_windup = function bi_windup(s) {\n    if (s.bi_valid > 8) {\n      put_short(s, s.bi_buf);\n    } else if (s.bi_valid > 0) {\n      //put_byte(s, (Byte)s->bi_buf);\n      s.pending_buf[s.pending++] = s.bi_buf;\n    }\n    s.bi_buf = 0;\n    s.bi_valid = 0;\n  };\n\n  /* ===========================================================================\n   * Compares to subtrees, using the tree depth as tie breaker when\n   * the subtrees have equal frequency. This minimizes the worst case length.\n   */\n  var smaller = function smaller(tree, n, m, depth) {\n    var _n2 = n * 2;\n    var _m2 = m * 2;\n    return tree[_n2] /*.Freq*/ < tree[_m2] /*.Freq*/ || tree[_n2] /*.Freq*/ === tree[_m2] /*.Freq*/ && depth[n] <= depth[m];\n  };\n\n  /* ===========================================================================\n   * Restore the heap property by moving down the tree starting at node k,\n   * exchanging a node with the smallest of its two sons if necessary, stopping\n   * when the heap property is re-established (each father smaller than its\n   * two sons).\n   */\n  var pqdownheap = function pqdownheap(s, tree, k) {\n    //    deflate_state *s;\n    //    ct_data *tree;  /* the tree to restore */\n    //    int k;               /* node to move down */\n\n    var v = s.heap[k];\n    var j = k << 1; /* left son of k */\n    while (j <= s.heap_len) {\n      /* Set j to the smallest of the two sons: */\n      if (j < s.heap_len && smaller(tree, s.heap[j + 1], s.heap[j], s.depth)) {\n        j++;\n      }\n      /* Exit if v is smaller than both sons */\n      if (smaller(tree, v, s.heap[j], s.depth)) {\n        break;\n      }\n\n      /* Exchange v with the smallest son */\n      s.heap[k] = s.heap[j];\n      k = j;\n\n      /* And continue down the tree, setting j to the left son of k */\n      j <<= 1;\n    }\n    s.heap[k] = v;\n  };\n\n  // inlined manually\n  // const SMALLEST = 1;\n\n  /* ===========================================================================\n   * Send the block data compressed using the given Huffman trees\n   */\n  var compress_block = function compress_block(s, ltree, dtree) {\n    //    deflate_state *s;\n    //    const ct_data *ltree; /* literal tree */\n    //    const ct_data *dtree; /* distance tree */\n\n    var dist; /* distance of matched string */\n    var lc; /* match length or unmatched char (if dist == 0) */\n    var sx = 0; /* running index in sym_buf */\n    var code; /* the code to send */\n    var extra; /* number of extra bits to send */\n\n    if (s.sym_next !== 0) {\n      do {\n        dist = s.pending_buf[s.sym_buf + sx++] & 0xff;\n        dist += (s.pending_buf[s.sym_buf + sx++] & 0xff) << 8;\n        lc = s.pending_buf[s.sym_buf + sx++];\n        if (dist === 0) {\n          send_code(s, lc, ltree); /* send a literal byte */\n          //Tracecv(isgraph(lc), (stderr,\" '%c' \", lc));\n        } else {\n          /* Here, lc is the match length - MIN_MATCH */\n          code = _length_code[lc];\n          send_code(s, code + LITERALS$1 + 1, ltree); /* send the length code */\n          extra = extra_lbits[code];\n          if (extra !== 0) {\n            lc -= base_length[code];\n            send_bits(s, lc, extra); /* send the extra length bits */\n          }\n\n          dist--; /* dist is now the match distance - 1 */\n          code = d_code(dist);\n          //Assert (code < D_CODES, \"bad d_code\");\n\n          send_code(s, code, dtree); /* send the distance code */\n          extra = extra_dbits[code];\n          if (extra !== 0) {\n            dist -= base_dist[code];\n            send_bits(s, dist, extra); /* send the extra distance bits */\n          }\n        } /* literal or match pair ? */\n\n        /* Check that the overlay between pending_buf and sym_buf is ok: */\n        //Assert(s->pending < s->lit_bufsize + sx, \"pendingBuf overflow\");\n      } while (sx < s.sym_next);\n    }\n    send_code(s, END_BLOCK, ltree);\n  };\n\n  /* ===========================================================================\n   * Construct one Huffman tree and assigns the code bit strings and lengths.\n   * Update the total bit length for the current block.\n   * IN assertion: the field freq is set for all tree elements.\n   * OUT assertions: the fields len and code are set to the optimal bit length\n   *     and corresponding code. The length opt_len is updated; static_len is\n   *     also updated if stree is not null. The field max_code is set.\n   */\n  var build_tree = function build_tree(s, desc) {\n    //    deflate_state *s;\n    //    tree_desc *desc; /* the tree descriptor */\n\n    var tree = desc.dyn_tree;\n    var stree = desc.stat_desc.static_tree;\n    var has_stree = desc.stat_desc.has_stree;\n    var elems = desc.stat_desc.elems;\n    var n, m; /* iterate over heap elements */\n    var max_code = -1; /* largest code with non zero frequency */\n    var node; /* new node being created */\n\n    /* Construct the initial heap, with least frequent element in\n     * heap[SMALLEST]. The sons of heap[n] are heap[2*n] and heap[2*n+1].\n     * heap[0] is not used.\n     */\n    s.heap_len = 0;\n    s.heap_max = HEAP_SIZE$1;\n    for (n = 0; n < elems; n++) {\n      if (tree[n * 2] /*.Freq*/ !== 0) {\n        s.heap[++s.heap_len] = max_code = n;\n        s.depth[n] = 0;\n      } else {\n        tree[n * 2 + 1] /*.Len*/ = 0;\n      }\n    }\n\n    /* The pkzip format requires that at least one distance code exists,\n     * and that at least one bit should be sent even if there is only one\n     * possible code. So to avoid special checks later on we force at least\n     * two codes of non zero frequency.\n     */\n    while (s.heap_len < 2) {\n      node = s.heap[++s.heap_len] = max_code < 2 ? ++max_code : 0;\n      tree[node * 2] /*.Freq*/ = 1;\n      s.depth[node] = 0;\n      s.opt_len--;\n      if (has_stree) {\n        s.static_len -= stree[node * 2 + 1] /*.Len*/;\n      }\n      /* node is 0 or 1 so it does not have extra bits */\n    }\n\n    desc.max_code = max_code;\n\n    /* The elements heap[heap_len/2+1 .. heap_len] are leaves of the tree,\n     * establish sub-heaps of increasing lengths:\n     */\n    for (n = s.heap_len >> 1 /*int /2*/; n >= 1; n--) {\n      pqdownheap(s, tree, n);\n    }\n\n    /* Construct the Huffman tree by repeatedly combining the least two\n     * frequent nodes.\n     */\n    node = elems; /* next internal node of the tree */\n    do {\n      //pqremove(s, tree, n);  /* n = node of least frequency */\n      /*** pqremove ***/\n      n = s.heap[1 /*SMALLEST*/];\n      s.heap[1 /*SMALLEST*/] = s.heap[s.heap_len--];\n      pqdownheap(s, tree, 1 /*SMALLEST*/);\n      /***/\n\n      m = s.heap[1 /*SMALLEST*/]; /* m = node of next least frequency */\n\n      s.heap[--s.heap_max] = n; /* keep the nodes sorted by frequency */\n      s.heap[--s.heap_max] = m;\n\n      /* Create a new node father of n and m */\n      tree[node * 2] /*.Freq*/ = tree[n * 2] /*.Freq*/ + tree[m * 2] /*.Freq*/;\n      s.depth[node] = (s.depth[n] >= s.depth[m] ? s.depth[n] : s.depth[m]) + 1;\n      tree[n * 2 + 1] /*.Dad*/ = tree[m * 2 + 1] /*.Dad*/ = node;\n\n      /* and insert the new node in the heap */\n      s.heap[1 /*SMALLEST*/] = node++;\n      pqdownheap(s, tree, 1 /*SMALLEST*/);\n    } while (s.heap_len >= 2);\n    s.heap[--s.heap_max] = s.heap[1 /*SMALLEST*/];\n\n    /* At this point, the fields freq and dad are set. We can now\n     * generate the bit lengths.\n     */\n    gen_bitlen(s, desc);\n\n    /* The field len is now set, we can generate the bit codes */\n    gen_codes(tree, max_code, s.bl_count);\n  };\n\n  /* ===========================================================================\n   * Scan a literal or distance tree to determine the frequencies of the codes\n   * in the bit length tree.\n   */\n  var scan_tree = function scan_tree(s, tree, max_code) {\n    //    deflate_state *s;\n    //    ct_data *tree;   /* the tree to be scanned */\n    //    int max_code;    /* and its largest code of non zero frequency */\n\n    var n; /* iterates over all tree elements */\n    var prevlen = -1; /* last emitted length */\n    var curlen; /* length of current code */\n\n    var nextlen = tree[0 * 2 + 1] /*.Len*/; /* length of next code */\n\n    var count = 0; /* repeat count of the current code */\n    var max_count = 7; /* max repeat count */\n    var min_count = 4; /* min repeat count */\n\n    if (nextlen === 0) {\n      max_count = 138;\n      min_count = 3;\n    }\n    tree[(max_code + 1) * 2 + 1] /*.Len*/ = 0xffff; /* guard */\n\n    for (n = 0; n <= max_code; n++) {\n      curlen = nextlen;\n      nextlen = tree[(n + 1) * 2 + 1] /*.Len*/;\n\n      if (++count < max_count && curlen === nextlen) {\n        continue;\n      } else if (count < min_count) {\n        s.bl_tree[curlen * 2] /*.Freq*/ += count;\n      } else if (curlen !== 0) {\n        if (curlen !== prevlen) {\n          s.bl_tree[curlen * 2] /*.Freq*/++;\n        }\n        s.bl_tree[REP_3_6 * 2] /*.Freq*/++;\n      } else if (count <= 10) {\n        s.bl_tree[REPZ_3_10 * 2] /*.Freq*/++;\n      } else {\n        s.bl_tree[REPZ_11_138 * 2] /*.Freq*/++;\n      }\n\n      count = 0;\n      prevlen = curlen;\n      if (nextlen === 0) {\n        max_count = 138;\n        min_count = 3;\n      } else if (curlen === nextlen) {\n        max_count = 6;\n        min_count = 3;\n      } else {\n        max_count = 7;\n        min_count = 4;\n      }\n    }\n  };\n\n  /* ===========================================================================\n   * Send a literal or distance tree in compressed form, using the codes in\n   * bl_tree.\n   */\n  var send_tree = function send_tree(s, tree, max_code) {\n    //    deflate_state *s;\n    //    ct_data *tree; /* the tree to be scanned */\n    //    int max_code;       /* and its largest code of non zero frequency */\n\n    var n; /* iterates over all tree elements */\n    var prevlen = -1; /* last emitted length */\n    var curlen; /* length of current code */\n\n    var nextlen = tree[0 * 2 + 1] /*.Len*/; /* length of next code */\n\n    var count = 0; /* repeat count of the current code */\n    var max_count = 7; /* max repeat count */\n    var min_count = 4; /* min repeat count */\n\n    /* tree[max_code+1].Len = -1; */ /* guard already set */\n    if (nextlen === 0) {\n      max_count = 138;\n      min_count = 3;\n    }\n    for (n = 0; n <= max_code; n++) {\n      curlen = nextlen;\n      nextlen = tree[(n + 1) * 2 + 1] /*.Len*/;\n\n      if (++count < max_count && curlen === nextlen) {\n        continue;\n      } else if (count < min_count) {\n        do {\n          send_code(s, curlen, s.bl_tree);\n        } while (--count !== 0);\n      } else if (curlen !== 0) {\n        if (curlen !== prevlen) {\n          send_code(s, curlen, s.bl_tree);\n          count--;\n        }\n        //Assert(count >= 3 && count <= 6, \" 3_6?\");\n        send_code(s, REP_3_6, s.bl_tree);\n        send_bits(s, count - 3, 2);\n      } else if (count <= 10) {\n        send_code(s, REPZ_3_10, s.bl_tree);\n        send_bits(s, count - 3, 3);\n      } else {\n        send_code(s, REPZ_11_138, s.bl_tree);\n        send_bits(s, count - 11, 7);\n      }\n      count = 0;\n      prevlen = curlen;\n      if (nextlen === 0) {\n        max_count = 138;\n        min_count = 3;\n      } else if (curlen === nextlen) {\n        max_count = 6;\n        min_count = 3;\n      } else {\n        max_count = 7;\n        min_count = 4;\n      }\n    }\n  };\n\n  /* ===========================================================================\n   * Construct the Huffman tree for the bit lengths and return the index in\n   * bl_order of the last bit length code to send.\n   */\n  var build_bl_tree = function build_bl_tree(s) {\n    var max_blindex; /* index of last bit length code of non zero freq */\n\n    /* Determine the bit length frequencies for literal and distance trees */\n    scan_tree(s, s.dyn_ltree, s.l_desc.max_code);\n    scan_tree(s, s.dyn_dtree, s.d_desc.max_code);\n\n    /* Build the bit length tree: */\n    build_tree(s, s.bl_desc);\n    /* opt_len now includes the length of the tree representations, except\n     * the lengths of the bit lengths codes and the 5+5+4 bits for the counts.\n     */\n\n    /* Determine the number of bit length codes to send. The pkzip format\n     * requires that at least 4 bit length codes be sent. (appnote.txt says\n     * 3 but the actual value used is 4.)\n     */\n    for (max_blindex = BL_CODES$1 - 1; max_blindex >= 3; max_blindex--) {\n      if (s.bl_tree[bl_order[max_blindex] * 2 + 1] /*.Len*/ !== 0) {\n        break;\n      }\n    }\n    /* Update opt_len to include the bit length tree and counts */\n    s.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;\n    //Tracev((stderr, \"\\ndyn trees: dyn %ld, stat %ld\",\n    //        s->opt_len, s->static_len));\n\n    return max_blindex;\n  };\n\n  /* ===========================================================================\n   * Send the header for a block using dynamic Huffman trees: the counts, the\n   * lengths of the bit length codes, the literal tree and the distance tree.\n   * IN assertion: lcodes >= 257, dcodes >= 1, blcodes >= 4.\n   */\n  var send_all_trees = function send_all_trees(s, lcodes, dcodes, blcodes) {\n    //    deflate_state *s;\n    //    int lcodes, dcodes, blcodes; /* number of codes for each tree */\n\n    var rank; /* index in bl_order */\n\n    //Assert (lcodes >= 257 && dcodes >= 1 && blcodes >= 4, \"not enough codes\");\n    //Assert (lcodes <= L_CODES && dcodes <= D_CODES && blcodes <= BL_CODES,\n    //        \"too many codes\");\n    //Tracev((stderr, \"\\nbl counts: \"));\n    send_bits(s, lcodes - 257, 5); /* not +255 as stated in appnote.txt */\n    send_bits(s, dcodes - 1, 5);\n    send_bits(s, blcodes - 4, 4); /* not -3 as stated in appnote.txt */\n    for (rank = 0; rank < blcodes; rank++) {\n      //Tracev((stderr, \"\\nbl code %2d \", bl_order[rank]));\n      send_bits(s, s.bl_tree[bl_order[rank] * 2 + 1] /*.Len*/, 3);\n    }\n    //Tracev((stderr, \"\\nbl tree: sent %ld\", s->bits_sent));\n\n    send_tree(s, s.dyn_ltree, lcodes - 1); /* literal tree */\n    //Tracev((stderr, \"\\nlit tree: sent %ld\", s->bits_sent));\n\n    send_tree(s, s.dyn_dtree, dcodes - 1); /* distance tree */\n    //Tracev((stderr, \"\\ndist tree: sent %ld\", s->bits_sent));\n  };\n\n  /* ===========================================================================\n   * Check if the data type is TEXT or BINARY, using the following algorithm:\n   * - TEXT if the two conditions below are satisfied:\n   *    a) There are no non-portable control characters belonging to the\n   *       \"block list\" (0..6, 14..25, 28..31).\n   *    b) There is at least one printable character belonging to the\n   *       \"allow list\" (9 {TAB}, 10 {LF}, 13 {CR}, 32..255).\n   * - BINARY otherwise.\n   * - The following partially-portable control characters form a\n   *   \"gray list\" that is ignored in this detection algorithm:\n   *   (7 {BEL}, 8 {BS}, 11 {VT}, 12 {FF}, 26 {SUB}, 27 {ESC}).\n   * IN assertion: the fields Freq of dyn_ltree are set.\n   */\n  var detect_data_type = function detect_data_type(s) {\n    /* block_mask is the bit mask of block-listed bytes\n     * set bits 0..6, 14..25, and 28..31\n     * 0xf3ffc07f = binary 11110011111111111100000001111111\n     */\n    var block_mask = 0xf3ffc07f;\n    var n;\n\n    /* Check for non-textual (\"block-listed\") bytes. */\n    for (n = 0; n <= 31; n++, block_mask >>>= 1) {\n      if (block_mask & 1 && s.dyn_ltree[n * 2] /*.Freq*/ !== 0) {\n        return Z_BINARY;\n      }\n    }\n\n    /* Check for textual (\"allow-listed\") bytes. */\n    if (s.dyn_ltree[9 * 2] /*.Freq*/ !== 0 || s.dyn_ltree[10 * 2] /*.Freq*/ !== 0 || s.dyn_ltree[13 * 2] /*.Freq*/ !== 0) {\n      return Z_TEXT;\n    }\n    for (n = 32; n < LITERALS$1; n++) {\n      if (s.dyn_ltree[n * 2] /*.Freq*/ !== 0) {\n        return Z_TEXT;\n      }\n    }\n\n    /* There are no \"block-listed\" or \"allow-listed\" bytes:\n     * this stream either is empty or has tolerated (\"gray-listed\") bytes only.\n     */\n    return Z_BINARY;\n  };\n  var static_init_done = false;\n\n  /* ===========================================================================\n   * Initialize the tree data structures for a new zlib stream.\n   */\n  var _tr_init$1 = function _tr_init(s) {\n    if (!static_init_done) {\n      tr_static_init();\n      static_init_done = true;\n    }\n    s.l_desc = new TreeDesc(s.dyn_ltree, static_l_desc);\n    s.d_desc = new TreeDesc(s.dyn_dtree, static_d_desc);\n    s.bl_desc = new TreeDesc(s.bl_tree, static_bl_desc);\n    s.bi_buf = 0;\n    s.bi_valid = 0;\n\n    /* Initialize the first block of the first file: */\n    init_block(s);\n  };\n\n  /* ===========================================================================\n   * Send a stored block\n   */\n  var _tr_stored_block$1 = function _tr_stored_block(s, buf, stored_len, last) {\n    //DeflateState *s;\n    //charf *buf;       /* input block */\n    //ulg stored_len;   /* length of input block */\n    //int last;         /* one if this is the last block for a file */\n\n    send_bits(s, (STORED_BLOCK << 1) + (last ? 1 : 0), 3); /* send block type */\n    bi_windup(s); /* align on byte boundary */\n    put_short(s, stored_len);\n    put_short(s, ~stored_len);\n    if (stored_len) {\n      s.pending_buf.set(s.window.subarray(buf, buf + stored_len), s.pending);\n    }\n    s.pending += stored_len;\n  };\n\n  /* ===========================================================================\n   * Send one empty static block to give enough lookahead for inflate.\n   * This takes 10 bits, of which 7 may remain in the bit buffer.\n   */\n  var _tr_align$1 = function _tr_align(s) {\n    send_bits(s, STATIC_TREES << 1, 3);\n    send_code(s, END_BLOCK, static_ltree);\n    bi_flush(s);\n  };\n\n  /* ===========================================================================\n   * Determine the best encoding for the current block: dynamic trees, static\n   * trees or store, and write out the encoded block.\n   */\n  var _tr_flush_block$1 = function _tr_flush_block(s, buf, stored_len, last) {\n    //DeflateState *s;\n    //charf *buf;       /* input block, or NULL if too old */\n    //ulg stored_len;   /* length of input block */\n    //int last;         /* one if this is the last block for a file */\n\n    var opt_lenb, static_lenb; /* opt_len and static_len in bytes */\n    var max_blindex = 0; /* index of last bit length code of non zero freq */\n\n    /* Build the Huffman trees unless a stored block is forced */\n    if (s.level > 0) {\n      /* Check if the file is binary or text */\n      if (s.strm.data_type === Z_UNKNOWN$1) {\n        s.strm.data_type = detect_data_type(s);\n      }\n\n      /* Construct the literal and distance trees */\n      build_tree(s, s.l_desc);\n      // Tracev((stderr, \"\\nlit data: dyn %ld, stat %ld\", s->opt_len,\n      //        s->static_len));\n\n      build_tree(s, s.d_desc);\n      // Tracev((stderr, \"\\ndist data: dyn %ld, stat %ld\", s->opt_len,\n      //        s->static_len));\n      /* At this point, opt_len and static_len are the total bit lengths of\n       * the compressed block data, excluding the tree representations.\n       */\n\n      /* Build the bit length tree for the above two trees, and get the index\n       * in bl_order of the last bit length code to send.\n       */\n      max_blindex = build_bl_tree(s);\n\n      /* Determine the best encoding. Compute the block lengths in bytes. */\n      opt_lenb = s.opt_len + 3 + 7 >>> 3;\n      static_lenb = s.static_len + 3 + 7 >>> 3;\n\n      // Tracev((stderr, \"\\nopt %lu(%lu) stat %lu(%lu) stored %lu lit %u \",\n      //        opt_lenb, s->opt_len, static_lenb, s->static_len, stored_len,\n      //        s->sym_next / 3));\n\n      if (static_lenb <= opt_lenb) {\n        opt_lenb = static_lenb;\n      }\n    } else {\n      // Assert(buf != (char*)0, \"lost buf\");\n      opt_lenb = static_lenb = stored_len + 5; /* force a stored block */\n    }\n\n    if (stored_len + 4 <= opt_lenb && buf !== -1) {\n      /* 4: two words for the lengths */\n\n      /* The test buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.\n       * Otherwise we can't have processed more than WSIZE input bytes since\n       * the last block flush, because compression would have been\n       * successful. If LIT_BUFSIZE <= WSIZE, it is never too late to\n       * transform a block into a stored block.\n       */\n      _tr_stored_block$1(s, buf, stored_len, last);\n    } else if (s.strategy === Z_FIXED$1 || static_lenb === opt_lenb) {\n      send_bits(s, (STATIC_TREES << 1) + (last ? 1 : 0), 3);\n      compress_block(s, static_ltree, static_dtree);\n    } else {\n      send_bits(s, (DYN_TREES << 1) + (last ? 1 : 0), 3);\n      send_all_trees(s, s.l_desc.max_code + 1, s.d_desc.max_code + 1, max_blindex + 1);\n      compress_block(s, s.dyn_ltree, s.dyn_dtree);\n    }\n    // Assert (s->compressed_len == s->bits_sent, \"bad compressed size\");\n    /* The above check is made mod 2^32, for files larger than 512 MB\n     * and uLong implemented on 32 bits.\n     */\n    init_block(s);\n    if (last) {\n      bi_windup(s);\n    }\n    // Tracev((stderr,\"\\ncomprlen %lu(%lu) \", s->compressed_len>>3,\n    //       s->compressed_len-7*last));\n  };\n\n  /* ===========================================================================\n   * Save the match info and tally the frequency counts. Return true if\n   * the current block must be flushed.\n   */\n  var _tr_tally$1 = function _tr_tally(s, dist, lc) {\n    //    deflate_state *s;\n    //    unsigned dist;  /* distance of matched string */\n    //    unsigned lc;    /* match length-MIN_MATCH or unmatched char (if dist==0) */\n\n    s.pending_buf[s.sym_buf + s.sym_next++] = dist;\n    s.pending_buf[s.sym_buf + s.sym_next++] = dist >> 8;\n    s.pending_buf[s.sym_buf + s.sym_next++] = lc;\n    if (dist === 0) {\n      /* lc is the unmatched char */\n      s.dyn_ltree[lc * 2] /*.Freq*/++;\n    } else {\n      s.matches++;\n      /* Here, lc is the match length - MIN_MATCH */\n      dist--; /* dist = match distance - 1 */\n      //Assert((ush)dist < (ush)MAX_DIST(s) &&\n      //       (ush)lc <= (ush)(MAX_MATCH-MIN_MATCH) &&\n      //       (ush)d_code(dist) < (ush)D_CODES,  \"_tr_tally: bad match\");\n\n      s.dyn_ltree[(_length_code[lc] + LITERALS$1 + 1) * 2] /*.Freq*/++;\n      s.dyn_dtree[d_code(dist) * 2] /*.Freq*/++;\n    }\n\n    return s.sym_next === s.sym_end;\n  };\n  var _tr_init_1 = _tr_init$1;\n  var _tr_stored_block_1 = _tr_stored_block$1;\n  var _tr_flush_block_1 = _tr_flush_block$1;\n  var _tr_tally_1 = _tr_tally$1;\n  var _tr_align_1 = _tr_align$1;\n  var trees = {\n    _tr_init: _tr_init_1,\n    _tr_stored_block: _tr_stored_block_1,\n    _tr_flush_block: _tr_flush_block_1,\n    _tr_tally: _tr_tally_1,\n    _tr_align: _tr_align_1\n  };\n\n  // Note: adler32 takes 12% for level 0 and 2% for level 6.\n  // It isn't worth it to make additional optimizations as in original.\n  // Small size is preferable.\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  var adler32 = function adler32(adler, buf, len, pos) {\n    var s1 = adler & 0xffff | 0,\n      s2 = adler >>> 16 & 0xffff | 0,\n      n = 0;\n    while (len !== 0) {\n      // Set limit ~ twice less than 5552, to keep\n      // s2 in 31-bits, because we force signed ints.\n      // in other case %= will fail.\n      n = len > 2000 ? 2000 : len;\n      len -= n;\n      do {\n        s1 = s1 + buf[pos++] | 0;\n        s2 = s2 + s1 | 0;\n      } while (--n);\n      s1 %= 65521;\n      s2 %= 65521;\n    }\n    return s1 | s2 << 16 | 0;\n  };\n  var adler32_1 = adler32;\n\n  // Note: we can't get significant speed boost here.\n  // So write code to minimize size - no pregenerated tables\n  // and array tools dependencies.\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n\n  // Use ordinary array, since untyped makes no boost here\n  var makeTable = function makeTable() {\n    var c,\n      table = [];\n    for (var n = 0; n < 256; n++) {\n      c = n;\n      for (var k = 0; k < 8; k++) {\n        c = c & 1 ? 0xEDB88320 ^ c >>> 1 : c >>> 1;\n      }\n      table[n] = c;\n    }\n    return table;\n  };\n\n  // Create table on load. Just 255 signed longs. Not a problem.\n  var crcTable = new Uint32Array(makeTable());\n  var crc32 = function crc32(crc, buf, len, pos) {\n    var t = crcTable;\n    var end = pos + len;\n    crc ^= -1;\n    for (var i = pos; i < end; i++) {\n      crc = crc >>> 8 ^ t[(crc ^ buf[i]) & 0xFF];\n    }\n    return crc ^ -1; // >>> 0;\n  };\n\n  var crc32_1 = crc32;\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  var messages = {\n    2: 'need dictionary',\n    /* Z_NEED_DICT       2  */\n    1: 'stream end',\n    /* Z_STREAM_END      1  */\n    0: '',\n    /* Z_OK              0  */\n    '-1': 'file error',\n    /* Z_ERRNO         (-1) */\n    '-2': 'stream error',\n    /* Z_STREAM_ERROR  (-2) */\n    '-3': 'data error',\n    /* Z_DATA_ERROR    (-3) */\n    '-4': 'insufficient memory',\n    /* Z_MEM_ERROR     (-4) */\n    '-5': 'buffer error',\n    /* Z_BUF_ERROR     (-5) */\n    '-6': 'incompatible version' /* Z_VERSION_ERROR (-6) */\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  var constants$2 = {\n    /* Allowed flush values; see deflate() and inflate() below for details */\n    Z_NO_FLUSH: 0,\n    Z_PARTIAL_FLUSH: 1,\n    Z_SYNC_FLUSH: 2,\n    Z_FULL_FLUSH: 3,\n    Z_FINISH: 4,\n    Z_BLOCK: 5,\n    Z_TREES: 6,\n    /* Return codes for the compression/decompression functions. Negative values\n    * are errors, positive values are used for special but normal events.\n    */\n    Z_OK: 0,\n    Z_STREAM_END: 1,\n    Z_NEED_DICT: 2,\n    Z_ERRNO: -1,\n    Z_STREAM_ERROR: -2,\n    Z_DATA_ERROR: -3,\n    Z_MEM_ERROR: -4,\n    Z_BUF_ERROR: -5,\n    //Z_VERSION_ERROR: -6,\n\n    /* compression levels */\n    Z_NO_COMPRESSION: 0,\n    Z_BEST_SPEED: 1,\n    Z_BEST_COMPRESSION: 9,\n    Z_DEFAULT_COMPRESSION: -1,\n    Z_FILTERED: 1,\n    Z_HUFFMAN_ONLY: 2,\n    Z_RLE: 3,\n    Z_FIXED: 4,\n    Z_DEFAULT_STRATEGY: 0,\n    /* Possible values of the data_type field (though see inflate()) */\n    Z_BINARY: 0,\n    Z_TEXT: 1,\n    //Z_ASCII:                1, // = Z_TEXT (deprecated)\n    Z_UNKNOWN: 2,\n    /* The deflate compression method */\n    Z_DEFLATED: 8\n    //Z_NULL:                 null // Use -1 or null inline, depending on var type\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n\n  var _tr_init = trees._tr_init,\n    _tr_stored_block = trees._tr_stored_block,\n    _tr_flush_block = trees._tr_flush_block,\n    _tr_tally = trees._tr_tally,\n    _tr_align = trees._tr_align;\n\n  /* Public constants ==========================================================*/\n  /* ===========================================================================*/\n\n  var Z_NO_FLUSH$2 = constants$2.Z_NO_FLUSH,\n    Z_PARTIAL_FLUSH = constants$2.Z_PARTIAL_FLUSH,\n    Z_FULL_FLUSH$1 = constants$2.Z_FULL_FLUSH,\n    Z_FINISH$3 = constants$2.Z_FINISH,\n    Z_BLOCK$1 = constants$2.Z_BLOCK,\n    Z_OK$3 = constants$2.Z_OK,\n    Z_STREAM_END$3 = constants$2.Z_STREAM_END,\n    Z_STREAM_ERROR$2 = constants$2.Z_STREAM_ERROR,\n    Z_DATA_ERROR$2 = constants$2.Z_DATA_ERROR,\n    Z_BUF_ERROR$1 = constants$2.Z_BUF_ERROR,\n    Z_DEFAULT_COMPRESSION$1 = constants$2.Z_DEFAULT_COMPRESSION,\n    Z_FILTERED = constants$2.Z_FILTERED,\n    Z_HUFFMAN_ONLY = constants$2.Z_HUFFMAN_ONLY,\n    Z_RLE = constants$2.Z_RLE,\n    Z_FIXED = constants$2.Z_FIXED,\n    Z_DEFAULT_STRATEGY$1 = constants$2.Z_DEFAULT_STRATEGY,\n    Z_UNKNOWN = constants$2.Z_UNKNOWN,\n    Z_DEFLATED$2 = constants$2.Z_DEFLATED;\n\n  /*============================================================================*/\n\n  var MAX_MEM_LEVEL = 9;\n  /* Maximum value for memLevel in deflateInit2 */\n  var MAX_WBITS$1 = 15;\n  /* 32K LZ77 window */\n  var DEF_MEM_LEVEL = 8;\n  var LENGTH_CODES = 29;\n  /* number of length codes, not counting the special END_BLOCK code */\n  var LITERALS = 256;\n  /* number of literal bytes 0..255 */\n  var L_CODES = LITERALS + 1 + LENGTH_CODES;\n  /* number of Literal or Length codes, including the END_BLOCK code */\n  var D_CODES = 30;\n  /* number of distance codes */\n  var BL_CODES = 19;\n  /* number of codes used to transfer the bit lengths */\n  var HEAP_SIZE = 2 * L_CODES + 1;\n  /* maximum heap size */\n  var MAX_BITS = 15;\n  /* All codes must not exceed MAX_BITS bits */\n\n  var MIN_MATCH = 3;\n  var MAX_MATCH = 258;\n  var MIN_LOOKAHEAD = MAX_MATCH + MIN_MATCH + 1;\n  var PRESET_DICT = 0x20;\n  var INIT_STATE = 42; /* zlib header -> BUSY_STATE */\n  //#ifdef GZIP\n  var GZIP_STATE = 57; /* gzip header -> BUSY_STATE | EXTRA_STATE */\n  //#endif\n  var EXTRA_STATE = 69; /* gzip extra block -> NAME_STATE */\n  var NAME_STATE = 73; /* gzip file name -> COMMENT_STATE */\n  var COMMENT_STATE = 91; /* gzip comment -> HCRC_STATE */\n  var HCRC_STATE = 103; /* gzip header CRC -> BUSY_STATE */\n  var BUSY_STATE = 113; /* deflate -> FINISH_STATE */\n  var FINISH_STATE = 666; /* stream complete */\n\n  var BS_NEED_MORE = 1; /* block not completed, need more input or more output */\n  var BS_BLOCK_DONE = 2; /* block flush performed */\n  var BS_FINISH_STARTED = 3; /* finish started, need only more output at next deflate */\n  var BS_FINISH_DONE = 4; /* finish done, accept no more input or output */\n\n  var OS_CODE = 0x03; // Unix :) . Don't detect, use this default.\n\n  var err = function err(strm, errorCode) {\n    strm.msg = messages[errorCode];\n    return errorCode;\n  };\n  var rank = function rank(f) {\n    return f * 2 - (f > 4 ? 9 : 0);\n  };\n  var zero = function zero(buf) {\n    var len = buf.length;\n    while (--len >= 0) {\n      buf[len] = 0;\n    }\n  };\n\n  /* ===========================================================================\n   * Slide the hash table when sliding the window down (could be avoided with 32\n   * bit values at the expense of memory usage). We slide even when level == 0 to\n   * keep the hash table consistent if we switch back to level > 0 later.\n   */\n  var slide_hash = function slide_hash(s) {\n    var n, m;\n    var p;\n    var wsize = s.w_size;\n    n = s.hash_size;\n    p = n;\n    do {\n      m = s.head[--p];\n      s.head[p] = m >= wsize ? m - wsize : 0;\n    } while (--n);\n    n = wsize;\n    //#ifndef FASTEST\n    p = n;\n    do {\n      m = s.prev[--p];\n      s.prev[p] = m >= wsize ? m - wsize : 0;\n      /* If n is not on any hash chain, prev[n] is garbage but\n       * its value will never be used.\n       */\n    } while (--n);\n    //#endif\n  };\n\n  /* eslint-disable new-cap */\n  var HASH_ZLIB = function HASH_ZLIB(s, prev, data) {\n    return (prev << s.hash_shift ^ data) & s.hash_mask;\n  };\n  // This hash causes less collisions, https://github.com/nodeca/pako/issues/135\n  // But breaks binary compatibility\n  //let HASH_FAST = (s, prev, data) => ((prev << 8) + (prev >> 8) + (data << 4)) & s.hash_mask;\n  var HASH = HASH_ZLIB;\n\n  /* =========================================================================\n   * Flush as much pending output as possible. All deflate() output, except for\n   * some deflate_stored() output, goes through this function so some\n   * applications may wish to modify it to avoid allocating a large\n   * strm->next_out buffer and copying into it. (See also read_buf()).\n   */\n  var flush_pending = function flush_pending(strm) {\n    var s = strm.state;\n\n    //_tr_flush_bits(s);\n    var len = s.pending;\n    if (len > strm.avail_out) {\n      len = strm.avail_out;\n    }\n    if (len === 0) {\n      return;\n    }\n    strm.output.set(s.pending_buf.subarray(s.pending_out, s.pending_out + len), strm.next_out);\n    strm.next_out += len;\n    s.pending_out += len;\n    strm.total_out += len;\n    strm.avail_out -= len;\n    s.pending -= len;\n    if (s.pending === 0) {\n      s.pending_out = 0;\n    }\n  };\n  var flush_block_only = function flush_block_only(s, last) {\n    _tr_flush_block(s, s.block_start >= 0 ? s.block_start : -1, s.strstart - s.block_start, last);\n    s.block_start = s.strstart;\n    flush_pending(s.strm);\n  };\n  var put_byte = function put_byte(s, b) {\n    s.pending_buf[s.pending++] = b;\n  };\n\n  /* =========================================================================\n   * Put a short in the pending buffer. The 16-bit value is put in MSB order.\n   * IN assertion: the stream state is correct and there is enough room in\n   * pending_buf.\n   */\n  var putShortMSB = function putShortMSB(s, b) {\n    //  put_byte(s, (Byte)(b >> 8));\n    //  put_byte(s, (Byte)(b & 0xff));\n    s.pending_buf[s.pending++] = b >>> 8 & 0xff;\n    s.pending_buf[s.pending++] = b & 0xff;\n  };\n\n  /* ===========================================================================\n   * Read a new buffer from the current input stream, update the adler32\n   * and total number of bytes read.  All deflate() input goes through\n   * this function so some applications may wish to modify it to avoid\n   * allocating a large strm->input buffer and copying from it.\n   * (See also flush_pending()).\n   */\n  var read_buf = function read_buf(strm, buf, start, size) {\n    var len = strm.avail_in;\n    if (len > size) {\n      len = size;\n    }\n    if (len === 0) {\n      return 0;\n    }\n    strm.avail_in -= len;\n\n    // zmemcpy(buf, strm->next_in, len);\n    buf.set(strm.input.subarray(strm.next_in, strm.next_in + len), start);\n    if (strm.state.wrap === 1) {\n      strm.adler = adler32_1(strm.adler, buf, len, start);\n    } else if (strm.state.wrap === 2) {\n      strm.adler = crc32_1(strm.adler, buf, len, start);\n    }\n    strm.next_in += len;\n    strm.total_in += len;\n    return len;\n  };\n\n  /* ===========================================================================\n   * Set match_start to the longest match starting at the given string and\n   * return its length. Matches shorter or equal to prev_length are discarded,\n   * in which case the result is equal to prev_length and match_start is\n   * garbage.\n   * IN assertions: cur_match is the head of the hash chain for the current\n   *   string (strstart) and its distance is <= MAX_DIST, and prev_length >= 1\n   * OUT assertion: the match length is not greater than s->lookahead.\n   */\n  var longest_match = function longest_match(s, cur_match) {\n    var chain_length = s.max_chain_length; /* max hash chain length */\n    var scan = s.strstart; /* current string */\n    var match; /* matched string */\n    var len; /* length of current match */\n    var best_len = s.prev_length; /* best match length so far */\n    var nice_match = s.nice_match; /* stop if match long enough */\n    var limit = s.strstart > s.w_size - MIN_LOOKAHEAD ? s.strstart - (s.w_size - MIN_LOOKAHEAD) : 0 /*NIL*/;\n\n    var _win = s.window; // shortcut\n\n    var wmask = s.w_mask;\n    var prev = s.prev;\n\n    /* Stop when cur_match becomes <= limit. To simplify the code,\n     * we prevent matches with the string of window index 0.\n     */\n\n    var strend = s.strstart + MAX_MATCH;\n    var scan_end1 = _win[scan + best_len - 1];\n    var scan_end = _win[scan + best_len];\n\n    /* The code is optimized for HASH_BITS >= 8 and MAX_MATCH-2 multiple of 16.\n     * It is easy to get rid of this optimization if necessary.\n     */\n    // Assert(s->hash_bits >= 8 && MAX_MATCH == 258, \"Code too clever\");\n\n    /* Do not waste too much time if we already have a good match: */\n    if (s.prev_length >= s.good_match) {\n      chain_length >>= 2;\n    }\n    /* Do not look for matches beyond the end of the input. This is necessary\n     * to make deflate deterministic.\n     */\n    if (nice_match > s.lookahead) {\n      nice_match = s.lookahead;\n    }\n\n    // Assert((ulg)s->strstart <= s->window_size-MIN_LOOKAHEAD, \"need lookahead\");\n\n    do {\n      // Assert(cur_match < s->strstart, \"no future\");\n      match = cur_match;\n\n      /* Skip to next match if the match length cannot increase\n       * or if the match length is less than 2.  Note that the checks below\n       * for insufficient lookahead only occur occasionally for performance\n       * reasons.  Therefore uninitialized memory will be accessed, and\n       * conditional jumps will be made that depend on those values.\n       * However the length of the match is limited to the lookahead, so\n       * the output of deflate is not affected by the uninitialized values.\n       */\n\n      if (_win[match + best_len] !== scan_end || _win[match + best_len - 1] !== scan_end1 || _win[match] !== _win[scan] || _win[++match] !== _win[scan + 1]) {\n        continue;\n      }\n\n      /* The check at best_len-1 can be removed because it will be made\n       * again later. (This heuristic is not always a win.)\n       * It is not necessary to compare scan[2] and match[2] since they\n       * are always equal when the other bytes match, given that\n       * the hash keys are equal and that HASH_BITS >= 8.\n       */\n      scan += 2;\n      match++;\n      // Assert(*scan == *match, \"match[2]?\");\n\n      /* We check for insufficient lookahead only every 8th comparison;\n       * the 256th check will be made at strstart+258.\n       */\n      do {\n        /*jshint noempty:false*/\n      } while (_win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && _win[++scan] === _win[++match] && scan < strend);\n\n      // Assert(scan <= s->window+(unsigned)(s->window_size-1), \"wild scan\");\n\n      len = MAX_MATCH - (strend - scan);\n      scan = strend - MAX_MATCH;\n      if (len > best_len) {\n        s.match_start = cur_match;\n        best_len = len;\n        if (len >= nice_match) {\n          break;\n        }\n        scan_end1 = _win[scan + best_len - 1];\n        scan_end = _win[scan + best_len];\n      }\n    } while ((cur_match = prev[cur_match & wmask]) > limit && --chain_length !== 0);\n    if (best_len <= s.lookahead) {\n      return best_len;\n    }\n    return s.lookahead;\n  };\n\n  /* ===========================================================================\n   * Fill the window when the lookahead becomes insufficient.\n   * Updates strstart and lookahead.\n   *\n   * IN assertion: lookahead < MIN_LOOKAHEAD\n   * OUT assertions: strstart <= window_size-MIN_LOOKAHEAD\n   *    At least one byte has been read, or avail_in == 0; reads are\n   *    performed for at least two bytes (required for the zip translate_eol\n   *    option -- not supported here).\n   */\n  var fill_window = function fill_window(s) {\n    var _w_size = s.w_size;\n    var n, more, str;\n\n    //Assert(s->lookahead < MIN_LOOKAHEAD, \"already enough lookahead\");\n\n    do {\n      more = s.window_size - s.lookahead - s.strstart;\n\n      // JS ints have 32 bit, block below not needed\n      /* Deal with !@#$% 64K limit: */\n      //if (sizeof(int) <= 2) {\n      //    if (more == 0 && s->strstart == 0 && s->lookahead == 0) {\n      //        more = wsize;\n      //\n      //  } else if (more == (unsigned)(-1)) {\n      //        /* Very unlikely, but possible on 16 bit machine if\n      //         * strstart == 0 && lookahead == 1 (input done a byte at time)\n      //         */\n      //        more--;\n      //    }\n      //}\n\n      /* If the window is almost full and there is insufficient lookahead,\n       * move the upper half to the lower one to make room in the upper half.\n       */\n      if (s.strstart >= _w_size + (_w_size - MIN_LOOKAHEAD)) {\n        s.window.set(s.window.subarray(_w_size, _w_size + _w_size - more), 0);\n        s.match_start -= _w_size;\n        s.strstart -= _w_size;\n        /* we now have strstart >= MAX_DIST */\n        s.block_start -= _w_size;\n        if (s.insert > s.strstart) {\n          s.insert = s.strstart;\n        }\n        slide_hash(s);\n        more += _w_size;\n      }\n      if (s.strm.avail_in === 0) {\n        break;\n      }\n\n      /* If there was no sliding:\n       *    strstart <= WSIZE+MAX_DIST-1 && lookahead <= MIN_LOOKAHEAD - 1 &&\n       *    more == window_size - lookahead - strstart\n       * => more >= window_size - (MIN_LOOKAHEAD-1 + WSIZE + MAX_DIST-1)\n       * => more >= window_size - 2*WSIZE + 2\n       * In the BIG_MEM or MMAP case (not yet supported),\n       *   window_size == input_size + MIN_LOOKAHEAD  &&\n       *   strstart + s->lookahead <= input_size => more >= MIN_LOOKAHEAD.\n       * Otherwise, window_size == 2*WSIZE so more >= 2.\n       * If there was sliding, more >= WSIZE. So in all cases, more >= 2.\n       */\n      //Assert(more >= 2, \"more < 2\");\n      n = read_buf(s.strm, s.window, s.strstart + s.lookahead, more);\n      s.lookahead += n;\n\n      /* Initialize the hash value now that we have some input: */\n      if (s.lookahead + s.insert >= MIN_MATCH) {\n        str = s.strstart - s.insert;\n        s.ins_h = s.window[str];\n\n        /* UPDATE_HASH(s, s->ins_h, s->window[str + 1]); */\n        s.ins_h = HASH(s, s.ins_h, s.window[str + 1]);\n        //#if MIN_MATCH != 3\n        //        Call update_hash() MIN_MATCH-3 more times\n        //#endif\n        while (s.insert) {\n          /* UPDATE_HASH(s, s->ins_h, s->window[str + MIN_MATCH-1]); */\n          s.ins_h = HASH(s, s.ins_h, s.window[str + MIN_MATCH - 1]);\n          s.prev[str & s.w_mask] = s.head[s.ins_h];\n          s.head[s.ins_h] = str;\n          str++;\n          s.insert--;\n          if (s.lookahead + s.insert < MIN_MATCH) {\n            break;\n          }\n        }\n      }\n      /* If the whole input has less than MIN_MATCH bytes, ins_h is garbage,\n       * but this is not important since only literal bytes will be emitted.\n       */\n    } while (s.lookahead < MIN_LOOKAHEAD && s.strm.avail_in !== 0);\n\n    /* If the WIN_INIT bytes after the end of the current data have never been\n     * written, then zero those bytes in order to avoid memory check reports of\n     * the use of uninitialized (or uninitialised as Julian writes) bytes by\n     * the longest match routines.  Update the high water mark for the next\n     * time through here.  WIN_INIT is set to MAX_MATCH since the longest match\n     * routines allow scanning to strstart + MAX_MATCH, ignoring lookahead.\n     */\n    //  if (s.high_water < s.window_size) {\n    //    const curr = s.strstart + s.lookahead;\n    //    let init = 0;\n    //\n    //    if (s.high_water < curr) {\n    //      /* Previous high water mark below current data -- zero WIN_INIT\n    //       * bytes or up to end of window, whichever is less.\n    //       */\n    //      init = s.window_size - curr;\n    //      if (init > WIN_INIT)\n    //        init = WIN_INIT;\n    //      zmemzero(s->window + curr, (unsigned)init);\n    //      s->high_water = curr + init;\n    //    }\n    //    else if (s->high_water < (ulg)curr + WIN_INIT) {\n    //      /* High water mark at or above current data, but below current data\n    //       * plus WIN_INIT -- zero out to current data plus WIN_INIT, or up\n    //       * to end of window, whichever is less.\n    //       */\n    //      init = (ulg)curr + WIN_INIT - s->high_water;\n    //      if (init > s->window_size - s->high_water)\n    //        init = s->window_size - s->high_water;\n    //      zmemzero(s->window + s->high_water, (unsigned)init);\n    //      s->high_water += init;\n    //    }\n    //  }\n    //\n    //  Assert((ulg)s->strstart <= s->window_size - MIN_LOOKAHEAD,\n    //    \"not enough room for search\");\n  };\n\n  /* ===========================================================================\n   * Copy without compression as much as possible from the input stream, return\n   * the current block state.\n   *\n   * In case deflateParams() is used to later switch to a non-zero compression\n   * level, s->matches (otherwise unused when storing) keeps track of the number\n   * of hash table slides to perform. If s->matches is 1, then one hash table\n   * slide will be done when switching. If s->matches is 2, the maximum value\n   * allowed here, then the hash table will be cleared, since two or more slides\n   * is the same as a clear.\n   *\n   * deflate_stored() is written to minimize the number of times an input byte is\n   * copied. It is most efficient with large input and output buffers, which\n   * maximizes the opportunites to have a single copy from next_in to next_out.\n   */\n  var deflate_stored = function deflate_stored(s, flush) {\n    /* Smallest worthy block size when not flushing or finishing. By default\n     * this is 32K. This can be as small as 507 bytes for memLevel == 1. For\n     * large input and output buffers, the stored block size will be larger.\n     */\n    var min_block = s.pending_buf_size - 5 > s.w_size ? s.w_size : s.pending_buf_size - 5;\n\n    /* Copy as many min_block or larger stored blocks directly to next_out as\n     * possible. If flushing, copy the remaining available input to next_out as\n     * stored blocks, if there is enough space.\n     */\n    var len,\n      left,\n      have,\n      last = 0;\n    var used = s.strm.avail_in;\n    do {\n      /* Set len to the maximum size block that we can copy directly with the\n       * available input data and output space. Set left to how much of that\n       * would be copied from what's left in the window.\n       */\n      len = 65535 /* MAX_STORED */; /* maximum deflate stored block length */\n      have = s.bi_valid + 42 >> 3; /* number of header bytes */\n      if (s.strm.avail_out < have) {\n        /* need room for header */\n        break;\n      }\n      /* maximum stored block length that will fit in avail_out: */\n      have = s.strm.avail_out - have;\n      left = s.strstart - s.block_start; /* bytes left in window */\n      if (len > left + s.strm.avail_in) {\n        len = left + s.strm.avail_in; /* limit len to the input */\n      }\n\n      if (len > have) {\n        len = have; /* limit len to the output */\n      }\n\n      /* If the stored block would be less than min_block in length, or if\n       * unable to copy all of the available input when flushing, then try\n       * copying to the window and the pending buffer instead. Also don't\n       * write an empty block when flushing -- deflate() does that.\n       */\n      if (len < min_block && (len === 0 && flush !== Z_FINISH$3 || flush === Z_NO_FLUSH$2 || len !== left + s.strm.avail_in)) {\n        break;\n      }\n\n      /* Make a dummy stored block in pending to get the header bytes,\n       * including any pending bits. This also updates the debugging counts.\n       */\n      last = flush === Z_FINISH$3 && len === left + s.strm.avail_in ? 1 : 0;\n      _tr_stored_block(s, 0, 0, last);\n\n      /* Replace the lengths in the dummy stored block with len. */\n      s.pending_buf[s.pending - 4] = len;\n      s.pending_buf[s.pending - 3] = len >> 8;\n      s.pending_buf[s.pending - 2] = ~len;\n      s.pending_buf[s.pending - 1] = ~len >> 8;\n\n      /* Write the stored block header bytes. */\n      flush_pending(s.strm);\n\n      //#ifdef ZLIB_DEBUG\n      //    /* Update debugging counts for the data about to be copied. */\n      //    s->compressed_len += len << 3;\n      //    s->bits_sent += len << 3;\n      //#endif\n\n      /* Copy uncompressed bytes from the window to next_out. */\n      if (left) {\n        if (left > len) {\n          left = len;\n        }\n        //zmemcpy(s->strm->next_out, s->window + s->block_start, left);\n        s.strm.output.set(s.window.subarray(s.block_start, s.block_start + left), s.strm.next_out);\n        s.strm.next_out += left;\n        s.strm.avail_out -= left;\n        s.strm.total_out += left;\n        s.block_start += left;\n        len -= left;\n      }\n\n      /* Copy uncompressed bytes directly from next_in to next_out, updating\n       * the check value.\n       */\n      if (len) {\n        read_buf(s.strm, s.strm.output, s.strm.next_out, len);\n        s.strm.next_out += len;\n        s.strm.avail_out -= len;\n        s.strm.total_out += len;\n      }\n    } while (last === 0);\n\n    /* Update the sliding window with the last s->w_size bytes of the copied\n     * data, or append all of the copied data to the existing window if less\n     * than s->w_size bytes were copied. Also update the number of bytes to\n     * insert in the hash tables, in the event that deflateParams() switches to\n     * a non-zero compression level.\n     */\n    used -= s.strm.avail_in; /* number of input bytes directly copied */\n    if (used) {\n      /* If any input was used, then no unused input remains in the window,\n       * therefore s->block_start == s->strstart.\n       */\n      if (used >= s.w_size) {\n        /* supplant the previous history */\n        s.matches = 2; /* clear hash */\n        //zmemcpy(s->window, s->strm->next_in - s->w_size, s->w_size);\n        s.window.set(s.strm.input.subarray(s.strm.next_in - s.w_size, s.strm.next_in), 0);\n        s.strstart = s.w_size;\n        s.insert = s.strstart;\n      } else {\n        if (s.window_size - s.strstart <= used) {\n          /* Slide the window down. */\n          s.strstart -= s.w_size;\n          //zmemcpy(s->window, s->window + s->w_size, s->strstart);\n          s.window.set(s.window.subarray(s.w_size, s.w_size + s.strstart), 0);\n          if (s.matches < 2) {\n            s.matches++; /* add a pending slide_hash() */\n          }\n\n          if (s.insert > s.strstart) {\n            s.insert = s.strstart;\n          }\n        }\n        //zmemcpy(s->window + s->strstart, s->strm->next_in - used, used);\n        s.window.set(s.strm.input.subarray(s.strm.next_in - used, s.strm.next_in), s.strstart);\n        s.strstart += used;\n        s.insert += used > s.w_size - s.insert ? s.w_size - s.insert : used;\n      }\n      s.block_start = s.strstart;\n    }\n    if (s.high_water < s.strstart) {\n      s.high_water = s.strstart;\n    }\n\n    /* If the last block was written to next_out, then done. */\n    if (last) {\n      return BS_FINISH_DONE;\n    }\n\n    /* If flushing and all input has been consumed, then done. */\n    if (flush !== Z_NO_FLUSH$2 && flush !== Z_FINISH$3 && s.strm.avail_in === 0 && s.strstart === s.block_start) {\n      return BS_BLOCK_DONE;\n    }\n\n    /* Fill the window with any remaining input. */\n    have = s.window_size - s.strstart;\n    if (s.strm.avail_in > have && s.block_start >= s.w_size) {\n      /* Slide the window down. */\n      s.block_start -= s.w_size;\n      s.strstart -= s.w_size;\n      //zmemcpy(s->window, s->window + s->w_size, s->strstart);\n      s.window.set(s.window.subarray(s.w_size, s.w_size + s.strstart), 0);\n      if (s.matches < 2) {\n        s.matches++; /* add a pending slide_hash() */\n      }\n\n      have += s.w_size; /* more space now */\n      if (s.insert > s.strstart) {\n        s.insert = s.strstart;\n      }\n    }\n    if (have > s.strm.avail_in) {\n      have = s.strm.avail_in;\n    }\n    if (have) {\n      read_buf(s.strm, s.window, s.strstart, have);\n      s.strstart += have;\n      s.insert += have > s.w_size - s.insert ? s.w_size - s.insert : have;\n    }\n    if (s.high_water < s.strstart) {\n      s.high_water = s.strstart;\n    }\n\n    /* There was not enough avail_out to write a complete worthy or flushed\n     * stored block to next_out. Write a stored block to pending instead, if we\n     * have enough input for a worthy block, or if flushing and there is enough\n     * room for the remaining input as a stored block in the pending buffer.\n     */\n    have = s.bi_valid + 42 >> 3; /* number of header bytes */\n    /* maximum stored block length that will fit in pending: */\n    have = s.pending_buf_size - have > 65535 /* MAX_STORED */ ? 65535 /* MAX_STORED */ : s.pending_buf_size - have;\n    min_block = have > s.w_size ? s.w_size : have;\n    left = s.strstart - s.block_start;\n    if (left >= min_block || (left || flush === Z_FINISH$3) && flush !== Z_NO_FLUSH$2 && s.strm.avail_in === 0 && left <= have) {\n      len = left > have ? have : left;\n      last = flush === Z_FINISH$3 && s.strm.avail_in === 0 && len === left ? 1 : 0;\n      _tr_stored_block(s, s.block_start, len, last);\n      s.block_start += len;\n      flush_pending(s.strm);\n    }\n\n    /* We've done all we can with the available input and output. */\n    return last ? BS_FINISH_STARTED : BS_NEED_MORE;\n  };\n\n  /* ===========================================================================\n   * Compress as much as possible from the input stream, return the current\n   * block state.\n   * This function does not perform lazy evaluation of matches and inserts\n   * new strings in the dictionary only for unmatched strings or for short\n   * matches. It is used only for the fast compression options.\n   */\n  var deflate_fast = function deflate_fast(s, flush) {\n    var hash_head; /* head of the hash chain */\n    var bflush; /* set if current block must be flushed */\n\n    for (;;) {\n      /* Make sure that we always have enough lookahead, except\n       * at the end of the input file. We need MAX_MATCH bytes\n       * for the next match, plus MIN_MATCH bytes to insert the\n       * string following the next match.\n       */\n      if (s.lookahead < MIN_LOOKAHEAD) {\n        fill_window(s);\n        if (s.lookahead < MIN_LOOKAHEAD && flush === Z_NO_FLUSH$2) {\n          return BS_NEED_MORE;\n        }\n        if (s.lookahead === 0) {\n          break; /* flush the current block */\n        }\n      }\n\n      /* Insert the string window[strstart .. strstart+2] in the\n       * dictionary, and set hash_head to the head of the hash chain:\n       */\n      hash_head = 0 /*NIL*/;\n      if (s.lookahead >= MIN_MATCH) {\n        /*** INSERT_STRING(s, s.strstart, hash_head); ***/\n        s.ins_h = HASH(s, s.ins_h, s.window[s.strstart + MIN_MATCH - 1]);\n        hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];\n        s.head[s.ins_h] = s.strstart;\n        /***/\n      }\n\n      /* Find the longest match, discarding those <= prev_length.\n       * At this point we have always match_length < MIN_MATCH\n       */\n      if (hash_head !== 0 /*NIL*/ && s.strstart - hash_head <= s.w_size - MIN_LOOKAHEAD) {\n        /* To simplify the code, we prevent matches with the string\n         * of window index 0 (in particular we have to avoid a match\n         * of the string with itself at the start of the input file).\n         */\n        s.match_length = longest_match(s, hash_head);\n        /* longest_match() sets match_start */\n      }\n\n      if (s.match_length >= MIN_MATCH) {\n        // check_match(s, s.strstart, s.match_start, s.match_length); // for debug only\n\n        /*** _tr_tally_dist(s, s.strstart - s.match_start,\n                       s.match_length - MIN_MATCH, bflush); ***/\n        bflush = _tr_tally(s, s.strstart - s.match_start, s.match_length - MIN_MATCH);\n        s.lookahead -= s.match_length;\n\n        /* Insert new strings in the hash table only if the match length\n         * is not too large. This saves time but degrades compression.\n         */\n        if (s.match_length <= s.max_lazy_match /*max_insert_length*/ && s.lookahead >= MIN_MATCH) {\n          s.match_length--; /* string at strstart already in table */\n          do {\n            s.strstart++;\n            /*** INSERT_STRING(s, s.strstart, hash_head); ***/\n            s.ins_h = HASH(s, s.ins_h, s.window[s.strstart + MIN_MATCH - 1]);\n            hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];\n            s.head[s.ins_h] = s.strstart;\n            /***/\n            /* strstart never exceeds WSIZE-MAX_MATCH, so there are\n             * always MIN_MATCH bytes ahead.\n             */\n          } while (--s.match_length !== 0);\n          s.strstart++;\n        } else {\n          s.strstart += s.match_length;\n          s.match_length = 0;\n          s.ins_h = s.window[s.strstart];\n          /* UPDATE_HASH(s, s.ins_h, s.window[s.strstart+1]); */\n          s.ins_h = HASH(s, s.ins_h, s.window[s.strstart + 1]);\n\n          //#if MIN_MATCH != 3\n          //                Call UPDATE_HASH() MIN_MATCH-3 more times\n          //#endif\n          /* If lookahead < MIN_MATCH, ins_h is garbage, but it does not\n           * matter since it will be recomputed at next deflate call.\n           */\n        }\n      } else {\n        /* No match, output a literal byte */\n        //Tracevv((stderr,\"%c\", s.window[s.strstart]));\n        /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/\n        bflush = _tr_tally(s, 0, s.window[s.strstart]);\n        s.lookahead--;\n        s.strstart++;\n      }\n      if (bflush) {\n        /*** FLUSH_BLOCK(s, 0); ***/\n        flush_block_only(s, false);\n        if (s.strm.avail_out === 0) {\n          return BS_NEED_MORE;\n        }\n        /***/\n      }\n    }\n\n    s.insert = s.strstart < MIN_MATCH - 1 ? s.strstart : MIN_MATCH - 1;\n    if (flush === Z_FINISH$3) {\n      /*** FLUSH_BLOCK(s, 1); ***/\n      flush_block_only(s, true);\n      if (s.strm.avail_out === 0) {\n        return BS_FINISH_STARTED;\n      }\n      /***/\n      return BS_FINISH_DONE;\n    }\n    if (s.sym_next) {\n      /*** FLUSH_BLOCK(s, 0); ***/\n      flush_block_only(s, false);\n      if (s.strm.avail_out === 0) {\n        return BS_NEED_MORE;\n      }\n      /***/\n    }\n\n    return BS_BLOCK_DONE;\n  };\n\n  /* ===========================================================================\n   * Same as above, but achieves better compression. We use a lazy\n   * evaluation for matches: a match is finally adopted only if there is\n   * no better match at the next window position.\n   */\n  var deflate_slow = function deflate_slow(s, flush) {\n    var hash_head; /* head of hash chain */\n    var bflush; /* set if current block must be flushed */\n\n    var max_insert;\n\n    /* Process the input block. */\n    for (;;) {\n      /* Make sure that we always have enough lookahead, except\n       * at the end of the input file. We need MAX_MATCH bytes\n       * for the next match, plus MIN_MATCH bytes to insert the\n       * string following the next match.\n       */\n      if (s.lookahead < MIN_LOOKAHEAD) {\n        fill_window(s);\n        if (s.lookahead < MIN_LOOKAHEAD && flush === Z_NO_FLUSH$2) {\n          return BS_NEED_MORE;\n        }\n        if (s.lookahead === 0) {\n          break;\n        } /* flush the current block */\n      }\n\n      /* Insert the string window[strstart .. strstart+2] in the\n       * dictionary, and set hash_head to the head of the hash chain:\n       */\n      hash_head = 0 /*NIL*/;\n      if (s.lookahead >= MIN_MATCH) {\n        /*** INSERT_STRING(s, s.strstart, hash_head); ***/\n        s.ins_h = HASH(s, s.ins_h, s.window[s.strstart + MIN_MATCH - 1]);\n        hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];\n        s.head[s.ins_h] = s.strstart;\n        /***/\n      }\n\n      /* Find the longest match, discarding those <= prev_length.\n       */\n      s.prev_length = s.match_length;\n      s.prev_match = s.match_start;\n      s.match_length = MIN_MATCH - 1;\n      if (hash_head !== 0 /*NIL*/ && s.prev_length < s.max_lazy_match && s.strstart - hash_head <= s.w_size - MIN_LOOKAHEAD /*MAX_DIST(s)*/) {\n        /* To simplify the code, we prevent matches with the string\n         * of window index 0 (in particular we have to avoid a match\n         * of the string with itself at the start of the input file).\n         */\n        s.match_length = longest_match(s, hash_head);\n        /* longest_match() sets match_start */\n\n        if (s.match_length <= 5 && (s.strategy === Z_FILTERED || s.match_length === MIN_MATCH && s.strstart - s.match_start > 4096 /*TOO_FAR*/)) {\n          /* If prev_match is also MIN_MATCH, match_start is garbage\n           * but we will ignore the current match anyway.\n           */\n          s.match_length = MIN_MATCH - 1;\n        }\n      }\n      /* If there was a match at the previous step and the current\n       * match is not better, output the previous match:\n       */\n      if (s.prev_length >= MIN_MATCH && s.match_length <= s.prev_length) {\n        max_insert = s.strstart + s.lookahead - MIN_MATCH;\n        /* Do not insert strings in hash table beyond this. */\n\n        //check_match(s, s.strstart-1, s.prev_match, s.prev_length);\n\n        /***_tr_tally_dist(s, s.strstart - 1 - s.prev_match,\n                       s.prev_length - MIN_MATCH, bflush);***/\n        bflush = _tr_tally(s, s.strstart - 1 - s.prev_match, s.prev_length - MIN_MATCH);\n        /* Insert in hash table all strings up to the end of the match.\n         * strstart-1 and strstart are already inserted. If there is not\n         * enough lookahead, the last two strings are not inserted in\n         * the hash table.\n         */\n        s.lookahead -= s.prev_length - 1;\n        s.prev_length -= 2;\n        do {\n          if (++s.strstart <= max_insert) {\n            /*** INSERT_STRING(s, s.strstart, hash_head); ***/\n            s.ins_h = HASH(s, s.ins_h, s.window[s.strstart + MIN_MATCH - 1]);\n            hash_head = s.prev[s.strstart & s.w_mask] = s.head[s.ins_h];\n            s.head[s.ins_h] = s.strstart;\n            /***/\n          }\n        } while (--s.prev_length !== 0);\n        s.match_available = 0;\n        s.match_length = MIN_MATCH - 1;\n        s.strstart++;\n        if (bflush) {\n          /*** FLUSH_BLOCK(s, 0); ***/\n          flush_block_only(s, false);\n          if (s.strm.avail_out === 0) {\n            return BS_NEED_MORE;\n          }\n          /***/\n        }\n      } else if (s.match_available) {\n        /* If there was no match at the previous position, output a\n         * single literal. If there was a match but the current match\n         * is longer, truncate the previous match to a single literal.\n         */\n        //Tracevv((stderr,\"%c\", s->window[s->strstart-1]));\n        /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/\n        bflush = _tr_tally(s, 0, s.window[s.strstart - 1]);\n        if (bflush) {\n          /*** FLUSH_BLOCK_ONLY(s, 0) ***/\n          flush_block_only(s, false);\n          /***/\n        }\n\n        s.strstart++;\n        s.lookahead--;\n        if (s.strm.avail_out === 0) {\n          return BS_NEED_MORE;\n        }\n      } else {\n        /* There is no previous match to compare with, wait for\n         * the next step to decide.\n         */\n        s.match_available = 1;\n        s.strstart++;\n        s.lookahead--;\n      }\n    }\n    //Assert (flush != Z_NO_FLUSH, \"no flush?\");\n    if (s.match_available) {\n      //Tracevv((stderr,\"%c\", s->window[s->strstart-1]));\n      /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/\n      bflush = _tr_tally(s, 0, s.window[s.strstart - 1]);\n      s.match_available = 0;\n    }\n    s.insert = s.strstart < MIN_MATCH - 1 ? s.strstart : MIN_MATCH - 1;\n    if (flush === Z_FINISH$3) {\n      /*** FLUSH_BLOCK(s, 1); ***/\n      flush_block_only(s, true);\n      if (s.strm.avail_out === 0) {\n        return BS_FINISH_STARTED;\n      }\n      /***/\n      return BS_FINISH_DONE;\n    }\n    if (s.sym_next) {\n      /*** FLUSH_BLOCK(s, 0); ***/\n      flush_block_only(s, false);\n      if (s.strm.avail_out === 0) {\n        return BS_NEED_MORE;\n      }\n      /***/\n    }\n\n    return BS_BLOCK_DONE;\n  };\n\n  /* ===========================================================================\n   * For Z_RLE, simply look for runs of bytes, generate matches only of distance\n   * one.  Do not maintain a hash table.  (It will be regenerated if this run of\n   * deflate switches away from Z_RLE.)\n   */\n  var deflate_rle = function deflate_rle(s, flush) {\n    var bflush; /* set if current block must be flushed */\n    var prev; /* byte at distance one to match */\n    var scan, strend; /* scan goes up to strend for length of run */\n\n    var _win = s.window;\n    for (;;) {\n      /* Make sure that we always have enough lookahead, except\n       * at the end of the input file. We need MAX_MATCH bytes\n       * for the longest run, plus one for the unrolled loop.\n       */\n      if (s.lookahead <= MAX_MATCH) {\n        fill_window(s);\n        if (s.lookahead <= MAX_MATCH && flush === Z_NO_FLUSH$2) {\n          return BS_NEED_MORE;\n        }\n        if (s.lookahead === 0) {\n          break;\n        } /* flush the current block */\n      }\n\n      /* See how many times the previous byte repeats */\n      s.match_length = 0;\n      if (s.lookahead >= MIN_MATCH && s.strstart > 0) {\n        scan = s.strstart - 1;\n        prev = _win[scan];\n        if (prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan]) {\n          strend = s.strstart + MAX_MATCH;\n          do {\n            /*jshint noempty:false*/\n          } while (prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && prev === _win[++scan] && scan < strend);\n          s.match_length = MAX_MATCH - (strend - scan);\n          if (s.match_length > s.lookahead) {\n            s.match_length = s.lookahead;\n          }\n        }\n        //Assert(scan <= s->window+(uInt)(s->window_size-1), \"wild scan\");\n      }\n\n      /* Emit match if have run of MIN_MATCH or longer, else emit literal */\n      if (s.match_length >= MIN_MATCH) {\n        //check_match(s, s.strstart, s.strstart - 1, s.match_length);\n\n        /*** _tr_tally_dist(s, 1, s.match_length - MIN_MATCH, bflush); ***/\n        bflush = _tr_tally(s, 1, s.match_length - MIN_MATCH);\n        s.lookahead -= s.match_length;\n        s.strstart += s.match_length;\n        s.match_length = 0;\n      } else {\n        /* No match, output a literal byte */\n        //Tracevv((stderr,\"%c\", s->window[s->strstart]));\n        /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/\n        bflush = _tr_tally(s, 0, s.window[s.strstart]);\n        s.lookahead--;\n        s.strstart++;\n      }\n      if (bflush) {\n        /*** FLUSH_BLOCK(s, 0); ***/\n        flush_block_only(s, false);\n        if (s.strm.avail_out === 0) {\n          return BS_NEED_MORE;\n        }\n        /***/\n      }\n    }\n\n    s.insert = 0;\n    if (flush === Z_FINISH$3) {\n      /*** FLUSH_BLOCK(s, 1); ***/\n      flush_block_only(s, true);\n      if (s.strm.avail_out === 0) {\n        return BS_FINISH_STARTED;\n      }\n      /***/\n      return BS_FINISH_DONE;\n    }\n    if (s.sym_next) {\n      /*** FLUSH_BLOCK(s, 0); ***/\n      flush_block_only(s, false);\n      if (s.strm.avail_out === 0) {\n        return BS_NEED_MORE;\n      }\n      /***/\n    }\n\n    return BS_BLOCK_DONE;\n  };\n\n  /* ===========================================================================\n   * For Z_HUFFMAN_ONLY, do not look for matches.  Do not maintain a hash table.\n   * (It will be regenerated if this run of deflate switches away from Huffman.)\n   */\n  var deflate_huff = function deflate_huff(s, flush) {\n    var bflush; /* set if current block must be flushed */\n\n    for (;;) {\n      /* Make sure that we have a literal to write. */\n      if (s.lookahead === 0) {\n        fill_window(s);\n        if (s.lookahead === 0) {\n          if (flush === Z_NO_FLUSH$2) {\n            return BS_NEED_MORE;\n          }\n          break; /* flush the current block */\n        }\n      }\n\n      /* Output a literal byte */\n      s.match_length = 0;\n      //Tracevv((stderr,\"%c\", s->window[s->strstart]));\n      /*** _tr_tally_lit(s, s.window[s.strstart], bflush); ***/\n      bflush = _tr_tally(s, 0, s.window[s.strstart]);\n      s.lookahead--;\n      s.strstart++;\n      if (bflush) {\n        /*** FLUSH_BLOCK(s, 0); ***/\n        flush_block_only(s, false);\n        if (s.strm.avail_out === 0) {\n          return BS_NEED_MORE;\n        }\n        /***/\n      }\n    }\n\n    s.insert = 0;\n    if (flush === Z_FINISH$3) {\n      /*** FLUSH_BLOCK(s, 1); ***/\n      flush_block_only(s, true);\n      if (s.strm.avail_out === 0) {\n        return BS_FINISH_STARTED;\n      }\n      /***/\n      return BS_FINISH_DONE;\n    }\n    if (s.sym_next) {\n      /*** FLUSH_BLOCK(s, 0); ***/\n      flush_block_only(s, false);\n      if (s.strm.avail_out === 0) {\n        return BS_NEED_MORE;\n      }\n      /***/\n    }\n\n    return BS_BLOCK_DONE;\n  };\n\n  /* Values for max_lazy_match, good_match and max_chain_length, depending on\n   * the desired pack level (0..9). The values given below have been tuned to\n   * exclude worst case performance for pathological files. Better values may be\n   * found for specific files.\n   */\n  function Config(good_length, max_lazy, nice_length, max_chain, func) {\n    this.good_length = good_length;\n    this.max_lazy = max_lazy;\n    this.nice_length = nice_length;\n    this.max_chain = max_chain;\n    this.func = func;\n  }\n  var configuration_table = [/*      good lazy nice chain */\n  new Config(0, 0, 0, 0, deflate_stored), /* 0 store only */\n  new Config(4, 4, 8, 4, deflate_fast), /* 1 max speed, no lazy matches */\n  new Config(4, 5, 16, 8, deflate_fast), /* 2 */\n  new Config(4, 6, 32, 32, deflate_fast), /* 3 */\n\n  new Config(4, 4, 16, 16, deflate_slow), /* 4 lazy matches */\n  new Config(8, 16, 32, 32, deflate_slow), /* 5 */\n  new Config(8, 16, 128, 128, deflate_slow), /* 6 */\n  new Config(8, 32, 128, 256, deflate_slow), /* 7 */\n  new Config(32, 128, 258, 1024, deflate_slow), /* 8 */\n  new Config(32, 258, 258, 4096, deflate_slow) /* 9 max compression */];\n\n  /* ===========================================================================\n   * Initialize the \"longest match\" routines for a new zlib stream\n   */\n  var lm_init = function lm_init(s) {\n    s.window_size = 2 * s.w_size;\n\n    /*** CLEAR_HASH(s); ***/\n    zero(s.head); // Fill with NIL (= 0);\n\n    /* Set the default configuration parameters:\n     */\n    s.max_lazy_match = configuration_table[s.level].max_lazy;\n    s.good_match = configuration_table[s.level].good_length;\n    s.nice_match = configuration_table[s.level].nice_length;\n    s.max_chain_length = configuration_table[s.level].max_chain;\n    s.strstart = 0;\n    s.block_start = 0;\n    s.lookahead = 0;\n    s.insert = 0;\n    s.match_length = s.prev_length = MIN_MATCH - 1;\n    s.match_available = 0;\n    s.ins_h = 0;\n  };\n  function DeflateState() {\n    this.strm = null; /* pointer back to this zlib stream */\n    this.status = 0; /* as the name implies */\n    this.pending_buf = null; /* output still pending */\n    this.pending_buf_size = 0; /* size of pending_buf */\n    this.pending_out = 0; /* next pending byte to output to the stream */\n    this.pending = 0; /* nb of bytes in the pending buffer */\n    this.wrap = 0; /* bit 0 true for zlib, bit 1 true for gzip */\n    this.gzhead = null; /* gzip header information to write */\n    this.gzindex = 0; /* where in extra, name, or comment */\n    this.method = Z_DEFLATED$2; /* can only be DEFLATED */\n    this.last_flush = -1; /* value of flush param for previous deflate call */\n\n    this.w_size = 0; /* LZ77 window size (32K by default) */\n    this.w_bits = 0; /* log2(w_size)  (8..16) */\n    this.w_mask = 0; /* w_size - 1 */\n\n    this.window = null;\n    /* Sliding window. Input bytes are read into the second half of the window,\n     * and move to the first half later to keep a dictionary of at least wSize\n     * bytes. With this organization, matches are limited to a distance of\n     * wSize-MAX_MATCH bytes, but this ensures that IO is always\n     * performed with a length multiple of the block size.\n     */\n\n    this.window_size = 0;\n    /* Actual size of window: 2*wSize, except when the user input buffer\n     * is directly used as sliding window.\n     */\n\n    this.prev = null;\n    /* Link to older string with same hash index. To limit the size of this\n     * array to 64K, this link is maintained only for the last 32K strings.\n     * An index in this array is thus a window index modulo 32K.\n     */\n\n    this.head = null; /* Heads of the hash chains or NIL. */\n\n    this.ins_h = 0; /* hash index of string to be inserted */\n    this.hash_size = 0; /* number of elements in hash table */\n    this.hash_bits = 0; /* log2(hash_size) */\n    this.hash_mask = 0; /* hash_size-1 */\n\n    this.hash_shift = 0;\n    /* Number of bits by which ins_h must be shifted at each input\n     * step. It must be such that after MIN_MATCH steps, the oldest\n     * byte no longer takes part in the hash key, that is:\n     *   hash_shift * MIN_MATCH >= hash_bits\n     */\n\n    this.block_start = 0;\n    /* Window position at the beginning of the current output block. Gets\n     * negative when the window is moved backwards.\n     */\n\n    this.match_length = 0; /* length of best match */\n    this.prev_match = 0; /* previous match */\n    this.match_available = 0; /* set if previous match exists */\n    this.strstart = 0; /* start of string to insert */\n    this.match_start = 0; /* start of matching string */\n    this.lookahead = 0; /* number of valid bytes ahead in window */\n\n    this.prev_length = 0;\n    /* Length of the best match at previous step. Matches not greater than this\n     * are discarded. This is used in the lazy match evaluation.\n     */\n\n    this.max_chain_length = 0;\n    /* To speed up deflation, hash chains are never searched beyond this\n     * length.  A higher limit improves compression ratio but degrades the\n     * speed.\n     */\n\n    this.max_lazy_match = 0;\n    /* Attempt to find a better match only when the current match is strictly\n     * smaller than this value. This mechanism is used only for compression\n     * levels >= 4.\n     */\n    // That's alias to max_lazy_match, don't use directly\n    //this.max_insert_length = 0;\n    /* Insert new strings in the hash table only if the match length is not\n     * greater than this length. This saves time but degrades compression.\n     * max_insert_length is used only for compression levels <= 3.\n     */\n\n    this.level = 0; /* compression level (1..9) */\n    this.strategy = 0; /* favor or force Huffman coding*/\n\n    this.good_match = 0;\n    /* Use a faster search when the previous match is longer than this */\n\n    this.nice_match = 0; /* Stop searching when current match exceeds this */\n\n    /* used by trees.c: */\n\n    /* Didn't use ct_data typedef below to suppress compiler warning */\n\n    // struct ct_data_s dyn_ltree[HEAP_SIZE];   /* literal and length tree */\n    // struct ct_data_s dyn_dtree[2*D_CODES+1]; /* distance tree */\n    // struct ct_data_s bl_tree[2*BL_CODES+1];  /* Huffman tree for bit lengths */\n\n    // Use flat array of DOUBLE size, with interleaved fata,\n    // because JS does not support effective\n    this.dyn_ltree = new Uint16Array(HEAP_SIZE * 2);\n    this.dyn_dtree = new Uint16Array((2 * D_CODES + 1) * 2);\n    this.bl_tree = new Uint16Array((2 * BL_CODES + 1) * 2);\n    zero(this.dyn_ltree);\n    zero(this.dyn_dtree);\n    zero(this.bl_tree);\n    this.l_desc = null; /* desc. for literal tree */\n    this.d_desc = null; /* desc. for distance tree */\n    this.bl_desc = null; /* desc. for bit length tree */\n\n    //ush bl_count[MAX_BITS+1];\n    this.bl_count = new Uint16Array(MAX_BITS + 1);\n    /* number of codes at each bit length for an optimal tree */\n\n    //int heap[2*L_CODES+1];      /* heap used to build the Huffman trees */\n    this.heap = new Uint16Array(2 * L_CODES + 1); /* heap used to build the Huffman trees */\n    zero(this.heap);\n    this.heap_len = 0; /* number of elements in the heap */\n    this.heap_max = 0; /* element of largest frequency */\n    /* The sons of heap[n] are heap[2*n] and heap[2*n+1]. heap[0] is not used.\n     * The same heap array is used to build all trees.\n     */\n\n    this.depth = new Uint16Array(2 * L_CODES + 1); //uch depth[2*L_CODES+1];\n    zero(this.depth);\n    /* Depth of each subtree used as tie breaker for trees of equal frequency\n     */\n\n    this.sym_buf = 0; /* buffer for distances and literals/lengths */\n\n    this.lit_bufsize = 0;\n    /* Size of match buffer for literals/lengths.  There are 4 reasons for\n     * limiting lit_bufsize to 64K:\n     *   - frequencies can be kept in 16 bit counters\n     *   - if compression is not successful for the first block, all input\n     *     data is still in the window so we can still emit a stored block even\n     *     when input comes from standard input.  (This can also be done for\n     *     all blocks if lit_bufsize is not greater than 32K.)\n     *   - if compression is not successful for a file smaller than 64K, we can\n     *     even emit a stored file instead of a stored block (saving 5 bytes).\n     *     This is applicable only for zip (not gzip or zlib).\n     *   - creating new Huffman trees less frequently may not provide fast\n     *     adaptation to changes in the input data statistics. (Take for\n     *     example a binary file with poorly compressible code followed by\n     *     a highly compressible string table.) Smaller buffer sizes give\n     *     fast adaptation but have of course the overhead of transmitting\n     *     trees more frequently.\n     *   - I can't count above 4\n     */\n\n    this.sym_next = 0; /* running index in sym_buf */\n    this.sym_end = 0; /* symbol table full when sym_next reaches this */\n\n    this.opt_len = 0; /* bit length of current block with optimal trees */\n    this.static_len = 0; /* bit length of current block with static trees */\n    this.matches = 0; /* number of string matches in current block */\n    this.insert = 0; /* bytes at end of window left to insert */\n\n    this.bi_buf = 0;\n    /* Output buffer. bits are inserted starting at the bottom (least\n     * significant bits).\n     */\n    this.bi_valid = 0;\n    /* Number of valid bits in bi_buf.  All bits above the last valid bit\n     * are always zero.\n     */\n\n    // Used for window memory init. We safely ignore it for JS. That makes\n    // sense only for pointers and memory check tools.\n    //this.high_water = 0;\n    /* High water mark offset in window for initialized bytes -- bytes above\n     * this are set to zero in order to avoid memory check warnings when\n     * longest match routines access bytes past the input.  This is then\n     * updated to the new high water mark.\n     */\n  }\n\n  /* =========================================================================\n   * Check for a valid deflate stream state. Return 0 if ok, 1 if not.\n   */\n  var deflateStateCheck = function deflateStateCheck(strm) {\n    if (!strm) {\n      return 1;\n    }\n    var s = strm.state;\n    if (!s || s.strm !== strm || s.status !== INIT_STATE &&\n    //#ifdef GZIP\n    s.status !== GZIP_STATE &&\n    //#endif\n    s.status !== EXTRA_STATE && s.status !== NAME_STATE && s.status !== COMMENT_STATE && s.status !== HCRC_STATE && s.status !== BUSY_STATE && s.status !== FINISH_STATE) {\n      return 1;\n    }\n    return 0;\n  };\n  var deflateResetKeep = function deflateResetKeep(strm) {\n    if (deflateStateCheck(strm)) {\n      return err(strm, Z_STREAM_ERROR$2);\n    }\n    strm.total_in = strm.total_out = 0;\n    strm.data_type = Z_UNKNOWN;\n    var s = strm.state;\n    s.pending = 0;\n    s.pending_out = 0;\n    if (s.wrap < 0) {\n      s.wrap = -s.wrap;\n      /* was made negative by deflate(..., Z_FINISH); */\n    }\n\n    s.status =\n    //#ifdef GZIP\n    s.wrap === 2 ? GZIP_STATE :\n    //#endif\n    s.wrap ? INIT_STATE : BUSY_STATE;\n    strm.adler = s.wrap === 2 ? 0 // crc32(0, Z_NULL, 0)\n    : 1; // adler32(0, Z_NULL, 0)\n    s.last_flush = -2;\n    _tr_init(s);\n    return Z_OK$3;\n  };\n  var deflateReset = function deflateReset(strm) {\n    var ret = deflateResetKeep(strm);\n    if (ret === Z_OK$3) {\n      lm_init(strm.state);\n    }\n    return ret;\n  };\n  var deflateSetHeader = function deflateSetHeader(strm, head) {\n    if (deflateStateCheck(strm) || strm.state.wrap !== 2) {\n      return Z_STREAM_ERROR$2;\n    }\n    strm.state.gzhead = head;\n    return Z_OK$3;\n  };\n  var deflateInit2 = function deflateInit2(strm, level, method, windowBits, memLevel, strategy) {\n    if (!strm) {\n      // === Z_NULL\n      return Z_STREAM_ERROR$2;\n    }\n    var wrap = 1;\n    if (level === Z_DEFAULT_COMPRESSION$1) {\n      level = 6;\n    }\n    if (windowBits < 0) {\n      /* suppress zlib wrapper */\n      wrap = 0;\n      windowBits = -windowBits;\n    } else if (windowBits > 15) {\n      wrap = 2; /* write gzip wrapper instead */\n      windowBits -= 16;\n    }\n    if (memLevel < 1 || memLevel > MAX_MEM_LEVEL || method !== Z_DEFLATED$2 || windowBits < 8 || windowBits > 15 || level < 0 || level > 9 || strategy < 0 || strategy > Z_FIXED || windowBits === 8 && wrap !== 1) {\n      return err(strm, Z_STREAM_ERROR$2);\n    }\n    if (windowBits === 8) {\n      windowBits = 9;\n    }\n    /* until 256-byte window bug fixed */\n\n    var s = new DeflateState();\n    strm.state = s;\n    s.strm = strm;\n    s.status = INIT_STATE; /* to pass state test in deflateReset() */\n\n    s.wrap = wrap;\n    s.gzhead = null;\n    s.w_bits = windowBits;\n    s.w_size = 1 << s.w_bits;\n    s.w_mask = s.w_size - 1;\n    s.hash_bits = memLevel + 7;\n    s.hash_size = 1 << s.hash_bits;\n    s.hash_mask = s.hash_size - 1;\n    s.hash_shift = ~~((s.hash_bits + MIN_MATCH - 1) / MIN_MATCH);\n    s.window = new Uint8Array(s.w_size * 2);\n    s.head = new Uint16Array(s.hash_size);\n    s.prev = new Uint16Array(s.w_size);\n\n    // Don't need mem init magic for JS.\n    //s.high_water = 0;  /* nothing written to s->window yet */\n\n    s.lit_bufsize = 1 << memLevel + 6; /* 16K elements by default */\n\n    /* We overlay pending_buf and sym_buf. This works since the average size\n     * for length/distance pairs over any compressed block is assured to be 31\n     * bits or less.\n     *\n     * Analysis: The longest fixed codes are a length code of 8 bits plus 5\n     * extra bits, for lengths 131 to 257. The longest fixed distance codes are\n     * 5 bits plus 13 extra bits, for distances 16385 to 32768. The longest\n     * possible fixed-codes length/distance pair is then 31 bits total.\n     *\n     * sym_buf starts one-fourth of the way into pending_buf. So there are\n     * three bytes in sym_buf for every four bytes in pending_buf. Each symbol\n     * in sym_buf is three bytes -- two for the distance and one for the\n     * literal/length. As each symbol is consumed, the pointer to the next\n     * sym_buf value to read moves forward three bytes. From that symbol, up to\n     * 31 bits are written to pending_buf. The closest the written pending_buf\n     * bits gets to the next sym_buf symbol to read is just before the last\n     * code is written. At that time, 31*(n-2) bits have been written, just\n     * after 24*(n-2) bits have been consumed from sym_buf. sym_buf starts at\n     * 8*n bits into pending_buf. (Note that the symbol buffer fills when n-1\n     * symbols are written.) The closest the writing gets to what is unread is\n     * then n+14 bits. Here n is lit_bufsize, which is 16384 by default, and\n     * can range from 128 to 32768.\n     *\n     * Therefore, at a minimum, there are 142 bits of space between what is\n     * written and what is read in the overlain buffers, so the symbols cannot\n     * be overwritten by the compressed data. That space is actually 139 bits,\n     * due to the three-bit fixed-code block header.\n     *\n     * That covers the case where either Z_FIXED is specified, forcing fixed\n     * codes, or when the use of fixed codes is chosen, because that choice\n     * results in a smaller compressed block than dynamic codes. That latter\n     * condition then assures that the above analysis also covers all dynamic\n     * blocks. A dynamic-code block will only be chosen to be emitted if it has\n     * fewer bits than a fixed-code block would for the same set of symbols.\n     * Therefore its average symbol length is assured to be less than 31. So\n     * the compressed data for a dynamic block also cannot overwrite the\n     * symbols from which it is being constructed.\n     */\n\n    s.pending_buf_size = s.lit_bufsize * 4;\n    s.pending_buf = new Uint8Array(s.pending_buf_size);\n\n    // It is offset from `s.pending_buf` (size is `s.lit_bufsize * 2`)\n    //s->sym_buf = s->pending_buf + s->lit_bufsize;\n    s.sym_buf = s.lit_bufsize;\n\n    //s->sym_end = (s->lit_bufsize - 1) * 3;\n    s.sym_end = (s.lit_bufsize - 1) * 3;\n    /* We avoid equality with lit_bufsize*3 because of wraparound at 64K\n     * on 16 bit machines and because stored blocks are restricted to\n     * 64K-1 bytes.\n     */\n\n    s.level = level;\n    s.strategy = strategy;\n    s.method = method;\n    return deflateReset(strm);\n  };\n  var deflateInit = function deflateInit(strm, level) {\n    return deflateInit2(strm, level, Z_DEFLATED$2, MAX_WBITS$1, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY$1);\n  };\n\n  /* ========================================================================= */\n  var deflate$2 = function deflate(strm, flush) {\n    if (deflateStateCheck(strm) || flush > Z_BLOCK$1 || flush < 0) {\n      return strm ? err(strm, Z_STREAM_ERROR$2) : Z_STREAM_ERROR$2;\n    }\n    var s = strm.state;\n    if (!strm.output || strm.avail_in !== 0 && !strm.input || s.status === FINISH_STATE && flush !== Z_FINISH$3) {\n      return err(strm, strm.avail_out === 0 ? Z_BUF_ERROR$1 : Z_STREAM_ERROR$2);\n    }\n    var old_flush = s.last_flush;\n    s.last_flush = flush;\n\n    /* Flush as much pending output as possible */\n    if (s.pending !== 0) {\n      flush_pending(strm);\n      if (strm.avail_out === 0) {\n        /* Since avail_out is 0, deflate will be called again with\n         * more output space, but possibly with both pending and\n         * avail_in equal to zero. There won't be anything to do,\n         * but this is not an error situation so make sure we\n         * return OK instead of BUF_ERROR at next call of deflate:\n         */\n        s.last_flush = -1;\n        return Z_OK$3;\n      }\n\n      /* Make sure there is something to do and avoid duplicate consecutive\n       * flushes. For repeated and useless calls with Z_FINISH, we keep\n       * returning Z_STREAM_END instead of Z_BUF_ERROR.\n       */\n    } else if (strm.avail_in === 0 && rank(flush) <= rank(old_flush) && flush !== Z_FINISH$3) {\n      return err(strm, Z_BUF_ERROR$1);\n    }\n\n    /* User must not provide more input after the first FINISH: */\n    if (s.status === FINISH_STATE && strm.avail_in !== 0) {\n      return err(strm, Z_BUF_ERROR$1);\n    }\n\n    /* Write the header */\n    if (s.status === INIT_STATE && s.wrap === 0) {\n      s.status = BUSY_STATE;\n    }\n    if (s.status === INIT_STATE) {\n      /* zlib header */\n      var header = Z_DEFLATED$2 + (s.w_bits - 8 << 4) << 8;\n      var level_flags = -1;\n      if (s.strategy >= Z_HUFFMAN_ONLY || s.level < 2) {\n        level_flags = 0;\n      } else if (s.level < 6) {\n        level_flags = 1;\n      } else if (s.level === 6) {\n        level_flags = 2;\n      } else {\n        level_flags = 3;\n      }\n      header |= level_flags << 6;\n      if (s.strstart !== 0) {\n        header |= PRESET_DICT;\n      }\n      header += 31 - header % 31;\n      putShortMSB(s, header);\n\n      /* Save the adler32 of the preset dictionary: */\n      if (s.strstart !== 0) {\n        putShortMSB(s, strm.adler >>> 16);\n        putShortMSB(s, strm.adler & 0xffff);\n      }\n      strm.adler = 1; // adler32(0L, Z_NULL, 0);\n      s.status = BUSY_STATE;\n\n      /* Compression must start with an empty pending buffer */\n      flush_pending(strm);\n      if (s.pending !== 0) {\n        s.last_flush = -1;\n        return Z_OK$3;\n      }\n    }\n    //#ifdef GZIP\n    if (s.status === GZIP_STATE) {\n      /* gzip header */\n      strm.adler = 0; //crc32(0L, Z_NULL, 0);\n      put_byte(s, 31);\n      put_byte(s, 139);\n      put_byte(s, 8);\n      if (!s.gzhead) {\n        // s->gzhead == Z_NULL\n        put_byte(s, 0);\n        put_byte(s, 0);\n        put_byte(s, 0);\n        put_byte(s, 0);\n        put_byte(s, 0);\n        put_byte(s, s.level === 9 ? 2 : s.strategy >= Z_HUFFMAN_ONLY || s.level < 2 ? 4 : 0);\n        put_byte(s, OS_CODE);\n        s.status = BUSY_STATE;\n\n        /* Compression must start with an empty pending buffer */\n        flush_pending(strm);\n        if (s.pending !== 0) {\n          s.last_flush = -1;\n          return Z_OK$3;\n        }\n      } else {\n        put_byte(s, (s.gzhead.text ? 1 : 0) + (s.gzhead.hcrc ? 2 : 0) + (!s.gzhead.extra ? 0 : 4) + (!s.gzhead.name ? 0 : 8) + (!s.gzhead.comment ? 0 : 16));\n        put_byte(s, s.gzhead.time & 0xff);\n        put_byte(s, s.gzhead.time >> 8 & 0xff);\n        put_byte(s, s.gzhead.time >> 16 & 0xff);\n        put_byte(s, s.gzhead.time >> 24 & 0xff);\n        put_byte(s, s.level === 9 ? 2 : s.strategy >= Z_HUFFMAN_ONLY || s.level < 2 ? 4 : 0);\n        put_byte(s, s.gzhead.os & 0xff);\n        if (s.gzhead.extra && s.gzhead.extra.length) {\n          put_byte(s, s.gzhead.extra.length & 0xff);\n          put_byte(s, s.gzhead.extra.length >> 8 & 0xff);\n        }\n        if (s.gzhead.hcrc) {\n          strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending, 0);\n        }\n        s.gzindex = 0;\n        s.status = EXTRA_STATE;\n      }\n    }\n    if (s.status === EXTRA_STATE) {\n      if (s.gzhead.extra /* != Z_NULL*/) {\n        var beg = s.pending; /* start of bytes to update crc */\n        var left = (s.gzhead.extra.length & 0xffff) - s.gzindex;\n        while (s.pending + left > s.pending_buf_size) {\n          var copy = s.pending_buf_size - s.pending;\n          // zmemcpy(s.pending_buf + s.pending,\n          //    s.gzhead.extra + s.gzindex, copy);\n          s.pending_buf.set(s.gzhead.extra.subarray(s.gzindex, s.gzindex + copy), s.pending);\n          s.pending = s.pending_buf_size;\n          //--- HCRC_UPDATE(beg) ---//\n          if (s.gzhead.hcrc && s.pending > beg) {\n            strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - beg, beg);\n          }\n          //---//\n          s.gzindex += copy;\n          flush_pending(strm);\n          if (s.pending !== 0) {\n            s.last_flush = -1;\n            return Z_OK$3;\n          }\n          beg = 0;\n          left -= copy;\n        }\n        // JS specific: s.gzhead.extra may be TypedArray or Array for backward compatibility\n        //              TypedArray.slice and TypedArray.from don't exist in IE10-IE11\n        var gzhead_extra = new Uint8Array(s.gzhead.extra);\n        // zmemcpy(s->pending_buf + s->pending,\n        //     s->gzhead->extra + s->gzindex, left);\n        s.pending_buf.set(gzhead_extra.subarray(s.gzindex, s.gzindex + left), s.pending);\n        s.pending += left;\n        //--- HCRC_UPDATE(beg) ---//\n        if (s.gzhead.hcrc && s.pending > beg) {\n          strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - beg, beg);\n        }\n        //---//\n        s.gzindex = 0;\n      }\n      s.status = NAME_STATE;\n    }\n    if (s.status === NAME_STATE) {\n      if (s.gzhead.name /* != Z_NULL*/) {\n        var _beg = s.pending; /* start of bytes to update crc */\n        var val;\n        do {\n          if (s.pending === s.pending_buf_size) {\n            //--- HCRC_UPDATE(beg) ---//\n            if (s.gzhead.hcrc && s.pending > _beg) {\n              strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - _beg, _beg);\n            }\n            //---//\n            flush_pending(strm);\n            if (s.pending !== 0) {\n              s.last_flush = -1;\n              return Z_OK$3;\n            }\n            _beg = 0;\n          }\n          // JS specific: little magic to add zero terminator to end of string\n          if (s.gzindex < s.gzhead.name.length) {\n            val = s.gzhead.name.charCodeAt(s.gzindex++) & 0xff;\n          } else {\n            val = 0;\n          }\n          put_byte(s, val);\n        } while (val !== 0);\n        //--- HCRC_UPDATE(beg) ---//\n        if (s.gzhead.hcrc && s.pending > _beg) {\n          strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - _beg, _beg);\n        }\n        //---//\n        s.gzindex = 0;\n      }\n      s.status = COMMENT_STATE;\n    }\n    if (s.status === COMMENT_STATE) {\n      if (s.gzhead.comment /* != Z_NULL*/) {\n        var _beg2 = s.pending; /* start of bytes to update crc */\n        var _val;\n        do {\n          if (s.pending === s.pending_buf_size) {\n            //--- HCRC_UPDATE(beg) ---//\n            if (s.gzhead.hcrc && s.pending > _beg2) {\n              strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - _beg2, _beg2);\n            }\n            //---//\n            flush_pending(strm);\n            if (s.pending !== 0) {\n              s.last_flush = -1;\n              return Z_OK$3;\n            }\n            _beg2 = 0;\n          }\n          // JS specific: little magic to add zero terminator to end of string\n          if (s.gzindex < s.gzhead.comment.length) {\n            _val = s.gzhead.comment.charCodeAt(s.gzindex++) & 0xff;\n          } else {\n            _val = 0;\n          }\n          put_byte(s, _val);\n        } while (_val !== 0);\n        //--- HCRC_UPDATE(beg) ---//\n        if (s.gzhead.hcrc && s.pending > _beg2) {\n          strm.adler = crc32_1(strm.adler, s.pending_buf, s.pending - _beg2, _beg2);\n        }\n        //---//\n      }\n\n      s.status = HCRC_STATE;\n    }\n    if (s.status === HCRC_STATE) {\n      if (s.gzhead.hcrc) {\n        if (s.pending + 2 > s.pending_buf_size) {\n          flush_pending(strm);\n          if (s.pending !== 0) {\n            s.last_flush = -1;\n            return Z_OK$3;\n          }\n        }\n        put_byte(s, strm.adler & 0xff);\n        put_byte(s, strm.adler >> 8 & 0xff);\n        strm.adler = 0; //crc32(0L, Z_NULL, 0);\n      }\n\n      s.status = BUSY_STATE;\n\n      /* Compression must start with an empty pending buffer */\n      flush_pending(strm);\n      if (s.pending !== 0) {\n        s.last_flush = -1;\n        return Z_OK$3;\n      }\n    }\n    //#endif\n\n    /* Start a new block or continue the current one.\n     */\n    if (strm.avail_in !== 0 || s.lookahead !== 0 || flush !== Z_NO_FLUSH$2 && s.status !== FINISH_STATE) {\n      var bstate = s.level === 0 ? deflate_stored(s, flush) : s.strategy === Z_HUFFMAN_ONLY ? deflate_huff(s, flush) : s.strategy === Z_RLE ? deflate_rle(s, flush) : configuration_table[s.level].func(s, flush);\n      if (bstate === BS_FINISH_STARTED || bstate === BS_FINISH_DONE) {\n        s.status = FINISH_STATE;\n      }\n      if (bstate === BS_NEED_MORE || bstate === BS_FINISH_STARTED) {\n        if (strm.avail_out === 0) {\n          s.last_flush = -1;\n          /* avoid BUF_ERROR next call, see above */\n        }\n\n        return Z_OK$3;\n        /* If flush != Z_NO_FLUSH && avail_out == 0, the next call\n         * of deflate should use the same flush parameter to make sure\n         * that the flush is complete. So we don't have to output an\n         * empty block here, this will be done at next call. This also\n         * ensures that for a very small output buffer, we emit at most\n         * one empty block.\n         */\n      }\n\n      if (bstate === BS_BLOCK_DONE) {\n        if (flush === Z_PARTIAL_FLUSH) {\n          _tr_align(s);\n        } else if (flush !== Z_BLOCK$1) {\n          /* FULL_FLUSH or SYNC_FLUSH */\n\n          _tr_stored_block(s, 0, 0, false);\n          /* For a full flush, this empty block will be recognized\n           * as a special marker by inflate_sync().\n           */\n          if (flush === Z_FULL_FLUSH$1) {\n            /*** CLEAR_HASH(s); ***/ /* forget history */\n            zero(s.head); // Fill with NIL (= 0);\n\n            if (s.lookahead === 0) {\n              s.strstart = 0;\n              s.block_start = 0;\n              s.insert = 0;\n            }\n          }\n        }\n        flush_pending(strm);\n        if (strm.avail_out === 0) {\n          s.last_flush = -1; /* avoid BUF_ERROR at next call, see above */\n          return Z_OK$3;\n        }\n      }\n    }\n    if (flush !== Z_FINISH$3) {\n      return Z_OK$3;\n    }\n    if (s.wrap <= 0) {\n      return Z_STREAM_END$3;\n    }\n\n    /* Write the trailer */\n    if (s.wrap === 2) {\n      put_byte(s, strm.adler & 0xff);\n      put_byte(s, strm.adler >> 8 & 0xff);\n      put_byte(s, strm.adler >> 16 & 0xff);\n      put_byte(s, strm.adler >> 24 & 0xff);\n      put_byte(s, strm.total_in & 0xff);\n      put_byte(s, strm.total_in >> 8 & 0xff);\n      put_byte(s, strm.total_in >> 16 & 0xff);\n      put_byte(s, strm.total_in >> 24 & 0xff);\n    } else {\n      putShortMSB(s, strm.adler >>> 16);\n      putShortMSB(s, strm.adler & 0xffff);\n    }\n    flush_pending(strm);\n    /* If avail_out is zero, the application will call deflate again\n     * to flush the rest.\n     */\n    if (s.wrap > 0) {\n      s.wrap = -s.wrap;\n    }\n    /* write the trailer only once! */\n    return s.pending !== 0 ? Z_OK$3 : Z_STREAM_END$3;\n  };\n  var deflateEnd = function deflateEnd(strm) {\n    if (deflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$2;\n    }\n    var status = strm.state.status;\n    strm.state = null;\n    return status === BUSY_STATE ? err(strm, Z_DATA_ERROR$2) : Z_OK$3;\n  };\n\n  /* =========================================================================\n   * Initializes the compression dictionary from the given byte\n   * sequence without producing any compressed output.\n   */\n  var deflateSetDictionary = function deflateSetDictionary(strm, dictionary) {\n    var dictLength = dictionary.length;\n    if (deflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$2;\n    }\n    var s = strm.state;\n    var wrap = s.wrap;\n    if (wrap === 2 || wrap === 1 && s.status !== INIT_STATE || s.lookahead) {\n      return Z_STREAM_ERROR$2;\n    }\n\n    /* when using zlib wrappers, compute Adler-32 for provided dictionary */\n    if (wrap === 1) {\n      /* adler32(strm->adler, dictionary, dictLength); */\n      strm.adler = adler32_1(strm.adler, dictionary, dictLength, 0);\n    }\n    s.wrap = 0; /* avoid computing Adler-32 in read_buf */\n\n    /* if dictionary would fill window, just replace the history */\n    if (dictLength >= s.w_size) {\n      if (wrap === 0) {\n        /* already empty otherwise */\n        /*** CLEAR_HASH(s); ***/\n        zero(s.head); // Fill with NIL (= 0);\n        s.strstart = 0;\n        s.block_start = 0;\n        s.insert = 0;\n      }\n      /* use the tail */\n      // dictionary = dictionary.slice(dictLength - s.w_size);\n      var tmpDict = new Uint8Array(s.w_size);\n      tmpDict.set(dictionary.subarray(dictLength - s.w_size, dictLength), 0);\n      dictionary = tmpDict;\n      dictLength = s.w_size;\n    }\n    /* insert dictionary into window and hash */\n    var avail = strm.avail_in;\n    var next = strm.next_in;\n    var input = strm.input;\n    strm.avail_in = dictLength;\n    strm.next_in = 0;\n    strm.input = dictionary;\n    fill_window(s);\n    while (s.lookahead >= MIN_MATCH) {\n      var str = s.strstart;\n      var n = s.lookahead - (MIN_MATCH - 1);\n      do {\n        /* UPDATE_HASH(s, s->ins_h, s->window[str + MIN_MATCH-1]); */\n        s.ins_h = HASH(s, s.ins_h, s.window[str + MIN_MATCH - 1]);\n        s.prev[str & s.w_mask] = s.head[s.ins_h];\n        s.head[s.ins_h] = str;\n        str++;\n      } while (--n);\n      s.strstart = str;\n      s.lookahead = MIN_MATCH - 1;\n      fill_window(s);\n    }\n    s.strstart += s.lookahead;\n    s.block_start = s.strstart;\n    s.insert = s.lookahead;\n    s.lookahead = 0;\n    s.match_length = s.prev_length = MIN_MATCH - 1;\n    s.match_available = 0;\n    strm.next_in = next;\n    strm.input = input;\n    strm.avail_in = avail;\n    s.wrap = wrap;\n    return Z_OK$3;\n  };\n  var deflateInit_1 = deflateInit;\n  var deflateInit2_1 = deflateInit2;\n  var deflateReset_1 = deflateReset;\n  var deflateResetKeep_1 = deflateResetKeep;\n  var deflateSetHeader_1 = deflateSetHeader;\n  var deflate_2$1 = deflate$2;\n  var deflateEnd_1 = deflateEnd;\n  var deflateSetDictionary_1 = deflateSetDictionary;\n  var deflateInfo = 'pako deflate (from Nodeca project)';\n\n  /* Not implemented\n  module.exports.deflateBound = deflateBound;\n  module.exports.deflateCopy = deflateCopy;\n  module.exports.deflateGetDictionary = deflateGetDictionary;\n  module.exports.deflateParams = deflateParams;\n  module.exports.deflatePending = deflatePending;\n  module.exports.deflatePrime = deflatePrime;\n  module.exports.deflateTune = deflateTune;\n  */\n\n  var deflate_1$2 = {\n    deflateInit: deflateInit_1,\n    deflateInit2: deflateInit2_1,\n    deflateReset: deflateReset_1,\n    deflateResetKeep: deflateResetKeep_1,\n    deflateSetHeader: deflateSetHeader_1,\n    deflate: deflate_2$1,\n    deflateEnd: deflateEnd_1,\n    deflateSetDictionary: deflateSetDictionary_1,\n    deflateInfo: deflateInfo\n  };\n\n  function _typeof(obj) {\n    \"@babel/helpers - typeof\";\n\n    return _typeof = \"function\" == typeof Symbol && \"symbol\" == typeof Symbol.iterator ? function (obj) {\n      return typeof obj;\n    } : function (obj) {\n      return obj && \"function\" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj;\n    }, _typeof(obj);\n  }\n\n  var _has = function _has(obj, key) {\n    return Object.prototype.hasOwnProperty.call(obj, key);\n  };\n  var assign = function assign(obj /*from1, from2, from3, ...*/) {\n    var sources = Array.prototype.slice.call(arguments, 1);\n    while (sources.length) {\n      var source = sources.shift();\n      if (!source) {\n        continue;\n      }\n      if (_typeof(source) !== 'object') {\n        throw new TypeError(source + 'must be non-object');\n      }\n      for (var p in source) {\n        if (_has(source, p)) {\n          obj[p] = source[p];\n        }\n      }\n    }\n    return obj;\n  };\n\n  // Join array of chunks to single array.\n  var flattenChunks = function flattenChunks(chunks) {\n    // calculate data length\n    var len = 0;\n    for (var i = 0, l = chunks.length; i < l; i++) {\n      len += chunks[i].length;\n    }\n\n    // join chunks\n    var result = new Uint8Array(len);\n    for (var _i = 0, pos = 0, _l = chunks.length; _i < _l; _i++) {\n      var chunk = chunks[_i];\n      result.set(chunk, pos);\n      pos += chunk.length;\n    }\n    return result;\n  };\n  var common = {\n    assign: assign,\n    flattenChunks: flattenChunks\n  };\n\n  // String encode/decode helpers\n\n  // Quick check if we can use fast array to bin string conversion\n  //\n  // - apply(Array) can fail on Android 2.2\n  // - apply(Uint8Array) can fail on iOS 5.1 Safari\n  //\n  var STR_APPLY_UIA_OK = true;\n  try {\n    String.fromCharCode.apply(null, new Uint8Array(1));\n  } catch (__) {\n    STR_APPLY_UIA_OK = false;\n  }\n\n  // Table with utf8 lengths (calculated by first byte of sequence)\n  // Note, that 5 & 6-byte values and some 4-byte values can not be represented in JS,\n  // because max possible codepoint is 0x10ffff\n  var _utf8len = new Uint8Array(256);\n  for (var q = 0; q < 256; q++) {\n    _utf8len[q] = q >= 252 ? 6 : q >= 248 ? 5 : q >= 240 ? 4 : q >= 224 ? 3 : q >= 192 ? 2 : 1;\n  }\n  _utf8len[254] = _utf8len[254] = 1; // Invalid sequence start\n\n  // convert string to array (typed, when possible)\n  var string2buf = function string2buf(str) {\n    if (typeof TextEncoder === 'function' && TextEncoder.prototype.encode) {\n      return new TextEncoder().encode(str);\n    }\n    var buf,\n      c,\n      c2,\n      m_pos,\n      i,\n      str_len = str.length,\n      buf_len = 0;\n\n    // count binary size\n    for (m_pos = 0; m_pos < str_len; m_pos++) {\n      c = str.charCodeAt(m_pos);\n      if ((c & 0xfc00) === 0xd800 && m_pos + 1 < str_len) {\n        c2 = str.charCodeAt(m_pos + 1);\n        if ((c2 & 0xfc00) === 0xdc00) {\n          c = 0x10000 + (c - 0xd800 << 10) + (c2 - 0xdc00);\n          m_pos++;\n        }\n      }\n      buf_len += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;\n    }\n\n    // allocate buffer\n    buf = new Uint8Array(buf_len);\n\n    // convert\n    for (i = 0, m_pos = 0; i < buf_len; m_pos++) {\n      c = str.charCodeAt(m_pos);\n      if ((c & 0xfc00) === 0xd800 && m_pos + 1 < str_len) {\n        c2 = str.charCodeAt(m_pos + 1);\n        if ((c2 & 0xfc00) === 0xdc00) {\n          c = 0x10000 + (c - 0xd800 << 10) + (c2 - 0xdc00);\n          m_pos++;\n        }\n      }\n      if (c < 0x80) {\n        /* one byte */\n        buf[i++] = c;\n      } else if (c < 0x800) {\n        /* two bytes */\n        buf[i++] = 0xC0 | c >>> 6;\n        buf[i++] = 0x80 | c & 0x3f;\n      } else if (c < 0x10000) {\n        /* three bytes */\n        buf[i++] = 0xE0 | c >>> 12;\n        buf[i++] = 0x80 | c >>> 6 & 0x3f;\n        buf[i++] = 0x80 | c & 0x3f;\n      } else {\n        /* four bytes */\n        buf[i++] = 0xf0 | c >>> 18;\n        buf[i++] = 0x80 | c >>> 12 & 0x3f;\n        buf[i++] = 0x80 | c >>> 6 & 0x3f;\n        buf[i++] = 0x80 | c & 0x3f;\n      }\n    }\n    return buf;\n  };\n\n  // Helper\n  var buf2binstring = function buf2binstring(buf, len) {\n    // On Chrome, the arguments in a function call that are allowed is `65534`.\n    // If the length of the buffer is smaller than that, we can use this optimization,\n    // otherwise we will take a slower path.\n    if (len < 65534) {\n      if (buf.subarray && STR_APPLY_UIA_OK) {\n        return String.fromCharCode.apply(null, buf.length === len ? buf : buf.subarray(0, len));\n      }\n    }\n    var result = '';\n    for (var i = 0; i < len; i++) {\n      result += String.fromCharCode(buf[i]);\n    }\n    return result;\n  };\n\n  // convert array to string\n  var buf2string = function buf2string(buf, max) {\n    var len = max || buf.length;\n    if (typeof TextDecoder === 'function' && TextDecoder.prototype.decode) {\n      return new TextDecoder().decode(buf.subarray(0, max));\n    }\n    var i, out;\n\n    // Reserve max possible length (2 words per char)\n    // NB: by unknown reasons, Array is significantly faster for\n    //     String.fromCharCode.apply than Uint16Array.\n    var utf16buf = new Array(len * 2);\n    for (out = 0, i = 0; i < len;) {\n      var c = buf[i++];\n      // quick process ascii\n      if (c < 0x80) {\n        utf16buf[out++] = c;\n        continue;\n      }\n      var c_len = _utf8len[c];\n      // skip 5 & 6 byte codes\n      if (c_len > 4) {\n        utf16buf[out++] = 0xfffd;\n        i += c_len - 1;\n        continue;\n      }\n\n      // apply mask on first byte\n      c &= c_len === 2 ? 0x1f : c_len === 3 ? 0x0f : 0x07;\n      // join the rest\n      while (c_len > 1 && i < len) {\n        c = c << 6 | buf[i++] & 0x3f;\n        c_len--;\n      }\n\n      // terminated by end of string?\n      if (c_len > 1) {\n        utf16buf[out++] = 0xfffd;\n        continue;\n      }\n      if (c < 0x10000) {\n        utf16buf[out++] = c;\n      } else {\n        c -= 0x10000;\n        utf16buf[out++] = 0xd800 | c >> 10 & 0x3ff;\n        utf16buf[out++] = 0xdc00 | c & 0x3ff;\n      }\n    }\n    return buf2binstring(utf16buf, out);\n  };\n\n  // Calculate max possible position in utf8 buffer,\n  // that will not break sequence. If that's not possible\n  // - (very small limits) return max size as is.\n  //\n  // buf[] - utf8 bytes array\n  // max   - length limit (mandatory);\n  var utf8border = function utf8border(buf, max) {\n    max = max || buf.length;\n    if (max > buf.length) {\n      max = buf.length;\n    }\n\n    // go back from last position, until start of sequence found\n    var pos = max - 1;\n    while (pos >= 0 && (buf[pos] & 0xC0) === 0x80) {\n      pos--;\n    }\n\n    // Very small and broken sequence,\n    // return max, because we should return something anyway.\n    if (pos < 0) {\n      return max;\n    }\n\n    // If we came to start of buffer - that means buffer is too small,\n    // return max too.\n    if (pos === 0) {\n      return max;\n    }\n    return pos + _utf8len[buf[pos]] > max ? pos : max;\n  };\n  var strings = {\n    string2buf: string2buf,\n    buf2string: buf2string,\n    utf8border: utf8border\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  function ZStream() {\n    /* next input byte */\n    this.input = null; // JS specific, because we have no pointers\n    this.next_in = 0;\n    /* number of bytes available at input */\n    this.avail_in = 0;\n    /* total number of input bytes read so far */\n    this.total_in = 0;\n    /* next output byte should be put there */\n    this.output = null; // JS specific, because we have no pointers\n    this.next_out = 0;\n    /* remaining free space at output */\n    this.avail_out = 0;\n    /* total number of bytes output so far */\n    this.total_out = 0;\n    /* last error message, NULL if no error */\n    this.msg = '' /*Z_NULL*/;\n    /* not visible by applications */\n    this.state = null;\n    /* best guess about the data type: binary or text */\n    this.data_type = 2 /*Z_UNKNOWN*/;\n    /* adler32 value of the uncompressed data */\n    this.adler = 0;\n  }\n  var zstream = ZStream;\n\n  var toString$1 = Object.prototype.toString;\n\n  /* Public constants ==========================================================*/\n  /* ===========================================================================*/\n\n  var Z_NO_FLUSH$1 = constants$2.Z_NO_FLUSH,\n    Z_SYNC_FLUSH = constants$2.Z_SYNC_FLUSH,\n    Z_FULL_FLUSH = constants$2.Z_FULL_FLUSH,\n    Z_FINISH$2 = constants$2.Z_FINISH,\n    Z_OK$2 = constants$2.Z_OK,\n    Z_STREAM_END$2 = constants$2.Z_STREAM_END,\n    Z_DEFAULT_COMPRESSION = constants$2.Z_DEFAULT_COMPRESSION,\n    Z_DEFAULT_STRATEGY = constants$2.Z_DEFAULT_STRATEGY,\n    Z_DEFLATED$1 = constants$2.Z_DEFLATED;\n\n  /* ===========================================================================*/\n\n  /**\n   * class Deflate\n   *\n   * Generic JS-style wrapper for zlib calls. If you don't need\n   * streaming behaviour - use more simple functions: [[deflate]],\n   * [[deflateRaw]] and [[gzip]].\n   **/\n\n  /* internal\n   * Deflate.chunks -> Array\n   *\n   * Chunks of output data, if [[Deflate#onData]] not overridden.\n   **/\n\n  /**\n   * Deflate.result -> Uint8Array\n   *\n   * Compressed result, generated by default [[Deflate#onData]]\n   * and [[Deflate#onEnd]] handlers. Filled after you push last chunk\n   * (call [[Deflate#push]] with `Z_FINISH` / `true` param).\n   **/\n\n  /**\n   * Deflate.err -> Number\n   *\n   * Error code after deflate finished. 0 (Z_OK) on success.\n   * You will not need it in real life, because deflate errors\n   * are possible only on wrong options or bad `onData` / `onEnd`\n   * custom handlers.\n   **/\n\n  /**\n   * Deflate.msg -> String\n   *\n   * Error message, if [[Deflate.err]] != 0\n   **/\n\n  /**\n   * new Deflate(options)\n   * - options (Object): zlib deflate options.\n   *\n   * Creates new deflator instance with specified params. Throws exception\n   * on bad params. Supported options:\n   *\n   * - `level`\n   * - `windowBits`\n   * - `memLevel`\n   * - `strategy`\n   * - `dictionary`\n   *\n   * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)\n   * for more information on these.\n   *\n   * Additional options, for internal needs:\n   *\n   * - `chunkSize` - size of generated data chunks (16K by default)\n   * - `raw` (Boolean) - do raw deflate\n   * - `gzip` (Boolean) - create gzip wrapper\n   * - `header` (Object) - custom header for gzip\n   *   - `text` (Boolean) - true if compressed data believed to be text\n   *   - `time` (Number) - modification time, unix timestamp\n   *   - `os` (Number) - operation system code\n   *   - `extra` (Array) - array of bytes with extra data (max 65536)\n   *   - `name` (String) - file name (binary string)\n   *   - `comment` (String) - comment (binary string)\n   *   - `hcrc` (Boolean) - true if header crc should be added\n   *\n   * ##### Example:\n   *\n   * ```javascript\n   * const pako = require('pako')\n   *   , chunk1 = new Uint8Array([1,2,3,4,5,6,7,8,9])\n   *   , chunk2 = new Uint8Array([10,11,12,13,14,15,16,17,18,19]);\n   *\n   * const deflate = new pako.Deflate({ level: 3});\n   *\n   * deflate.push(chunk1, false);\n   * deflate.push(chunk2, true);  // true -> last chunk\n   *\n   * if (deflate.err) { throw new Error(deflate.err); }\n   *\n   * console.log(deflate.result);\n   * ```\n   **/\n  function Deflate$1(options) {\n    this.options = common.assign({\n      level: Z_DEFAULT_COMPRESSION,\n      method: Z_DEFLATED$1,\n      chunkSize: 16384,\n      windowBits: 15,\n      memLevel: 8,\n      strategy: Z_DEFAULT_STRATEGY\n    }, options || {});\n    var opt = this.options;\n    if (opt.raw && opt.windowBits > 0) {\n      opt.windowBits = -opt.windowBits;\n    } else if (opt.gzip && opt.windowBits > 0 && opt.windowBits < 16) {\n      opt.windowBits += 16;\n    }\n    this.err = 0; // error code, if happens (0 = Z_OK)\n    this.msg = ''; // error message\n    this.ended = false; // used to avoid multiple onEnd() calls\n    this.chunks = []; // chunks of compressed data\n\n    this.strm = new zstream();\n    this.strm.avail_out = 0;\n    var status = deflate_1$2.deflateInit2(this.strm, opt.level, opt.method, opt.windowBits, opt.memLevel, opt.strategy);\n    if (status !== Z_OK$2) {\n      throw new Error(messages[status]);\n    }\n    if (opt.header) {\n      deflate_1$2.deflateSetHeader(this.strm, opt.header);\n    }\n    if (opt.dictionary) {\n      var dict;\n      // Convert data if needed\n      if (typeof opt.dictionary === 'string') {\n        // If we need to compress text, change encoding to utf8.\n        dict = strings.string2buf(opt.dictionary);\n      } else if (toString$1.call(opt.dictionary) === '[object ArrayBuffer]') {\n        dict = new Uint8Array(opt.dictionary);\n      } else {\n        dict = opt.dictionary;\n      }\n      status = deflate_1$2.deflateSetDictionary(this.strm, dict);\n      if (status !== Z_OK$2) {\n        throw new Error(messages[status]);\n      }\n      this._dict_set = true;\n    }\n  }\n\n  /**\n   * Deflate#push(data[, flush_mode]) -> Boolean\n   * - data (Uint8Array|ArrayBuffer|String): input data. Strings will be\n   *   converted to utf8 byte sequence.\n   * - flush_mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE modes.\n   *   See constants. Skipped or `false` means Z_NO_FLUSH, `true` means Z_FINISH.\n   *\n   * Sends input data to deflate pipe, generating [[Deflate#onData]] calls with\n   * new compressed chunks. Returns `true` on success. The last data block must\n   * have `flush_mode` Z_FINISH (or `true`). That will flush internal pending\n   * buffers and call [[Deflate#onEnd]].\n   *\n   * On fail call [[Deflate#onEnd]] with error code and return false.\n   *\n   * ##### Example\n   *\n   * ```javascript\n   * push(chunk, false); // push one of data chunks\n   * ...\n   * push(chunk, true);  // push last chunk\n   * ```\n   **/\n  Deflate$1.prototype.push = function (data, flush_mode) {\n    var strm = this.strm;\n    var chunkSize = this.options.chunkSize;\n    var status, _flush_mode;\n    if (this.ended) {\n      return false;\n    }\n    if (flush_mode === ~~flush_mode) _flush_mode = flush_mode;else _flush_mode = flush_mode === true ? Z_FINISH$2 : Z_NO_FLUSH$1;\n\n    // Convert data if needed\n    if (typeof data === 'string') {\n      // If we need to compress text, change encoding to utf8.\n      strm.input = strings.string2buf(data);\n    } else if (toString$1.call(data) === '[object ArrayBuffer]') {\n      strm.input = new Uint8Array(data);\n    } else {\n      strm.input = data;\n    }\n    strm.next_in = 0;\n    strm.avail_in = strm.input.length;\n    for (;;) {\n      if (strm.avail_out === 0) {\n        strm.output = new Uint8Array(chunkSize);\n        strm.next_out = 0;\n        strm.avail_out = chunkSize;\n      }\n\n      // Make sure avail_out > 6 to avoid repeating markers\n      if ((_flush_mode === Z_SYNC_FLUSH || _flush_mode === Z_FULL_FLUSH) && strm.avail_out <= 6) {\n        this.onData(strm.output.subarray(0, strm.next_out));\n        strm.avail_out = 0;\n        continue;\n      }\n      status = deflate_1$2.deflate(strm, _flush_mode);\n\n      // Ended => flush and finish\n      if (status === Z_STREAM_END$2) {\n        if (strm.next_out > 0) {\n          this.onData(strm.output.subarray(0, strm.next_out));\n        }\n        status = deflate_1$2.deflateEnd(this.strm);\n        this.onEnd(status);\n        this.ended = true;\n        return status === Z_OK$2;\n      }\n\n      // Flush if out buffer full\n      if (strm.avail_out === 0) {\n        this.onData(strm.output);\n        continue;\n      }\n\n      // Flush if requested and has data\n      if (_flush_mode > 0 && strm.next_out > 0) {\n        this.onData(strm.output.subarray(0, strm.next_out));\n        strm.avail_out = 0;\n        continue;\n      }\n      if (strm.avail_in === 0) break;\n    }\n    return true;\n  };\n\n  /**\n   * Deflate#onData(chunk) -> Void\n   * - chunk (Uint8Array): output data.\n   *\n   * By default, stores data blocks in `chunks[]` property and glue\n   * those in `onEnd`. Override this handler, if you need another behaviour.\n   **/\n  Deflate$1.prototype.onData = function (chunk) {\n    this.chunks.push(chunk);\n  };\n\n  /**\n   * Deflate#onEnd(status) -> Void\n   * - status (Number): deflate status. 0 (Z_OK) on success,\n   *   other if not.\n   *\n   * Called once after you tell deflate that the input stream is\n   * complete (Z_FINISH). By default - join collected chunks,\n   * free memory and fill `results` / `err` properties.\n   **/\n  Deflate$1.prototype.onEnd = function (status) {\n    // On success - join\n    if (status === Z_OK$2) {\n      this.result = common.flattenChunks(this.chunks);\n    }\n    this.chunks = [];\n    this.err = status;\n    this.msg = this.strm.msg;\n  };\n\n  /**\n   * deflate(data[, options]) -> Uint8Array\n   * - data (Uint8Array|ArrayBuffer|String): input data to compress.\n   * - options (Object): zlib deflate options.\n   *\n   * Compress `data` with deflate algorithm and `options`.\n   *\n   * Supported options are:\n   *\n   * - level\n   * - windowBits\n   * - memLevel\n   * - strategy\n   * - dictionary\n   *\n   * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)\n   * for more information on these.\n   *\n   * Sugar (options):\n   *\n   * - `raw` (Boolean) - say that we work with raw stream, if you don't wish to specify\n   *   negative windowBits implicitly.\n   *\n   * ##### Example:\n   *\n   * ```javascript\n   * const pako = require('pako')\n   * const data = new Uint8Array([1,2,3,4,5,6,7,8,9]);\n   *\n   * console.log(pako.deflate(data));\n   * ```\n   **/\n  function deflate$1(input, options) {\n    var deflator = new Deflate$1(options);\n    deflator.push(input, true);\n\n    // That will never happens, if you don't cheat with options :)\n    if (deflator.err) {\n      throw deflator.msg || messages[deflator.err];\n    }\n    return deflator.result;\n  }\n\n  /**\n   * deflateRaw(data[, options]) -> Uint8Array\n   * - data (Uint8Array|ArrayBuffer|String): input data to compress.\n   * - options (Object): zlib deflate options.\n   *\n   * The same as [[deflate]], but creates raw data, without wrapper\n   * (header and adler32 crc).\n   **/\n  function deflateRaw$1(input, options) {\n    options = options || {};\n    options.raw = true;\n    return deflate$1(input, options);\n  }\n\n  /**\n   * gzip(data[, options]) -> Uint8Array\n   * - data (Uint8Array|ArrayBuffer|String): input data to compress.\n   * - options (Object): zlib deflate options.\n   *\n   * The same as [[deflate]], but create gzip wrapper instead of\n   * deflate one.\n   **/\n  function gzip$1(input, options) {\n    options = options || {};\n    options.gzip = true;\n    return deflate$1(input, options);\n  }\n  var Deflate_1$1 = Deflate$1;\n  var deflate_2 = deflate$1;\n  var deflateRaw_1$1 = deflateRaw$1;\n  var gzip_1$1 = gzip$1;\n  var constants$1 = constants$2;\n  var deflate_1$1 = {\n    Deflate: Deflate_1$1,\n    deflate: deflate_2,\n    deflateRaw: deflateRaw_1$1,\n    gzip: gzip_1$1,\n    constants: constants$1\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n\n  // See state defs from inflate.js\n  var BAD$1 = 16209; /* got a data error -- remain here until reset */\n  var TYPE$1 = 16191; /* i: waiting for type bits, including last-flag bit */\n\n  /*\n     Decode literal, length, and distance codes and write out the resulting\n     literal and match bytes until either not enough input or output is\n     available, an end-of-block is encountered, or a data error is encountered.\n     When large enough input and output buffers are supplied to inflate(), for\n     example, a 16K input buffer and a 64K output buffer, more than 95% of the\n     inflate execution time is spent in this routine.\n\n     Entry assumptions:\n\n          state.mode === LEN\n          strm.avail_in >= 6\n          strm.avail_out >= 258\n          start >= strm.avail_out\n          state.bits < 8\n\n     On return, state.mode is one of:\n\n          LEN -- ran out of enough output space or enough available input\n          TYPE -- reached end of block code, inflate() to interpret next block\n          BAD -- error in block data\n\n     Notes:\n\n      - The maximum input bits used by a length/distance pair is 15 bits for the\n        length code, 5 bits for the length extra, 15 bits for the distance code,\n        and 13 bits for the distance extra.  This totals 48 bits, or six bytes.\n        Therefore if strm.avail_in >= 6, then there is enough input to avoid\n        checking for available input while decoding.\n\n      - The maximum bytes that a single length/distance pair can output is 258\n        bytes, which is the maximum length that can be coded.  inflate_fast()\n        requires strm.avail_out >= 258 for each loop to avoid checking for\n        output space.\n   */\n  var inffast = function inflate_fast(strm, start) {\n    var _in; /* local strm.input */\n    var last; /* have enough input while in < last */\n    var _out; /* local strm.output */\n    var beg; /* inflate()'s initial strm.output */\n    var end; /* while out < end, enough space available */\n    //#ifdef INFLATE_STRICT\n    var dmax; /* maximum distance from zlib header */\n    //#endif\n    var wsize; /* window size or zero if not using window */\n    var whave; /* valid bytes in the window */\n    var wnext; /* window write index */\n    // Use `s_window` instead `window`, avoid conflict with instrumentation tools\n    var s_window; /* allocated sliding window, if wsize != 0 */\n    var hold; /* local strm.hold */\n    var bits; /* local strm.bits */\n    var lcode; /* local strm.lencode */\n    var dcode; /* local strm.distcode */\n    var lmask; /* mask for first level of length codes */\n    var dmask; /* mask for first level of distance codes */\n    var here; /* retrieved table entry */\n    var op; /* code bits, operation, extra bits, or */\n    /*  window position, window bytes to copy */\n    var len; /* match length, unused bytes */\n    var dist; /* match distance */\n    var from; /* where to copy match from */\n    var from_source;\n    var input, output; // JS specific, because we have no pointers\n\n    /* copy state to local variables */\n    var state = strm.state;\n    //here = state.here;\n    _in = strm.next_in;\n    input = strm.input;\n    last = _in + (strm.avail_in - 5);\n    _out = strm.next_out;\n    output = strm.output;\n    beg = _out - (start - strm.avail_out);\n    end = _out + (strm.avail_out - 257);\n    //#ifdef INFLATE_STRICT\n    dmax = state.dmax;\n    //#endif\n    wsize = state.wsize;\n    whave = state.whave;\n    wnext = state.wnext;\n    s_window = state.window;\n    hold = state.hold;\n    bits = state.bits;\n    lcode = state.lencode;\n    dcode = state.distcode;\n    lmask = (1 << state.lenbits) - 1;\n    dmask = (1 << state.distbits) - 1;\n\n    /* decode literals and length/distances until end-of-block or not enough\n       input data or output space */\n\n    top: do {\n      if (bits < 15) {\n        hold += input[_in++] << bits;\n        bits += 8;\n        hold += input[_in++] << bits;\n        bits += 8;\n      }\n      here = lcode[hold & lmask];\n      dolen: for (;;) {\n        // Goto emulation\n        op = here >>> 24 /*here.bits*/;\n        hold >>>= op;\n        bits -= op;\n        op = here >>> 16 & 0xff /*here.op*/;\n        if (op === 0) {\n          /* literal */\n          //Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ?\n          //        \"inflate:         literal '%c'\\n\" :\n          //        \"inflate:         literal 0x%02x\\n\", here.val));\n          output[_out++] = here & 0xffff /*here.val*/;\n        } else if (op & 16) {\n          /* length base */\n          len = here & 0xffff /*here.val*/;\n          op &= 15; /* number of extra bits */\n          if (op) {\n            if (bits < op) {\n              hold += input[_in++] << bits;\n              bits += 8;\n            }\n            len += hold & (1 << op) - 1;\n            hold >>>= op;\n            bits -= op;\n          }\n          //Tracevv((stderr, \"inflate:         length %u\\n\", len));\n          if (bits < 15) {\n            hold += input[_in++] << bits;\n            bits += 8;\n            hold += input[_in++] << bits;\n            bits += 8;\n          }\n          here = dcode[hold & dmask];\n          dodist: for (;;) {\n            // goto emulation\n            op = here >>> 24 /*here.bits*/;\n            hold >>>= op;\n            bits -= op;\n            op = here >>> 16 & 0xff /*here.op*/;\n\n            if (op & 16) {\n              /* distance base */\n              dist = here & 0xffff /*here.val*/;\n              op &= 15; /* number of extra bits */\n              if (bits < op) {\n                hold += input[_in++] << bits;\n                bits += 8;\n                if (bits < op) {\n                  hold += input[_in++] << bits;\n                  bits += 8;\n                }\n              }\n              dist += hold & (1 << op) - 1;\n              //#ifdef INFLATE_STRICT\n              if (dist > dmax) {\n                strm.msg = 'invalid distance too far back';\n                state.mode = BAD$1;\n                break top;\n              }\n              //#endif\n              hold >>>= op;\n              bits -= op;\n              //Tracevv((stderr, \"inflate:         distance %u\\n\", dist));\n              op = _out - beg; /* max distance in output */\n              if (dist > op) {\n                /* see if copy from window */\n                op = dist - op; /* distance back in window */\n                if (op > whave) {\n                  if (state.sane) {\n                    strm.msg = 'invalid distance too far back';\n                    state.mode = BAD$1;\n                    break top;\n                  }\n\n                  // (!) This block is disabled in zlib defaults,\n                  // don't enable it for binary compatibility\n                  //#ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR\n                  //                if (len <= op - whave) {\n                  //                  do {\n                  //                    output[_out++] = 0;\n                  //                  } while (--len);\n                  //                  continue top;\n                  //                }\n                  //                len -= op - whave;\n                  //                do {\n                  //                  output[_out++] = 0;\n                  //                } while (--op > whave);\n                  //                if (op === 0) {\n                  //                  from = _out - dist;\n                  //                  do {\n                  //                    output[_out++] = output[from++];\n                  //                  } while (--len);\n                  //                  continue top;\n                  //                }\n                  //#endif\n                }\n\n                from = 0; // window index\n                from_source = s_window;\n                if (wnext === 0) {\n                  /* very common case */\n                  from += wsize - op;\n                  if (op < len) {\n                    /* some from window */\n                    len -= op;\n                    do {\n                      output[_out++] = s_window[from++];\n                    } while (--op);\n                    from = _out - dist; /* rest from output */\n                    from_source = output;\n                  }\n                } else if (wnext < op) {\n                  /* wrap around window */\n                  from += wsize + wnext - op;\n                  op -= wnext;\n                  if (op < len) {\n                    /* some from end of window */\n                    len -= op;\n                    do {\n                      output[_out++] = s_window[from++];\n                    } while (--op);\n                    from = 0;\n                    if (wnext < len) {\n                      /* some from start of window */\n                      op = wnext;\n                      len -= op;\n                      do {\n                        output[_out++] = s_window[from++];\n                      } while (--op);\n                      from = _out - dist; /* rest from output */\n                      from_source = output;\n                    }\n                  }\n                } else {\n                  /* contiguous in window */\n                  from += wnext - op;\n                  if (op < len) {\n                    /* some from window */\n                    len -= op;\n                    do {\n                      output[_out++] = s_window[from++];\n                    } while (--op);\n                    from = _out - dist; /* rest from output */\n                    from_source = output;\n                  }\n                }\n                while (len > 2) {\n                  output[_out++] = from_source[from++];\n                  output[_out++] = from_source[from++];\n                  output[_out++] = from_source[from++];\n                  len -= 3;\n                }\n                if (len) {\n                  output[_out++] = from_source[from++];\n                  if (len > 1) {\n                    output[_out++] = from_source[from++];\n                  }\n                }\n              } else {\n                from = _out - dist; /* copy direct from output */\n                do {\n                  /* minimum length is three */\n                  output[_out++] = output[from++];\n                  output[_out++] = output[from++];\n                  output[_out++] = output[from++];\n                  len -= 3;\n                } while (len > 2);\n                if (len) {\n                  output[_out++] = output[from++];\n                  if (len > 1) {\n                    output[_out++] = output[from++];\n                  }\n                }\n              }\n            } else if ((op & 64) === 0) {\n              /* 2nd level distance code */\n              here = dcode[(here & 0xffff /*here.val*/) + (hold & (1 << op) - 1)];\n              continue dodist;\n            } else {\n              strm.msg = 'invalid distance code';\n              state.mode = BAD$1;\n              break top;\n            }\n            break; // need to emulate goto via \"continue\"\n          }\n        } else if ((op & 64) === 0) {\n          /* 2nd level length code */\n          here = lcode[(here & 0xffff /*here.val*/) + (hold & (1 << op) - 1)];\n          continue dolen;\n        } else if (op & 32) {\n          /* end-of-block */\n          //Tracevv((stderr, \"inflate:         end of block\\n\"));\n          state.mode = TYPE$1;\n          break top;\n        } else {\n          strm.msg = 'invalid literal/length code';\n          state.mode = BAD$1;\n          break top;\n        }\n        break; // need to emulate goto via \"continue\"\n      }\n    } while (_in < last && _out < end);\n\n    /* return unused bytes (on entry, bits < 8, so in won't go too far back) */\n    len = bits >> 3;\n    _in -= len;\n    bits -= len << 3;\n    hold &= (1 << bits) - 1;\n\n    /* update state and return */\n    strm.next_in = _in;\n    strm.next_out = _out;\n    strm.avail_in = _in < last ? 5 + (last - _in) : 5 - (_in - last);\n    strm.avail_out = _out < end ? 257 + (end - _out) : 257 - (_out - end);\n    state.hold = hold;\n    state.bits = bits;\n    return;\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  var MAXBITS = 15;\n  var ENOUGH_LENS$1 = 852;\n  var ENOUGH_DISTS$1 = 592;\n  //const ENOUGH = (ENOUGH_LENS+ENOUGH_DISTS);\n\n  var CODES$1 = 0;\n  var LENS$1 = 1;\n  var DISTS$1 = 2;\n  var lbase = new Uint16Array([/* Length codes 257..285 base */\n  3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0]);\n  var lext = new Uint8Array([/* Length codes 257..285 extra */\n  16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18, 19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 72, 78]);\n  var dbase = new Uint16Array([/* Distance codes 0..29 base */\n  1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, 0, 0]);\n  var dext = new Uint8Array([/* Distance codes 0..29 extra */\n  16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 64, 64]);\n  var inflate_table = function inflate_table(type, lens, lens_index, codes, table, table_index, work, opts) {\n    var bits = opts.bits;\n    //here = opts.here; /* table entry for duplication */\n\n    var len = 0; /* a code's length in bits */\n    var sym = 0; /* index of code symbols */\n    var min = 0,\n      max = 0; /* minimum and maximum code lengths */\n    var root = 0; /* number of index bits for root table */\n    var curr = 0; /* number of index bits for current table */\n    var drop = 0; /* code bits to drop for sub-table */\n    var left = 0; /* number of prefix codes available */\n    var used = 0; /* code entries in table used */\n    var huff = 0; /* Huffman code */\n    var incr; /* for incrementing code, index */\n    var fill; /* index for replicating entries */\n    var low; /* low bits for current root entry */\n    var mask; /* mask for low root bits */\n    var next; /* next available space in table */\n    var base = null; /* base value table to use */\n    //  let shoextra;    /* extra bits table to use */\n    var match; /* use base and extra for symbol >= match */\n    var count = new Uint16Array(MAXBITS + 1); //[MAXBITS+1];    /* number of codes of each length */\n    var offs = new Uint16Array(MAXBITS + 1); //[MAXBITS+1];     /* offsets in table for each length */\n    var extra = null;\n    var here_bits, here_op, here_val;\n\n    /*\n     Process a set of code lengths to create a canonical Huffman code.  The\n     code lengths are lens[0..codes-1].  Each length corresponds to the\n     symbols 0..codes-1.  The Huffman code is generated by first sorting the\n     symbols by length from short to long, and retaining the symbol order\n     for codes with equal lengths.  Then the code starts with all zero bits\n     for the first code of the shortest length, and the codes are integer\n     increments for the same length, and zeros are appended as the length\n     increases.  For the deflate format, these bits are stored backwards\n     from their more natural integer increment ordering, and so when the\n     decoding tables are built in the large loop below, the integer codes\n     are incremented backwards.\n      This routine assumes, but does not check, that all of the entries in\n     lens[] are in the range 0..MAXBITS.  The caller must assure this.\n     1..MAXBITS is interpreted as that code length.  zero means that that\n     symbol does not occur in this code.\n      The codes are sorted by computing a count of codes for each length,\n     creating from that a table of starting indices for each length in the\n     sorted table, and then entering the symbols in order in the sorted\n     table.  The sorted table is work[], with that space being provided by\n     the caller.\n      The length counts are used for other purposes as well, i.e. finding\n     the minimum and maximum length codes, determining if there are any\n     codes at all, checking for a valid set of lengths, and looking ahead\n     at length counts to determine sub-table sizes when building the\n     decoding tables.\n     */\n\n    /* accumulate lengths for codes (assumes lens[] all in 0..MAXBITS) */\n    for (len = 0; len <= MAXBITS; len++) {\n      count[len] = 0;\n    }\n    for (sym = 0; sym < codes; sym++) {\n      count[lens[lens_index + sym]]++;\n    }\n\n    /* bound code lengths, force root to be within code lengths */\n    root = bits;\n    for (max = MAXBITS; max >= 1; max--) {\n      if (count[max] !== 0) {\n        break;\n      }\n    }\n    if (root > max) {\n      root = max;\n    }\n    if (max === 0) {\n      /* no symbols to code at all */\n      //table.op[opts.table_index] = 64;  //here.op = (var char)64;    /* invalid code marker */\n      //table.bits[opts.table_index] = 1;   //here.bits = (var char)1;\n      //table.val[opts.table_index++] = 0;   //here.val = (var short)0;\n      table[table_index++] = 1 << 24 | 64 << 16 | 0;\n\n      //table.op[opts.table_index] = 64;\n      //table.bits[opts.table_index] = 1;\n      //table.val[opts.table_index++] = 0;\n      table[table_index++] = 1 << 24 | 64 << 16 | 0;\n      opts.bits = 1;\n      return 0; /* no symbols, but wait for decoding to report error */\n    }\n\n    for (min = 1; min < max; min++) {\n      if (count[min] !== 0) {\n        break;\n      }\n    }\n    if (root < min) {\n      root = min;\n    }\n\n    /* check for an over-subscribed or incomplete set of lengths */\n    left = 1;\n    for (len = 1; len <= MAXBITS; len++) {\n      left <<= 1;\n      left -= count[len];\n      if (left < 0) {\n        return -1;\n      } /* over-subscribed */\n    }\n\n    if (left > 0 && (type === CODES$1 || max !== 1)) {\n      return -1; /* incomplete set */\n    }\n\n    /* generate offsets into symbol table for each length for sorting */\n    offs[1] = 0;\n    for (len = 1; len < MAXBITS; len++) {\n      offs[len + 1] = offs[len] + count[len];\n    }\n\n    /* sort symbols by length, by symbol order within each length */\n    for (sym = 0; sym < codes; sym++) {\n      if (lens[lens_index + sym] !== 0) {\n        work[offs[lens[lens_index + sym]]++] = sym;\n      }\n    }\n\n    /*\n     Create and fill in decoding tables.  In this loop, the table being\n     filled is at next and has curr index bits.  The code being used is huff\n     with length len.  That code is converted to an index by dropping drop\n     bits off of the bottom.  For codes where len is less than drop + curr,\n     those top drop + curr - len bits are incremented through all values to\n     fill the table with replicated entries.\n      root is the number of index bits for the root table.  When len exceeds\n     root, sub-tables are created pointed to by the root entry with an index\n     of the low root bits of huff.  This is saved in low to check for when a\n     new sub-table should be started.  drop is zero when the root table is\n     being filled, and drop is root when sub-tables are being filled.\n      When a new sub-table is needed, it is necessary to look ahead in the\n     code lengths to determine what size sub-table is needed.  The length\n     counts are used for this, and so count[] is decremented as codes are\n     entered in the tables.\n      used keeps track of how many table entries have been allocated from the\n     provided *table space.  It is checked for LENS and DIST tables against\n     the constants ENOUGH_LENS and ENOUGH_DISTS to guard against changes in\n     the initial root table size constants.  See the comments in inftrees.h\n     for more information.\n      sym increments through all symbols, and the loop terminates when\n     all codes of length max, i.e. all codes, have been processed.  This\n     routine permits incomplete codes, so another loop after this one fills\n     in the rest of the decoding tables with invalid code markers.\n     */\n\n    /* set up for code type */\n    // poor man optimization - use if-else instead of switch,\n    // to avoid deopts in old v8\n    if (type === CODES$1) {\n      base = extra = work; /* dummy value--not used */\n      match = 20;\n    } else if (type === LENS$1) {\n      base = lbase;\n      extra = lext;\n      match = 257;\n    } else {\n      /* DISTS */\n      base = dbase;\n      extra = dext;\n      match = 0;\n    }\n\n    /* initialize opts for loop */\n    huff = 0; /* starting code */\n    sym = 0; /* starting code symbol */\n    len = min; /* starting code length */\n    next = table_index; /* current table to fill in */\n    curr = root; /* current table index bits */\n    drop = 0; /* current bits to drop from code for index */\n    low = -1; /* trigger new sub-table when len > root */\n    used = 1 << root; /* use root table entries */\n    mask = used - 1; /* mask for comparing low */\n\n    /* check available table space */\n    if (type === LENS$1 && used > ENOUGH_LENS$1 || type === DISTS$1 && used > ENOUGH_DISTS$1) {\n      return 1;\n    }\n\n    /* process all codes and make table entries */\n    for (;;) {\n      /* create table entry */\n      here_bits = len - drop;\n      if (work[sym] + 1 < match) {\n        here_op = 0;\n        here_val = work[sym];\n      } else if (work[sym] >= match) {\n        here_op = extra[work[sym] - match];\n        here_val = base[work[sym] - match];\n      } else {\n        here_op = 32 + 64; /* end of block */\n        here_val = 0;\n      }\n\n      /* replicate for those indices with low len bits equal to huff */\n      incr = 1 << len - drop;\n      fill = 1 << curr;\n      min = fill; /* save offset to next table */\n      do {\n        fill -= incr;\n        table[next + (huff >> drop) + fill] = here_bits << 24 | here_op << 16 | here_val | 0;\n      } while (fill !== 0);\n\n      /* backwards increment the len-bit code huff */\n      incr = 1 << len - 1;\n      while (huff & incr) {\n        incr >>= 1;\n      }\n      if (incr !== 0) {\n        huff &= incr - 1;\n        huff += incr;\n      } else {\n        huff = 0;\n      }\n\n      /* go to next symbol, update count, len */\n      sym++;\n      if (--count[len] === 0) {\n        if (len === max) {\n          break;\n        }\n        len = lens[lens_index + work[sym]];\n      }\n\n      /* create new sub-table if needed */\n      if (len > root && (huff & mask) !== low) {\n        /* if first time, transition to sub-tables */\n        if (drop === 0) {\n          drop = root;\n        }\n\n        /* increment past last table */\n        next += min; /* here min is 1 << curr */\n\n        /* determine length of next table */\n        curr = len - drop;\n        left = 1 << curr;\n        while (curr + drop < max) {\n          left -= count[curr + drop];\n          if (left <= 0) {\n            break;\n          }\n          curr++;\n          left <<= 1;\n        }\n\n        /* check for enough space */\n        used += 1 << curr;\n        if (type === LENS$1 && used > ENOUGH_LENS$1 || type === DISTS$1 && used > ENOUGH_DISTS$1) {\n          return 1;\n        }\n\n        /* point entry in root table to sub-table */\n        low = huff & mask;\n        /*table.op[low] = curr;\n        table.bits[low] = root;\n        table.val[low] = next - opts.table_index;*/\n        table[low] = root << 24 | curr << 16 | next - table_index | 0;\n      }\n    }\n\n    /* fill in remaining table entry if code is incomplete (guaranteed to have\n     at most one remaining entry, since if the code is incomplete, the\n     maximum code length that was allowed to get this far is one bit) */\n    if (huff !== 0) {\n      //table.op[next + huff] = 64;            /* invalid code marker */\n      //table.bits[next + huff] = len - drop;\n      //table.val[next + huff] = 0;\n      table[next + huff] = len - drop << 24 | 64 << 16 | 0;\n    }\n\n    /* set return parameters */\n    //opts.table_index += used;\n    opts.bits = root;\n    return 0;\n  };\n  var inftrees = inflate_table;\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n\n  var CODES = 0;\n  var LENS = 1;\n  var DISTS = 2;\n\n  /* Public constants ==========================================================*/\n  /* ===========================================================================*/\n\n  var Z_FINISH$1 = constants$2.Z_FINISH,\n    Z_BLOCK = constants$2.Z_BLOCK,\n    Z_TREES = constants$2.Z_TREES,\n    Z_OK$1 = constants$2.Z_OK,\n    Z_STREAM_END$1 = constants$2.Z_STREAM_END,\n    Z_NEED_DICT$1 = constants$2.Z_NEED_DICT,\n    Z_STREAM_ERROR$1 = constants$2.Z_STREAM_ERROR,\n    Z_DATA_ERROR$1 = constants$2.Z_DATA_ERROR,\n    Z_MEM_ERROR$1 = constants$2.Z_MEM_ERROR,\n    Z_BUF_ERROR = constants$2.Z_BUF_ERROR,\n    Z_DEFLATED = constants$2.Z_DEFLATED;\n\n  /* STATES ====================================================================*/\n  /* ===========================================================================*/\n\n  var HEAD = 16180; /* i: waiting for magic header */\n  var FLAGS = 16181; /* i: waiting for method and flags (gzip) */\n  var TIME = 16182; /* i: waiting for modification time (gzip) */\n  var OS = 16183; /* i: waiting for extra flags and operating system (gzip) */\n  var EXLEN = 16184; /* i: waiting for extra length (gzip) */\n  var EXTRA = 16185; /* i: waiting for extra bytes (gzip) */\n  var NAME = 16186; /* i: waiting for end of file name (gzip) */\n  var COMMENT = 16187; /* i: waiting for end of comment (gzip) */\n  var HCRC = 16188; /* i: waiting for header crc (gzip) */\n  var DICTID = 16189; /* i: waiting for dictionary check value */\n  var DICT = 16190; /* waiting for inflateSetDictionary() call */\n  var TYPE = 16191; /* i: waiting for type bits, including last-flag bit */\n  var TYPEDO = 16192; /* i: same, but skip check to exit inflate on new block */\n  var STORED = 16193; /* i: waiting for stored size (length and complement) */\n  var COPY_ = 16194; /* i/o: same as COPY below, but only first time in */\n  var COPY = 16195; /* i/o: waiting for input or output to copy stored block */\n  var TABLE = 16196; /* i: waiting for dynamic block table lengths */\n  var LENLENS = 16197; /* i: waiting for code length code lengths */\n  var CODELENS = 16198; /* i: waiting for length/lit and distance code lengths */\n  var LEN_ = 16199; /* i: same as LEN below, but only first time in */\n  var LEN = 16200; /* i: waiting for length/lit/eob code */\n  var LENEXT = 16201; /* i: waiting for length extra bits */\n  var DIST = 16202; /* i: waiting for distance code */\n  var DISTEXT = 16203; /* i: waiting for distance extra bits */\n  var MATCH = 16204; /* o: waiting for output space to copy string */\n  var LIT = 16205; /* o: waiting for output space to write literal */\n  var CHECK = 16206; /* i: waiting for 32-bit check value */\n  var LENGTH = 16207; /* i: waiting for 32-bit length (gzip) */\n  var DONE = 16208; /* finished check, done -- remain here until reset */\n  var BAD = 16209; /* got a data error -- remain here until reset */\n  var MEM = 16210; /* got an inflate() memory error -- remain here until reset */\n  var SYNC = 16211; /* looking for synchronization bytes to restart inflate() */\n\n  /* ===========================================================================*/\n\n  var ENOUGH_LENS = 852;\n  var ENOUGH_DISTS = 592;\n  //const ENOUGH =  (ENOUGH_LENS+ENOUGH_DISTS);\n\n  var MAX_WBITS = 15;\n  /* 32K LZ77 window */\n  var DEF_WBITS = MAX_WBITS;\n  var zswap32 = function zswap32(q) {\n    return (q >>> 24 & 0xff) + (q >>> 8 & 0xff00) + ((q & 0xff00) << 8) + ((q & 0xff) << 24);\n  };\n  function InflateState() {\n    this.strm = null; /* pointer back to this zlib stream */\n    this.mode = 0; /* current inflate mode */\n    this.last = false; /* true if processing last block */\n    this.wrap = 0; /* bit 0 true for zlib, bit 1 true for gzip,\n                      bit 2 true to validate check value */\n    this.havedict = false; /* true if dictionary provided */\n    this.flags = 0; /* gzip header method and flags (0 if zlib), or\n                       -1 if raw or no header yet */\n    this.dmax = 0; /* zlib header max distance (INFLATE_STRICT) */\n    this.check = 0; /* protected copy of check value */\n    this.total = 0; /* protected copy of output count */\n    // TODO: may be {}\n    this.head = null; /* where to save gzip header information */\n\n    /* sliding window */\n    this.wbits = 0; /* log base 2 of requested window size */\n    this.wsize = 0; /* window size or zero if not using window */\n    this.whave = 0; /* valid bytes in the window */\n    this.wnext = 0; /* window write index */\n    this.window = null; /* allocated sliding window, if needed */\n\n    /* bit accumulator */\n    this.hold = 0; /* input bit accumulator */\n    this.bits = 0; /* number of bits in \"in\" */\n\n    /* for string and stored block copying */\n    this.length = 0; /* literal or length of data to copy */\n    this.offset = 0; /* distance back to copy string from */\n\n    /* for table and code decoding */\n    this.extra = 0; /* extra bits needed */\n\n    /* fixed and dynamic code tables */\n    this.lencode = null; /* starting table for length/literal codes */\n    this.distcode = null; /* starting table for distance codes */\n    this.lenbits = 0; /* index bits for lencode */\n    this.distbits = 0; /* index bits for distcode */\n\n    /* dynamic table building */\n    this.ncode = 0; /* number of code length code lengths */\n    this.nlen = 0; /* number of length code lengths */\n    this.ndist = 0; /* number of distance code lengths */\n    this.have = 0; /* number of code lengths in lens[] */\n    this.next = null; /* next available space in codes[] */\n\n    this.lens = new Uint16Array(320); /* temporary storage for code lengths */\n    this.work = new Uint16Array(288); /* work area for code table building */\n\n    /*\n     because we don't have pointers in js, we use lencode and distcode directly\n     as buffers so we don't need codes\n    */\n    //this.codes = new Int32Array(ENOUGH);       /* space for code tables */\n    this.lendyn = null; /* dynamic table for length/literal codes (JS specific) */\n    this.distdyn = null; /* dynamic table for distance codes (JS specific) */\n    this.sane = 0; /* if false, allow invalid distance too far */\n    this.back = 0; /* bits back of last unprocessed length/lit */\n    this.was = 0; /* initial length of match */\n  }\n\n  var inflateStateCheck = function inflateStateCheck(strm) {\n    if (!strm) {\n      return 1;\n    }\n    var state = strm.state;\n    if (!state || state.strm !== strm || state.mode < HEAD || state.mode > SYNC) {\n      return 1;\n    }\n    return 0;\n  };\n  var inflateResetKeep = function inflateResetKeep(strm) {\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    var state = strm.state;\n    strm.total_in = strm.total_out = state.total = 0;\n    strm.msg = ''; /*Z_NULL*/\n    if (state.wrap) {\n      /* to support ill-conceived Java test suite */\n      strm.adler = state.wrap & 1;\n    }\n    state.mode = HEAD;\n    state.last = 0;\n    state.havedict = 0;\n    state.flags = -1;\n    state.dmax = 32768;\n    state.head = null /*Z_NULL*/;\n    state.hold = 0;\n    state.bits = 0;\n    //state.lencode = state.distcode = state.next = state.codes;\n    state.lencode = state.lendyn = new Int32Array(ENOUGH_LENS);\n    state.distcode = state.distdyn = new Int32Array(ENOUGH_DISTS);\n    state.sane = 1;\n    state.back = -1;\n    //Tracev((stderr, \"inflate: reset\\n\"));\n    return Z_OK$1;\n  };\n  var inflateReset = function inflateReset(strm) {\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    var state = strm.state;\n    state.wsize = 0;\n    state.whave = 0;\n    state.wnext = 0;\n    return inflateResetKeep(strm);\n  };\n  var inflateReset2 = function inflateReset2(strm, windowBits) {\n    var wrap;\n\n    /* get the state */\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    var state = strm.state;\n\n    /* extract wrap request from windowBits parameter */\n    if (windowBits < 0) {\n      wrap = 0;\n      windowBits = -windowBits;\n    } else {\n      wrap = (windowBits >> 4) + 5;\n      if (windowBits < 48) {\n        windowBits &= 15;\n      }\n    }\n\n    /* set number of window bits, free window if different */\n    if (windowBits && (windowBits < 8 || windowBits > 15)) {\n      return Z_STREAM_ERROR$1;\n    }\n    if (state.window !== null && state.wbits !== windowBits) {\n      state.window = null;\n    }\n\n    /* update state and reset the rest of it */\n    state.wrap = wrap;\n    state.wbits = windowBits;\n    return inflateReset(strm);\n  };\n  var inflateInit2 = function inflateInit2(strm, windowBits) {\n    if (!strm) {\n      return Z_STREAM_ERROR$1;\n    }\n    //strm.msg = Z_NULL;                 /* in case we return an error */\n\n    var state = new InflateState();\n\n    //if (state === Z_NULL) return Z_MEM_ERROR;\n    //Tracev((stderr, \"inflate: allocated\\n\"));\n    strm.state = state;\n    state.strm = strm;\n    state.window = null /*Z_NULL*/;\n    state.mode = HEAD; /* to pass state test in inflateReset2() */\n    var ret = inflateReset2(strm, windowBits);\n    if (ret !== Z_OK$1) {\n      strm.state = null /*Z_NULL*/;\n    }\n\n    return ret;\n  };\n  var inflateInit = function inflateInit(strm) {\n    return inflateInit2(strm, DEF_WBITS);\n  };\n\n  /*\n   Return state with length and distance decoding tables and index sizes set to\n   fixed code decoding.  Normally this returns fixed tables from inffixed.h.\n   If BUILDFIXED is defined, then instead this routine builds the tables the\n   first time it's called, and returns those tables the first time and\n   thereafter.  This reduces the size of the code by about 2K bytes, in\n   exchange for a little execution time.  However, BUILDFIXED should not be\n   used for threaded applications, since the rewriting of the tables and virgin\n   may not be thread-safe.\n   */\n  var virgin = true;\n  var lenfix, distfix; // We have no pointers in JS, so keep tables separate\n\n  var fixedtables = function fixedtables(state) {\n    /* build fixed huffman tables if first call (may not be thread safe) */\n    if (virgin) {\n      lenfix = new Int32Array(512);\n      distfix = new Int32Array(32);\n\n      /* literal/length table */\n      var sym = 0;\n      while (sym < 144) {\n        state.lens[sym++] = 8;\n      }\n      while (sym < 256) {\n        state.lens[sym++] = 9;\n      }\n      while (sym < 280) {\n        state.lens[sym++] = 7;\n      }\n      while (sym < 288) {\n        state.lens[sym++] = 8;\n      }\n      inftrees(LENS, state.lens, 0, 288, lenfix, 0, state.work, {\n        bits: 9\n      });\n\n      /* distance table */\n      sym = 0;\n      while (sym < 32) {\n        state.lens[sym++] = 5;\n      }\n      inftrees(DISTS, state.lens, 0, 32, distfix, 0, state.work, {\n        bits: 5\n      });\n\n      /* do this just once */\n      virgin = false;\n    }\n    state.lencode = lenfix;\n    state.lenbits = 9;\n    state.distcode = distfix;\n    state.distbits = 5;\n  };\n\n  /*\n   Update the window with the last wsize (normally 32K) bytes written before\n   returning.  If window does not exist yet, create it.  This is only called\n   when a window is already in use, or when output has been written during this\n   inflate call, but the end of the deflate stream has not been reached yet.\n   It is also called to create a window for dictionary data when a dictionary\n   is loaded.\n\n   Providing output buffers larger than 32K to inflate() should provide a speed\n   advantage, since only the last 32K of output is copied to the sliding window\n   upon return from inflate(), and since all distances after the first 32K of\n   output will fall in the output data, making match copies simpler and faster.\n   The advantage may be dependent on the size of the processor's data caches.\n   */\n  var updatewindow = function updatewindow(strm, src, end, copy) {\n    var dist;\n    var state = strm.state;\n\n    /* if it hasn't been done already, allocate space for the window */\n    if (state.window === null) {\n      state.wsize = 1 << state.wbits;\n      state.wnext = 0;\n      state.whave = 0;\n      state.window = new Uint8Array(state.wsize);\n    }\n\n    /* copy state->wsize or less output bytes into the circular window */\n    if (copy >= state.wsize) {\n      state.window.set(src.subarray(end - state.wsize, end), 0);\n      state.wnext = 0;\n      state.whave = state.wsize;\n    } else {\n      dist = state.wsize - state.wnext;\n      if (dist > copy) {\n        dist = copy;\n      }\n      //zmemcpy(state->window + state->wnext, end - copy, dist);\n      state.window.set(src.subarray(end - copy, end - copy + dist), state.wnext);\n      copy -= dist;\n      if (copy) {\n        //zmemcpy(state->window, end - copy, copy);\n        state.window.set(src.subarray(end - copy, end), 0);\n        state.wnext = copy;\n        state.whave = state.wsize;\n      } else {\n        state.wnext += dist;\n        if (state.wnext === state.wsize) {\n          state.wnext = 0;\n        }\n        if (state.whave < state.wsize) {\n          state.whave += dist;\n        }\n      }\n    }\n    return 0;\n  };\n  var inflate$2 = function inflate(strm, flush) {\n    var state;\n    var input, output; // input/output buffers\n    var next; /* next input INDEX */\n    var put; /* next output INDEX */\n    var have, left; /* available input and output */\n    var hold; /* bit buffer */\n    var bits; /* bits in bit buffer */\n    var _in, _out; /* save starting available input and output */\n    var copy; /* number of stored or match bytes to copy */\n    var from; /* where to copy match bytes from */\n    var from_source;\n    var here = 0; /* current decoding table entry */\n    var here_bits, here_op, here_val; // paked \"here\" denormalized (JS specific)\n    //let last;                   /* parent table entry */\n    var last_bits, last_op, last_val; // paked \"last\" denormalized (JS specific)\n    var len; /* length to copy for repeats, bits to drop */\n    var ret; /* return code */\n    var hbuf = new Uint8Array(4); /* buffer for gzip header crc calculation */\n    var opts;\n    var n; // temporary variable for NEED_BITS\n\n    var order = /* permutation of code lengths */\n    new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);\n    if (inflateStateCheck(strm) || !strm.output || !strm.input && strm.avail_in !== 0) {\n      return Z_STREAM_ERROR$1;\n    }\n    state = strm.state;\n    if (state.mode === TYPE) {\n      state.mode = TYPEDO;\n    } /* skip check */\n\n    //--- LOAD() ---\n    put = strm.next_out;\n    output = strm.output;\n    left = strm.avail_out;\n    next = strm.next_in;\n    input = strm.input;\n    have = strm.avail_in;\n    hold = state.hold;\n    bits = state.bits;\n    //---\n\n    _in = have;\n    _out = left;\n    ret = Z_OK$1;\n    inf_leave:\n    // goto emulation\n    for (;;) {\n      switch (state.mode) {\n        case HEAD:\n          if (state.wrap === 0) {\n            state.mode = TYPEDO;\n            break;\n          }\n          //=== NEEDBITS(16);\n          while (bits < 16) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          if (state.wrap & 2 && hold === 0x8b1f) {\n            /* gzip header */\n            if (state.wbits === 0) {\n              state.wbits = 15;\n            }\n            state.check = 0 /*crc32(0L, Z_NULL, 0)*/;\n            //=== CRC2(state.check, hold);\n            hbuf[0] = hold & 0xff;\n            hbuf[1] = hold >>> 8 & 0xff;\n            state.check = crc32_1(state.check, hbuf, 2, 0);\n            //===//\n\n            //=== INITBITS();\n            hold = 0;\n            bits = 0;\n            //===//\n            state.mode = FLAGS;\n            break;\n          }\n          if (state.head) {\n            state.head.done = false;\n          }\n          if (!(state.wrap & 1) || /* check if zlib header allowed */\n          (((hold & 0xff /*BITS(8)*/) << 8) + (hold >> 8)) % 31) {\n            strm.msg = 'incorrect header check';\n            state.mode = BAD;\n            break;\n          }\n          if ((hold & 0x0f /*BITS(4)*/) !== Z_DEFLATED) {\n            strm.msg = 'unknown compression method';\n            state.mode = BAD;\n            break;\n          }\n          //--- DROPBITS(4) ---//\n          hold >>>= 4;\n          bits -= 4;\n          //---//\n          len = (hold & 0x0f /*BITS(4)*/) + 8;\n          if (state.wbits === 0) {\n            state.wbits = len;\n          }\n          if (len > 15 || len > state.wbits) {\n            strm.msg = 'invalid window size';\n            state.mode = BAD;\n            break;\n          }\n\n          // !!! pako patch. Force use `options.windowBits` if passed.\n          // Required to always use max window size by default.\n          state.dmax = 1 << state.wbits;\n          //state.dmax = 1 << len;\n\n          state.flags = 0; /* indicate zlib header */\n          //Tracev((stderr, \"inflate:   zlib header ok\\n\"));\n          strm.adler = state.check = 1 /*adler32(0L, Z_NULL, 0)*/;\n          state.mode = hold & 0x200 ? DICTID : TYPE;\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          break;\n        case FLAGS:\n          //=== NEEDBITS(16); */\n          while (bits < 16) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          state.flags = hold;\n          if ((state.flags & 0xff) !== Z_DEFLATED) {\n            strm.msg = 'unknown compression method';\n            state.mode = BAD;\n            break;\n          }\n          if (state.flags & 0xe000) {\n            strm.msg = 'unknown header flags set';\n            state.mode = BAD;\n            break;\n          }\n          if (state.head) {\n            state.head.text = hold >> 8 & 1;\n          }\n          if (state.flags & 0x0200 && state.wrap & 4) {\n            //=== CRC2(state.check, hold);\n            hbuf[0] = hold & 0xff;\n            hbuf[1] = hold >>> 8 & 0xff;\n            state.check = crc32_1(state.check, hbuf, 2, 0);\n            //===//\n          }\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          state.mode = TIME;\n        /* falls through */\n        case TIME:\n          //=== NEEDBITS(32); */\n          while (bits < 32) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          if (state.head) {\n            state.head.time = hold;\n          }\n          if (state.flags & 0x0200 && state.wrap & 4) {\n            //=== CRC4(state.check, hold)\n            hbuf[0] = hold & 0xff;\n            hbuf[1] = hold >>> 8 & 0xff;\n            hbuf[2] = hold >>> 16 & 0xff;\n            hbuf[3] = hold >>> 24 & 0xff;\n            state.check = crc32_1(state.check, hbuf, 4, 0);\n            //===\n          }\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          state.mode = OS;\n        /* falls through */\n        case OS:\n          //=== NEEDBITS(16); */\n          while (bits < 16) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          if (state.head) {\n            state.head.xflags = hold & 0xff;\n            state.head.os = hold >> 8;\n          }\n          if (state.flags & 0x0200 && state.wrap & 4) {\n            //=== CRC2(state.check, hold);\n            hbuf[0] = hold & 0xff;\n            hbuf[1] = hold >>> 8 & 0xff;\n            state.check = crc32_1(state.check, hbuf, 2, 0);\n            //===//\n          }\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          state.mode = EXLEN;\n        /* falls through */\n        case EXLEN:\n          if (state.flags & 0x0400) {\n            //=== NEEDBITS(16); */\n            while (bits < 16) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            state.length = hold;\n            if (state.head) {\n              state.head.extra_len = hold;\n            }\n            if (state.flags & 0x0200 && state.wrap & 4) {\n              //=== CRC2(state.check, hold);\n              hbuf[0] = hold & 0xff;\n              hbuf[1] = hold >>> 8 & 0xff;\n              state.check = crc32_1(state.check, hbuf, 2, 0);\n              //===//\n            }\n            //=== INITBITS();\n            hold = 0;\n            bits = 0;\n            //===//\n          } else if (state.head) {\n            state.head.extra = null /*Z_NULL*/;\n          }\n\n          state.mode = EXTRA;\n        /* falls through */\n        case EXTRA:\n          if (state.flags & 0x0400) {\n            copy = state.length;\n            if (copy > have) {\n              copy = have;\n            }\n            if (copy) {\n              if (state.head) {\n                len = state.head.extra_len - state.length;\n                if (!state.head.extra) {\n                  // Use untyped array for more convenient processing later\n                  state.head.extra = new Uint8Array(state.head.extra_len);\n                }\n                state.head.extra.set(input.subarray(next,\n                // extra field is limited to 65536 bytes\n                // - no need for additional size check\n                next + copy), /*len + copy > state.head.extra_max - len ? state.head.extra_max : copy,*/\n                len);\n                //zmemcpy(state.head.extra + len, next,\n                //        len + copy > state.head.extra_max ?\n                //        state.head.extra_max - len : copy);\n              }\n\n              if (state.flags & 0x0200 && state.wrap & 4) {\n                state.check = crc32_1(state.check, input, copy, next);\n              }\n              have -= copy;\n              next += copy;\n              state.length -= copy;\n            }\n            if (state.length) {\n              break inf_leave;\n            }\n          }\n          state.length = 0;\n          state.mode = NAME;\n        /* falls through */\n        case NAME:\n          if (state.flags & 0x0800) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            copy = 0;\n            do {\n              // TODO: 2 or 1 bytes?\n              len = input[next + copy++];\n              /* use constant limit because in js we should not preallocate memory */\n              if (state.head && len && state.length < 65536 /*state.head.name_max*/) {\n                state.head.name += String.fromCharCode(len);\n              }\n            } while (len && copy < have);\n            if (state.flags & 0x0200 && state.wrap & 4) {\n              state.check = crc32_1(state.check, input, copy, next);\n            }\n            have -= copy;\n            next += copy;\n            if (len) {\n              break inf_leave;\n            }\n          } else if (state.head) {\n            state.head.name = null;\n          }\n          state.length = 0;\n          state.mode = COMMENT;\n        /* falls through */\n        case COMMENT:\n          if (state.flags & 0x1000) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            copy = 0;\n            do {\n              len = input[next + copy++];\n              /* use constant limit because in js we should not preallocate memory */\n              if (state.head && len && state.length < 65536 /*state.head.comm_max*/) {\n                state.head.comment += String.fromCharCode(len);\n              }\n            } while (len && copy < have);\n            if (state.flags & 0x0200 && state.wrap & 4) {\n              state.check = crc32_1(state.check, input, copy, next);\n            }\n            have -= copy;\n            next += copy;\n            if (len) {\n              break inf_leave;\n            }\n          } else if (state.head) {\n            state.head.comment = null;\n          }\n          state.mode = HCRC;\n        /* falls through */\n        case HCRC:\n          if (state.flags & 0x0200) {\n            //=== NEEDBITS(16); */\n            while (bits < 16) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            if (state.wrap & 4 && hold !== (state.check & 0xffff)) {\n              strm.msg = 'header crc mismatch';\n              state.mode = BAD;\n              break;\n            }\n            //=== INITBITS();\n            hold = 0;\n            bits = 0;\n            //===//\n          }\n\n          if (state.head) {\n            state.head.hcrc = state.flags >> 9 & 1;\n            state.head.done = true;\n          }\n          strm.adler = state.check = 0;\n          state.mode = TYPE;\n          break;\n        case DICTID:\n          //=== NEEDBITS(32); */\n          while (bits < 32) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          strm.adler = state.check = zswap32(hold);\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          state.mode = DICT;\n        /* falls through */\n        case DICT:\n          if (state.havedict === 0) {\n            //--- RESTORE() ---\n            strm.next_out = put;\n            strm.avail_out = left;\n            strm.next_in = next;\n            strm.avail_in = have;\n            state.hold = hold;\n            state.bits = bits;\n            //---\n            return Z_NEED_DICT$1;\n          }\n          strm.adler = state.check = 1 /*adler32(0L, Z_NULL, 0)*/;\n          state.mode = TYPE;\n        /* falls through */\n        case TYPE:\n          if (flush === Z_BLOCK || flush === Z_TREES) {\n            break inf_leave;\n          }\n        /* falls through */\n        case TYPEDO:\n          if (state.last) {\n            //--- BYTEBITS() ---//\n            hold >>>= bits & 7;\n            bits -= bits & 7;\n            //---//\n            state.mode = CHECK;\n            break;\n          }\n          //=== NEEDBITS(3); */\n          while (bits < 3) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          state.last = hold & 0x01 /*BITS(1)*/;\n          //--- DROPBITS(1) ---//\n          hold >>>= 1;\n          bits -= 1;\n          //---//\n\n          switch (hold & 0x03 /*BITS(2)*/) {\n            case 0:\n              /* stored block */\n              //Tracev((stderr, \"inflate:     stored block%s\\n\",\n              //        state.last ? \" (last)\" : \"\"));\n              state.mode = STORED;\n              break;\n            case 1:\n              /* fixed block */\n              fixedtables(state);\n              //Tracev((stderr, \"inflate:     fixed codes block%s\\n\",\n              //        state.last ? \" (last)\" : \"\"));\n              state.mode = LEN_; /* decode codes */\n              if (flush === Z_TREES) {\n                //--- DROPBITS(2) ---//\n                hold >>>= 2;\n                bits -= 2;\n                //---//\n                break inf_leave;\n              }\n              break;\n            case 2:\n              /* dynamic block */\n              //Tracev((stderr, \"inflate:     dynamic codes block%s\\n\",\n              //        state.last ? \" (last)\" : \"\"));\n              state.mode = TABLE;\n              break;\n            case 3:\n              strm.msg = 'invalid block type';\n              state.mode = BAD;\n          }\n          //--- DROPBITS(2) ---//\n          hold >>>= 2;\n          bits -= 2;\n          //---//\n          break;\n        case STORED:\n          //--- BYTEBITS() ---// /* go to byte boundary */\n          hold >>>= bits & 7;\n          bits -= bits & 7;\n          //---//\n          //=== NEEDBITS(32); */\n          while (bits < 32) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          if ((hold & 0xffff) !== (hold >>> 16 ^ 0xffff)) {\n            strm.msg = 'invalid stored block lengths';\n            state.mode = BAD;\n            break;\n          }\n          state.length = hold & 0xffff;\n          //Tracev((stderr, \"inflate:       stored length %u\\n\",\n          //        state.length));\n          //=== INITBITS();\n          hold = 0;\n          bits = 0;\n          //===//\n          state.mode = COPY_;\n          if (flush === Z_TREES) {\n            break inf_leave;\n          }\n        /* falls through */\n        case COPY_:\n          state.mode = COPY;\n        /* falls through */\n        case COPY:\n          copy = state.length;\n          if (copy) {\n            if (copy > have) {\n              copy = have;\n            }\n            if (copy > left) {\n              copy = left;\n            }\n            if (copy === 0) {\n              break inf_leave;\n            }\n            //--- zmemcpy(put, next, copy); ---\n            output.set(input.subarray(next, next + copy), put);\n            //---//\n            have -= copy;\n            next += copy;\n            left -= copy;\n            put += copy;\n            state.length -= copy;\n            break;\n          }\n          //Tracev((stderr, \"inflate:       stored end\\n\"));\n          state.mode = TYPE;\n          break;\n        case TABLE:\n          //=== NEEDBITS(14); */\n          while (bits < 14) {\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n          }\n          //===//\n          state.nlen = (hold & 0x1f /*BITS(5)*/) + 257;\n          //--- DROPBITS(5) ---//\n          hold >>>= 5;\n          bits -= 5;\n          //---//\n          state.ndist = (hold & 0x1f /*BITS(5)*/) + 1;\n          //--- DROPBITS(5) ---//\n          hold >>>= 5;\n          bits -= 5;\n          //---//\n          state.ncode = (hold & 0x0f /*BITS(4)*/) + 4;\n          //--- DROPBITS(4) ---//\n          hold >>>= 4;\n          bits -= 4;\n          //---//\n          //#ifndef PKZIP_BUG_WORKAROUND\n          if (state.nlen > 286 || state.ndist > 30) {\n            strm.msg = 'too many length or distance symbols';\n            state.mode = BAD;\n            break;\n          }\n          //#endif\n          //Tracev((stderr, \"inflate:       table sizes ok\\n\"));\n          state.have = 0;\n          state.mode = LENLENS;\n        /* falls through */\n        case LENLENS:\n          while (state.have < state.ncode) {\n            //=== NEEDBITS(3);\n            while (bits < 3) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            state.lens[order[state.have++]] = hold & 0x07; //BITS(3);\n            //--- DROPBITS(3) ---//\n            hold >>>= 3;\n            bits -= 3;\n            //---//\n          }\n\n          while (state.have < 19) {\n            state.lens[order[state.have++]] = 0;\n          }\n          // We have separate tables & no pointers. 2 commented lines below not needed.\n          //state.next = state.codes;\n          //state.lencode = state.next;\n          // Switch to use dynamic table\n          state.lencode = state.lendyn;\n          state.lenbits = 7;\n          opts = {\n            bits: state.lenbits\n          };\n          ret = inftrees(CODES, state.lens, 0, 19, state.lencode, 0, state.work, opts);\n          state.lenbits = opts.bits;\n          if (ret) {\n            strm.msg = 'invalid code lengths set';\n            state.mode = BAD;\n            break;\n          }\n          //Tracev((stderr, \"inflate:       code lengths ok\\n\"));\n          state.have = 0;\n          state.mode = CODELENS;\n        /* falls through */\n        case CODELENS:\n          while (state.have < state.nlen + state.ndist) {\n            for (;;) {\n              here = state.lencode[hold & (1 << state.lenbits) - 1]; /*BITS(state.lenbits)*/\n              here_bits = here >>> 24;\n              here_op = here >>> 16 & 0xff;\n              here_val = here & 0xffff;\n              if (here_bits <= bits) {\n                break;\n              }\n              //--- PULLBYTE() ---//\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n              //---//\n            }\n\n            if (here_val < 16) {\n              //--- DROPBITS(here.bits) ---//\n              hold >>>= here_bits;\n              bits -= here_bits;\n              //---//\n              state.lens[state.have++] = here_val;\n            } else {\n              if (here_val === 16) {\n                //=== NEEDBITS(here.bits + 2);\n                n = here_bits + 2;\n                while (bits < n) {\n                  if (have === 0) {\n                    break inf_leave;\n                  }\n                  have--;\n                  hold += input[next++] << bits;\n                  bits += 8;\n                }\n                //===//\n                //--- DROPBITS(here.bits) ---//\n                hold >>>= here_bits;\n                bits -= here_bits;\n                //---//\n                if (state.have === 0) {\n                  strm.msg = 'invalid bit length repeat';\n                  state.mode = BAD;\n                  break;\n                }\n                len = state.lens[state.have - 1];\n                copy = 3 + (hold & 0x03); //BITS(2);\n                //--- DROPBITS(2) ---//\n                hold >>>= 2;\n                bits -= 2;\n                //---//\n              } else if (here_val === 17) {\n                //=== NEEDBITS(here.bits + 3);\n                n = here_bits + 3;\n                while (bits < n) {\n                  if (have === 0) {\n                    break inf_leave;\n                  }\n                  have--;\n                  hold += input[next++] << bits;\n                  bits += 8;\n                }\n                //===//\n                //--- DROPBITS(here.bits) ---//\n                hold >>>= here_bits;\n                bits -= here_bits;\n                //---//\n                len = 0;\n                copy = 3 + (hold & 0x07); //BITS(3);\n                //--- DROPBITS(3) ---//\n                hold >>>= 3;\n                bits -= 3;\n                //---//\n              } else {\n                //=== NEEDBITS(here.bits + 7);\n                n = here_bits + 7;\n                while (bits < n) {\n                  if (have === 0) {\n                    break inf_leave;\n                  }\n                  have--;\n                  hold += input[next++] << bits;\n                  bits += 8;\n                }\n                //===//\n                //--- DROPBITS(here.bits) ---//\n                hold >>>= here_bits;\n                bits -= here_bits;\n                //---//\n                len = 0;\n                copy = 11 + (hold & 0x7f); //BITS(7);\n                //--- DROPBITS(7) ---//\n                hold >>>= 7;\n                bits -= 7;\n                //---//\n              }\n\n              if (state.have + copy > state.nlen + state.ndist) {\n                strm.msg = 'invalid bit length repeat';\n                state.mode = BAD;\n                break;\n              }\n              while (copy--) {\n                state.lens[state.have++] = len;\n              }\n            }\n          }\n\n          /* handle error breaks in while */\n          if (state.mode === BAD) {\n            break;\n          }\n\n          /* check for end-of-block code (better have one) */\n          if (state.lens[256] === 0) {\n            strm.msg = 'invalid code -- missing end-of-block';\n            state.mode = BAD;\n            break;\n          }\n\n          /* build code tables -- note: do not change the lenbits or distbits\n             values here (9 and 6) without reading the comments in inftrees.h\n             concerning the ENOUGH constants, which depend on those values */\n          state.lenbits = 9;\n          opts = {\n            bits: state.lenbits\n          };\n          ret = inftrees(LENS, state.lens, 0, state.nlen, state.lencode, 0, state.work, opts);\n          // We have separate tables & no pointers. 2 commented lines below not needed.\n          // state.next_index = opts.table_index;\n          state.lenbits = opts.bits;\n          // state.lencode = state.next;\n\n          if (ret) {\n            strm.msg = 'invalid literal/lengths set';\n            state.mode = BAD;\n            break;\n          }\n          state.distbits = 6;\n          //state.distcode.copy(state.codes);\n          // Switch to use dynamic table\n          state.distcode = state.distdyn;\n          opts = {\n            bits: state.distbits\n          };\n          ret = inftrees(DISTS, state.lens, state.nlen, state.ndist, state.distcode, 0, state.work, opts);\n          // We have separate tables & no pointers. 2 commented lines below not needed.\n          // state.next_index = opts.table_index;\n          state.distbits = opts.bits;\n          // state.distcode = state.next;\n\n          if (ret) {\n            strm.msg = 'invalid distances set';\n            state.mode = BAD;\n            break;\n          }\n          //Tracev((stderr, 'inflate:       codes ok\\n'));\n          state.mode = LEN_;\n          if (flush === Z_TREES) {\n            break inf_leave;\n          }\n        /* falls through */\n        case LEN_:\n          state.mode = LEN;\n        /* falls through */\n        case LEN:\n          if (have >= 6 && left >= 258) {\n            //--- RESTORE() ---\n            strm.next_out = put;\n            strm.avail_out = left;\n            strm.next_in = next;\n            strm.avail_in = have;\n            state.hold = hold;\n            state.bits = bits;\n            //---\n            inffast(strm, _out);\n            //--- LOAD() ---\n            put = strm.next_out;\n            output = strm.output;\n            left = strm.avail_out;\n            next = strm.next_in;\n            input = strm.input;\n            have = strm.avail_in;\n            hold = state.hold;\n            bits = state.bits;\n            //---\n\n            if (state.mode === TYPE) {\n              state.back = -1;\n            }\n            break;\n          }\n          state.back = 0;\n          for (;;) {\n            here = state.lencode[hold & (1 << state.lenbits) - 1]; /*BITS(state.lenbits)*/\n            here_bits = here >>> 24;\n            here_op = here >>> 16 & 0xff;\n            here_val = here & 0xffff;\n            if (here_bits <= bits) {\n              break;\n            }\n            //--- PULLBYTE() ---//\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n            //---//\n          }\n\n          if (here_op && (here_op & 0xf0) === 0) {\n            last_bits = here_bits;\n            last_op = here_op;\n            last_val = here_val;\n            for (;;) {\n              here = state.lencode[last_val + ((hold & (1 << last_bits + last_op) - 1 /*BITS(last.bits + last.op)*/) >> last_bits)];\n              here_bits = here >>> 24;\n              here_op = here >>> 16 & 0xff;\n              here_val = here & 0xffff;\n              if (last_bits + here_bits <= bits) {\n                break;\n              }\n              //--- PULLBYTE() ---//\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n              //---//\n            }\n            //--- DROPBITS(last.bits) ---//\n            hold >>>= last_bits;\n            bits -= last_bits;\n            //---//\n            state.back += last_bits;\n          }\n          //--- DROPBITS(here.bits) ---//\n          hold >>>= here_bits;\n          bits -= here_bits;\n          //---//\n          state.back += here_bits;\n          state.length = here_val;\n          if (here_op === 0) {\n            //Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ?\n            //        \"inflate:         literal '%c'\\n\" :\n            //        \"inflate:         literal 0x%02x\\n\", here.val));\n            state.mode = LIT;\n            break;\n          }\n          if (here_op & 32) {\n            //Tracevv((stderr, \"inflate:         end of block\\n\"));\n            state.back = -1;\n            state.mode = TYPE;\n            break;\n          }\n          if (here_op & 64) {\n            strm.msg = 'invalid literal/length code';\n            state.mode = BAD;\n            break;\n          }\n          state.extra = here_op & 15;\n          state.mode = LENEXT;\n        /* falls through */\n        case LENEXT:\n          if (state.extra) {\n            //=== NEEDBITS(state.extra);\n            n = state.extra;\n            while (bits < n) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            state.length += hold & (1 << state.extra) - 1 /*BITS(state.extra)*/;\n            //--- DROPBITS(state.extra) ---//\n            hold >>>= state.extra;\n            bits -= state.extra;\n            //---//\n            state.back += state.extra;\n          }\n          //Tracevv((stderr, \"inflate:         length %u\\n\", state.length));\n          state.was = state.length;\n          state.mode = DIST;\n        /* falls through */\n        case DIST:\n          for (;;) {\n            here = state.distcode[hold & (1 << state.distbits) - 1]; /*BITS(state.distbits)*/\n            here_bits = here >>> 24;\n            here_op = here >>> 16 & 0xff;\n            here_val = here & 0xffff;\n            if (here_bits <= bits) {\n              break;\n            }\n            //--- PULLBYTE() ---//\n            if (have === 0) {\n              break inf_leave;\n            }\n            have--;\n            hold += input[next++] << bits;\n            bits += 8;\n            //---//\n          }\n\n          if ((here_op & 0xf0) === 0) {\n            last_bits = here_bits;\n            last_op = here_op;\n            last_val = here_val;\n            for (;;) {\n              here = state.distcode[last_val + ((hold & (1 << last_bits + last_op) - 1 /*BITS(last.bits + last.op)*/) >> last_bits)];\n              here_bits = here >>> 24;\n              here_op = here >>> 16 & 0xff;\n              here_val = here & 0xffff;\n              if (last_bits + here_bits <= bits) {\n                break;\n              }\n              //--- PULLBYTE() ---//\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n              //---//\n            }\n            //--- DROPBITS(last.bits) ---//\n            hold >>>= last_bits;\n            bits -= last_bits;\n            //---//\n            state.back += last_bits;\n          }\n          //--- DROPBITS(here.bits) ---//\n          hold >>>= here_bits;\n          bits -= here_bits;\n          //---//\n          state.back += here_bits;\n          if (here_op & 64) {\n            strm.msg = 'invalid distance code';\n            state.mode = BAD;\n            break;\n          }\n          state.offset = here_val;\n          state.extra = here_op & 15;\n          state.mode = DISTEXT;\n        /* falls through */\n        case DISTEXT:\n          if (state.extra) {\n            //=== NEEDBITS(state.extra);\n            n = state.extra;\n            while (bits < n) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            state.offset += hold & (1 << state.extra) - 1 /*BITS(state.extra)*/;\n            //--- DROPBITS(state.extra) ---//\n            hold >>>= state.extra;\n            bits -= state.extra;\n            //---//\n            state.back += state.extra;\n          }\n          //#ifdef INFLATE_STRICT\n          if (state.offset > state.dmax) {\n            strm.msg = 'invalid distance too far back';\n            state.mode = BAD;\n            break;\n          }\n          //#endif\n          //Tracevv((stderr, \"inflate:         distance %u\\n\", state.offset));\n          state.mode = MATCH;\n        /* falls through */\n        case MATCH:\n          if (left === 0) {\n            break inf_leave;\n          }\n          copy = _out - left;\n          if (state.offset > copy) {\n            /* copy from window */\n            copy = state.offset - copy;\n            if (copy > state.whave) {\n              if (state.sane) {\n                strm.msg = 'invalid distance too far back';\n                state.mode = BAD;\n                break;\n              }\n              // (!) This block is disabled in zlib defaults,\n              // don't enable it for binary compatibility\n              //#ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR\n              //          Trace((stderr, \"inflate.c too far\\n\"));\n              //          copy -= state.whave;\n              //          if (copy > state.length) { copy = state.length; }\n              //          if (copy > left) { copy = left; }\n              //          left -= copy;\n              //          state.length -= copy;\n              //          do {\n              //            output[put++] = 0;\n              //          } while (--copy);\n              //          if (state.length === 0) { state.mode = LEN; }\n              //          break;\n              //#endif\n            }\n\n            if (copy > state.wnext) {\n              copy -= state.wnext;\n              from = state.wsize - copy;\n            } else {\n              from = state.wnext - copy;\n            }\n            if (copy > state.length) {\n              copy = state.length;\n            }\n            from_source = state.window;\n          } else {\n            /* copy from output */\n            from_source = output;\n            from = put - state.offset;\n            copy = state.length;\n          }\n          if (copy > left) {\n            copy = left;\n          }\n          left -= copy;\n          state.length -= copy;\n          do {\n            output[put++] = from_source[from++];\n          } while (--copy);\n          if (state.length === 0) {\n            state.mode = LEN;\n          }\n          break;\n        case LIT:\n          if (left === 0) {\n            break inf_leave;\n          }\n          output[put++] = state.length;\n          left--;\n          state.mode = LEN;\n          break;\n        case CHECK:\n          if (state.wrap) {\n            //=== NEEDBITS(32);\n            while (bits < 32) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              // Use '|' instead of '+' to make sure that result is signed\n              hold |= input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            _out -= left;\n            strm.total_out += _out;\n            state.total += _out;\n            if (state.wrap & 4 && _out) {\n              strm.adler = state.check = /*UPDATE_CHECK(state.check, put - _out, _out);*/\n              state.flags ? crc32_1(state.check, output, _out, put - _out) : adler32_1(state.check, output, _out, put - _out);\n            }\n            _out = left;\n            // NB: crc32 stored as signed 32-bit int, zswap32 returns signed too\n            if (state.wrap & 4 && (state.flags ? hold : zswap32(hold)) !== state.check) {\n              strm.msg = 'incorrect data check';\n              state.mode = BAD;\n              break;\n            }\n            //=== INITBITS();\n            hold = 0;\n            bits = 0;\n            //===//\n            //Tracev((stderr, \"inflate:   check matches trailer\\n\"));\n          }\n\n          state.mode = LENGTH;\n        /* falls through */\n        case LENGTH:\n          if (state.wrap && state.flags) {\n            //=== NEEDBITS(32);\n            while (bits < 32) {\n              if (have === 0) {\n                break inf_leave;\n              }\n              have--;\n              hold += input[next++] << bits;\n              bits += 8;\n            }\n            //===//\n            if (state.wrap & 4 && hold !== (state.total & 0xffffffff)) {\n              strm.msg = 'incorrect length check';\n              state.mode = BAD;\n              break;\n            }\n            //=== INITBITS();\n            hold = 0;\n            bits = 0;\n            //===//\n            //Tracev((stderr, \"inflate:   length matches trailer\\n\"));\n          }\n\n          state.mode = DONE;\n        /* falls through */\n        case DONE:\n          ret = Z_STREAM_END$1;\n          break inf_leave;\n        case BAD:\n          ret = Z_DATA_ERROR$1;\n          break inf_leave;\n        case MEM:\n          return Z_MEM_ERROR$1;\n        case SYNC:\n        /* falls through */\n        default:\n          return Z_STREAM_ERROR$1;\n      }\n    }\n\n    // inf_leave <- here is real place for \"goto inf_leave\", emulated via \"break inf_leave\"\n\n    /*\n       Return from inflate(), updating the total counts and the check value.\n       If there was no progress during the inflate() call, return a buffer\n       error.  Call updatewindow() to create and/or update the window state.\n       Note: a memory error from inflate() is non-recoverable.\n     */\n\n    //--- RESTORE() ---\n    strm.next_out = put;\n    strm.avail_out = left;\n    strm.next_in = next;\n    strm.avail_in = have;\n    state.hold = hold;\n    state.bits = bits;\n    //---\n\n    if (state.wsize || _out !== strm.avail_out && state.mode < BAD && (state.mode < CHECK || flush !== Z_FINISH$1)) {\n      if (updatewindow(strm, strm.output, strm.next_out, _out - strm.avail_out)) ;\n    }\n    _in -= strm.avail_in;\n    _out -= strm.avail_out;\n    strm.total_in += _in;\n    strm.total_out += _out;\n    state.total += _out;\n    if (state.wrap & 4 && _out) {\n      strm.adler = state.check = /*UPDATE_CHECK(state.check, strm.next_out - _out, _out);*/\n      state.flags ? crc32_1(state.check, output, _out, strm.next_out - _out) : adler32_1(state.check, output, _out, strm.next_out - _out);\n    }\n    strm.data_type = state.bits + (state.last ? 64 : 0) + (state.mode === TYPE ? 128 : 0) + (state.mode === LEN_ || state.mode === COPY_ ? 256 : 0);\n    if ((_in === 0 && _out === 0 || flush === Z_FINISH$1) && ret === Z_OK$1) {\n      ret = Z_BUF_ERROR;\n    }\n    return ret;\n  };\n  var inflateEnd = function inflateEnd(strm) {\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    var state = strm.state;\n    if (state.window) {\n      state.window = null;\n    }\n    strm.state = null;\n    return Z_OK$1;\n  };\n  var inflateGetHeader = function inflateGetHeader(strm, head) {\n    /* check state */\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    var state = strm.state;\n    if ((state.wrap & 2) === 0) {\n      return Z_STREAM_ERROR$1;\n    }\n\n    /* save header structure */\n    state.head = head;\n    head.done = false;\n    return Z_OK$1;\n  };\n  var inflateSetDictionary = function inflateSetDictionary(strm, dictionary) {\n    var dictLength = dictionary.length;\n    var state;\n    var dictid;\n    var ret;\n\n    /* check state */\n    if (inflateStateCheck(strm)) {\n      return Z_STREAM_ERROR$1;\n    }\n    state = strm.state;\n    if (state.wrap !== 0 && state.mode !== DICT) {\n      return Z_STREAM_ERROR$1;\n    }\n\n    /* check for correct dictionary identifier */\n    if (state.mode === DICT) {\n      dictid = 1; /* adler32(0, null, 0)*/\n      /* dictid = adler32(dictid, dictionary, dictLength); */\n      dictid = adler32_1(dictid, dictionary, dictLength, 0);\n      if (dictid !== state.check) {\n        return Z_DATA_ERROR$1;\n      }\n    }\n    /* copy dictionary to window using updatewindow(), which will amend the\n     existing dictionary if appropriate */\n    ret = updatewindow(strm, dictionary, dictLength, dictLength);\n    if (ret) {\n      state.mode = MEM;\n      return Z_MEM_ERROR$1;\n    }\n    state.havedict = 1;\n    // Tracev((stderr, \"inflate:   dictionary set\\n\"));\n    return Z_OK$1;\n  };\n  var inflateReset_1 = inflateReset;\n  var inflateReset2_1 = inflateReset2;\n  var inflateResetKeep_1 = inflateResetKeep;\n  var inflateInit_1 = inflateInit;\n  var inflateInit2_1 = inflateInit2;\n  var inflate_2$1 = inflate$2;\n  var inflateEnd_1 = inflateEnd;\n  var inflateGetHeader_1 = inflateGetHeader;\n  var inflateSetDictionary_1 = inflateSetDictionary;\n  var inflateInfo = 'pako inflate (from Nodeca project)';\n\n  /* Not implemented\n  module.exports.inflateCodesUsed = inflateCodesUsed;\n  module.exports.inflateCopy = inflateCopy;\n  module.exports.inflateGetDictionary = inflateGetDictionary;\n  module.exports.inflateMark = inflateMark;\n  module.exports.inflatePrime = inflatePrime;\n  module.exports.inflateSync = inflateSync;\n  module.exports.inflateSyncPoint = inflateSyncPoint;\n  module.exports.inflateUndermine = inflateUndermine;\n  module.exports.inflateValidate = inflateValidate;\n  */\n\n  var inflate_1$2 = {\n    inflateReset: inflateReset_1,\n    inflateReset2: inflateReset2_1,\n    inflateResetKeep: inflateResetKeep_1,\n    inflateInit: inflateInit_1,\n    inflateInit2: inflateInit2_1,\n    inflate: inflate_2$1,\n    inflateEnd: inflateEnd_1,\n    inflateGetHeader: inflateGetHeader_1,\n    inflateSetDictionary: inflateSetDictionary_1,\n    inflateInfo: inflateInfo\n  };\n\n  // (C) 1995-2013 Jean-loup Gailly and Mark Adler\n  // (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin\n  //\n  // This software is provided 'as-is', without any express or implied\n  // warranty. In no event will the authors be held liable for any damages\n  // arising from the use of this software.\n  //\n  // Permission is granted to anyone to use this software for any purpose,\n  // including commercial applications, and to alter it and redistribute it\n  // freely, subject to the following restrictions:\n  //\n  // 1. The origin of this software must not be misrepresented; you must not\n  //   claim that you wrote the original software. If you use this software\n  //   in a product, an acknowledgment in the product documentation would be\n  //   appreciated but is not required.\n  // 2. Altered source versions must be plainly marked as such, and must not be\n  //   misrepresented as being the original software.\n  // 3. This notice may not be removed or altered from any source distribution.\n  function GZheader() {\n    /* true if compressed data believed to be text */\n    this.text = 0;\n    /* modification time */\n    this.time = 0;\n    /* extra flags (not used when writing a gzip file) */\n    this.xflags = 0;\n    /* operating system */\n    this.os = 0;\n    /* pointer to extra field or Z_NULL if none */\n    this.extra = null;\n    /* extra field length (valid if extra != Z_NULL) */\n    this.extra_len = 0; // Actually, we don't need it in JS,\n    // but leave for few code modifications\n\n    //\n    // Setup limits is not necessary because in js we should not preallocate memory\n    // for inflate use constant limit in 65536 bytes\n    //\n\n    /* space at extra (only when reading header) */\n    // this.extra_max  = 0;\n    /* pointer to zero-terminated file name or Z_NULL */\n    this.name = '';\n    /* space at name (only when reading header) */\n    // this.name_max   = 0;\n    /* pointer to zero-terminated comment or Z_NULL */\n    this.comment = '';\n    /* space at comment (only when reading header) */\n    // this.comm_max   = 0;\n    /* true if there was or will be a header crc */\n    this.hcrc = 0;\n    /* true when done reading gzip header (not used when writing a gzip file) */\n    this.done = false;\n  }\n  var gzheader = GZheader;\n\n  var toString = Object.prototype.toString;\n\n  /* Public constants ==========================================================*/\n  /* ===========================================================================*/\n\n  var Z_NO_FLUSH = constants$2.Z_NO_FLUSH,\n    Z_FINISH = constants$2.Z_FINISH,\n    Z_OK = constants$2.Z_OK,\n    Z_STREAM_END = constants$2.Z_STREAM_END,\n    Z_NEED_DICT = constants$2.Z_NEED_DICT,\n    Z_STREAM_ERROR = constants$2.Z_STREAM_ERROR,\n    Z_DATA_ERROR = constants$2.Z_DATA_ERROR,\n    Z_MEM_ERROR = constants$2.Z_MEM_ERROR;\n\n  /* ===========================================================================*/\n\n  /**\n   * class Inflate\n   *\n   * Generic JS-style wrapper for zlib calls. If you don't need\n   * streaming behaviour - use more simple functions: [[inflate]]\n   * and [[inflateRaw]].\n   **/\n\n  /* internal\n   * inflate.chunks -> Array\n   *\n   * Chunks of output data, if [[Inflate#onData]] not overridden.\n   **/\n\n  /**\n   * Inflate.result -> Uint8Array|String\n   *\n   * Uncompressed result, generated by default [[Inflate#onData]]\n   * and [[Inflate#onEnd]] handlers. Filled after you push last chunk\n   * (call [[Inflate#push]] with `Z_FINISH` / `true` param).\n   **/\n\n  /**\n   * Inflate.err -> Number\n   *\n   * Error code after inflate finished. 0 (Z_OK) on success.\n   * Should be checked if broken data possible.\n   **/\n\n  /**\n   * Inflate.msg -> String\n   *\n   * Error message, if [[Inflate.err]] != 0\n   **/\n\n  /**\n   * new Inflate(options)\n   * - options (Object): zlib inflate options.\n   *\n   * Creates new inflator instance with specified params. Throws exception\n   * on bad params. Supported options:\n   *\n   * - `windowBits`\n   * - `dictionary`\n   *\n   * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)\n   * for more information on these.\n   *\n   * Additional options, for internal needs:\n   *\n   * - `chunkSize` - size of generated data chunks (16K by default)\n   * - `raw` (Boolean) - do raw inflate\n   * - `to` (String) - if equal to 'string', then result will be converted\n   *   from utf8 to utf16 (javascript) string. When string output requested,\n   *   chunk length can differ from `chunkSize`, depending on content.\n   *\n   * By default, when no options set, autodetect deflate/gzip data format via\n   * wrapper header.\n   *\n   * ##### Example:\n   *\n   * ```javascript\n   * const pako = require('pako')\n   * const chunk1 = new Uint8Array([1,2,3,4,5,6,7,8,9])\n   * const chunk2 = new Uint8Array([10,11,12,13,14,15,16,17,18,19]);\n   *\n   * const inflate = new pako.Inflate({ level: 3});\n   *\n   * inflate.push(chunk1, false);\n   * inflate.push(chunk2, true);  // true -> last chunk\n   *\n   * if (inflate.err) { throw new Error(inflate.err); }\n   *\n   * console.log(inflate.result);\n   * ```\n   **/\n  function Inflate$1(options) {\n    this.options = common.assign({\n      chunkSize: 1024 * 64,\n      windowBits: 15,\n      to: ''\n    }, options || {});\n    var opt = this.options;\n\n    // Force window size for `raw` data, if not set directly,\n    // because we have no header for autodetect.\n    if (opt.raw && opt.windowBits >= 0 && opt.windowBits < 16) {\n      opt.windowBits = -opt.windowBits;\n      if (opt.windowBits === 0) {\n        opt.windowBits = -15;\n      }\n    }\n\n    // If `windowBits` not defined (and mode not raw) - set autodetect flag for gzip/deflate\n    if (opt.windowBits >= 0 && opt.windowBits < 16 && !(options && options.windowBits)) {\n      opt.windowBits += 32;\n    }\n\n    // Gzip header has no info about windows size, we can do autodetect only\n    // for deflate. So, if window size not set, force it to max when gzip possible\n    if (opt.windowBits > 15 && opt.windowBits < 48) {\n      // bit 3 (16) -> gzipped data\n      // bit 4 (32) -> autodetect gzip/deflate\n      if ((opt.windowBits & 15) === 0) {\n        opt.windowBits |= 15;\n      }\n    }\n    this.err = 0; // error code, if happens (0 = Z_OK)\n    this.msg = ''; // error message\n    this.ended = false; // used to avoid multiple onEnd() calls\n    this.chunks = []; // chunks of compressed data\n\n    this.strm = new zstream();\n    this.strm.avail_out = 0;\n    var status = inflate_1$2.inflateInit2(this.strm, opt.windowBits);\n    if (status !== Z_OK) {\n      throw new Error(messages[status]);\n    }\n    this.header = new gzheader();\n    inflate_1$2.inflateGetHeader(this.strm, this.header);\n\n    // Setup dictionary\n    if (opt.dictionary) {\n      // Convert data if needed\n      if (typeof opt.dictionary === 'string') {\n        opt.dictionary = strings.string2buf(opt.dictionary);\n      } else if (toString.call(opt.dictionary) === '[object ArrayBuffer]') {\n        opt.dictionary = new Uint8Array(opt.dictionary);\n      }\n      if (opt.raw) {\n        //In raw mode we need to set the dictionary early\n        status = inflate_1$2.inflateSetDictionary(this.strm, opt.dictionary);\n        if (status !== Z_OK) {\n          throw new Error(messages[status]);\n        }\n      }\n    }\n  }\n\n  /**\n   * Inflate#push(data[, flush_mode]) -> Boolean\n   * - data (Uint8Array|ArrayBuffer): input data\n   * - flush_mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE\n   *   flush modes. See constants. Skipped or `false` means Z_NO_FLUSH,\n   *   `true` means Z_FINISH.\n   *\n   * Sends input data to inflate pipe, generating [[Inflate#onData]] calls with\n   * new output chunks. Returns `true` on success. If end of stream detected,\n   * [[Inflate#onEnd]] will be called.\n   *\n   * `flush_mode` is not needed for normal operation, because end of stream\n   * detected automatically. You may try to use it for advanced things, but\n   * this functionality was not tested.\n   *\n   * On fail call [[Inflate#onEnd]] with error code and return false.\n   *\n   * ##### Example\n   *\n   * ```javascript\n   * push(chunk, false); // push one of data chunks\n   * ...\n   * push(chunk, true);  // push last chunk\n   * ```\n   **/\n  Inflate$1.prototype.push = function (data, flush_mode) {\n    var strm = this.strm;\n    var chunkSize = this.options.chunkSize;\n    var dictionary = this.options.dictionary;\n    var status, _flush_mode, last_avail_out;\n    if (this.ended) return false;\n    if (flush_mode === ~~flush_mode) _flush_mode = flush_mode;else _flush_mode = flush_mode === true ? Z_FINISH : Z_NO_FLUSH;\n\n    // Convert data if needed\n    if (toString.call(data) === '[object ArrayBuffer]') {\n      strm.input = new Uint8Array(data);\n    } else {\n      strm.input = data;\n    }\n    strm.next_in = 0;\n    strm.avail_in = strm.input.length;\n    for (;;) {\n      if (strm.avail_out === 0) {\n        strm.output = new Uint8Array(chunkSize);\n        strm.next_out = 0;\n        strm.avail_out = chunkSize;\n      }\n      status = inflate_1$2.inflate(strm, _flush_mode);\n      if (status === Z_NEED_DICT && dictionary) {\n        status = inflate_1$2.inflateSetDictionary(strm, dictionary);\n        if (status === Z_OK) {\n          status = inflate_1$2.inflate(strm, _flush_mode);\n        } else if (status === Z_DATA_ERROR) {\n          // Replace code with more verbose\n          status = Z_NEED_DICT;\n        }\n      }\n\n      // Skip snyc markers if more data follows and not raw mode\n      while (strm.avail_in > 0 && status === Z_STREAM_END && strm.state.wrap > 0 && data[strm.next_in] !== 0) {\n        inflate_1$2.inflateReset(strm);\n        status = inflate_1$2.inflate(strm, _flush_mode);\n      }\n      switch (status) {\n        case Z_STREAM_ERROR:\n        case Z_DATA_ERROR:\n        case Z_NEED_DICT:\n        case Z_MEM_ERROR:\n          this.onEnd(status);\n          this.ended = true;\n          return false;\n      }\n\n      // Remember real `avail_out` value, because we may patch out buffer content\n      // to align utf8 strings boundaries.\n      last_avail_out = strm.avail_out;\n      if (strm.next_out) {\n        if (strm.avail_out === 0 || status === Z_STREAM_END) {\n          if (this.options.to === 'string') {\n            var next_out_utf8 = strings.utf8border(strm.output, strm.next_out);\n            var tail = strm.next_out - next_out_utf8;\n            var utf8str = strings.buf2string(strm.output, next_out_utf8);\n\n            // move tail & realign counters\n            strm.next_out = tail;\n            strm.avail_out = chunkSize - tail;\n            if (tail) strm.output.set(strm.output.subarray(next_out_utf8, next_out_utf8 + tail), 0);\n            this.onData(utf8str);\n          } else {\n            this.onData(strm.output.length === strm.next_out ? strm.output : strm.output.subarray(0, strm.next_out));\n          }\n        }\n      }\n\n      // Must repeat iteration if out buffer is full\n      if (status === Z_OK && last_avail_out === 0) continue;\n\n      // Finalize if end of stream reached.\n      if (status === Z_STREAM_END) {\n        status = inflate_1$2.inflateEnd(this.strm);\n        this.onEnd(status);\n        this.ended = true;\n        return true;\n      }\n      if (strm.avail_in === 0) break;\n    }\n    return true;\n  };\n\n  /**\n   * Inflate#onData(chunk) -> Void\n   * - chunk (Uint8Array|String): output data. When string output requested,\n   *   each chunk will be string.\n   *\n   * By default, stores data blocks in `chunks[]` property and glue\n   * those in `onEnd`. Override this handler, if you need another behaviour.\n   **/\n  Inflate$1.prototype.onData = function (chunk) {\n    this.chunks.push(chunk);\n  };\n\n  /**\n   * Inflate#onEnd(status) -> Void\n   * - status (Number): inflate status. 0 (Z_OK) on success,\n   *   other if not.\n   *\n   * Called either after you tell inflate that the input stream is\n   * complete (Z_FINISH). By default - join collected chunks,\n   * free memory and fill `results` / `err` properties.\n   **/\n  Inflate$1.prototype.onEnd = function (status) {\n    // On success - join\n    if (status === Z_OK) {\n      if (this.options.to === 'string') {\n        this.result = this.chunks.join('');\n      } else {\n        this.result = common.flattenChunks(this.chunks);\n      }\n    }\n    this.chunks = [];\n    this.err = status;\n    this.msg = this.strm.msg;\n  };\n\n  /**\n   * inflate(data[, options]) -> Uint8Array|String\n   * - data (Uint8Array|ArrayBuffer): input data to decompress.\n   * - options (Object): zlib inflate options.\n   *\n   * Decompress `data` with inflate/ungzip and `options`. Autodetect\n   * format via wrapper header by default. That's why we don't provide\n   * separate `ungzip` method.\n   *\n   * Supported options are:\n   *\n   * - windowBits\n   *\n   * [http://zlib.net/manual.html#Advanced](http://zlib.net/manual.html#Advanced)\n   * for more information.\n   *\n   * Sugar (options):\n   *\n   * - `raw` (Boolean) - say that we work with raw stream, if you don't wish to specify\n   *   negative windowBits implicitly.\n   * - `to` (String) - if equal to 'string', then result will be converted\n   *   from utf8 to utf16 (javascript) string. When string output requested,\n   *   chunk length can differ from `chunkSize`, depending on content.\n   *\n   *\n   * ##### Example:\n   *\n   * ```javascript\n   * const pako = require('pako');\n   * const input = pako.deflate(new Uint8Array([1,2,3,4,5,6,7,8,9]));\n   * let output;\n   *\n   * try {\n   *   output = pako.inflate(input);\n   * } catch (err) {\n   *   console.log(err);\n   * }\n   * ```\n   **/\n  function inflate$1(input, options) {\n    var inflator = new Inflate$1(options);\n    inflator.push(input);\n\n    // That will never happens, if you don't cheat with options :)\n    if (inflator.err) throw inflator.msg || messages[inflator.err];\n    return inflator.result;\n  }\n\n  /**\n   * inflateRaw(data[, options]) -> Uint8Array|String\n   * - data (Uint8Array|ArrayBuffer): input data to decompress.\n   * - options (Object): zlib inflate options.\n   *\n   * The same as [[inflate]], but creates raw data, without wrapper\n   * (header and adler32 crc).\n   **/\n  function inflateRaw$1(input, options) {\n    options = options || {};\n    options.raw = true;\n    return inflate$1(input, options);\n  }\n\n  /**\n   * ungzip(data[, options]) -> Uint8Array|String\n   * - data (Uint8Array|ArrayBuffer): input data to decompress.\n   * - options (Object): zlib inflate options.\n   *\n   * Just shortcut to [[inflate]], because it autodetects format\n   * by header.content. Done for convenience.\n   **/\n\n  var Inflate_1$1 = Inflate$1;\n  var inflate_2 = inflate$1;\n  var inflateRaw_1$1 = inflateRaw$1;\n  var ungzip$1 = inflate$1;\n  var constants = constants$2;\n  var inflate_1$1 = {\n    Inflate: Inflate_1$1,\n    inflate: inflate_2,\n    inflateRaw: inflateRaw_1$1,\n    ungzip: ungzip$1,\n    constants: constants\n  };\n\n  var Deflate = deflate_1$1.Deflate,\n    deflate = deflate_1$1.deflate,\n    deflateRaw = deflate_1$1.deflateRaw,\n    gzip = deflate_1$1.gzip;\n  var Inflate = inflate_1$1.Inflate,\n    inflate = inflate_1$1.inflate,\n    inflateRaw = inflate_1$1.inflateRaw,\n    ungzip = inflate_1$1.ungzip;\n  var Deflate_1 = Deflate;\n  var deflate_1 = deflate;\n  var deflateRaw_1 = deflateRaw;\n  var gzip_1 = gzip;\n  var Inflate_1 = Inflate;\n  var inflate_1 = inflate;\n  var inflateRaw_1 = inflateRaw;\n  var ungzip_1 = ungzip;\n  var constants_1 = constants$2;\n  var pako = {\n    Deflate: Deflate_1,\n    deflate: deflate_1,\n    deflateRaw: deflateRaw_1,\n    gzip: gzip_1,\n    Inflate: Inflate_1,\n    inflate: inflate_1,\n    inflateRaw: inflateRaw_1,\n    ungzip: ungzip_1,\n    constants: constants_1\n  };\n\n  exports.Deflate = Deflate_1;\n  exports.Inflate = Inflate_1;\n  exports.constants = constants_1;\n  exports[\"default\"] = pako;\n  exports.deflate = deflate_1;\n  exports.deflateRaw = deflateRaw_1;\n  exports.gzip = gzip_1;\n  exports.inflate = inflate_1;\n  exports.inflateRaw = inflateRaw_1;\n  exports.ungzip = ungzip_1;\n\n  Object.defineProperty(exports, '__esModule', { value: true });\n\n}));\n\n\n//# sourceURL=webpack://PizZip/./node_modules/pako/dist/pako.es5.js?");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./es6/index.js");
-/******/ 	window.PizZip = __webpack_exports__;
-/******/ 	
-/******/ })()
-;
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/base64.js
+var require_base64 = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/base64.js"(exports) {
+    "use strict";
+    var _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    exports.encode = function (input) {
+      var output = "";
+      var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+      var i = 0;
+      while (i < input.length) {
+        chr1 = input.charCodeAt(i++);
+        chr2 = input.charCodeAt(i++);
+        chr3 = input.charCodeAt(i++);
+        enc1 = chr1 >> 2;
+        enc2 = (chr1 & 3) << 4 | chr2 >> 4;
+        enc3 = (chr2 & 15) << 2 | chr3 >> 6;
+        enc4 = chr3 & 63;
+        if (isNaN(chr2)) {
+          enc3 = enc4 = 64;
+        } else if (isNaN(chr3)) {
+          enc4 = 64;
+        }
+        output = output + _keyStr.charAt(enc1) + _keyStr.charAt(enc2) + _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+      }
+      return output;
+    };
+    exports.decode = function (input) {
+      var output = "";
+      var chr1, chr2, chr3;
+      var enc1, enc2, enc3, enc4;
+      var i = 0;
+      input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+      while (i < input.length) {
+        enc1 = _keyStr.indexOf(input.charAt(i++));
+        enc2 = _keyStr.indexOf(input.charAt(i++));
+        enc3 = _keyStr.indexOf(input.charAt(i++));
+        enc4 = _keyStr.indexOf(input.charAt(i++));
+        chr1 = enc1 << 2 | enc2 >> 4;
+        chr2 = (enc2 & 15) << 4 | enc3 >> 2;
+        chr3 = (enc3 & 3) << 6 | enc4;
+        output += String.fromCharCode(chr1);
+        if (enc3 !== 64) {
+          output += String.fromCharCode(chr2);
+        }
+        if (enc4 !== 64) {
+          output += String.fromCharCode(chr3);
+        }
+      }
+      return output;
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/support.js
+var require_support = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/support.js"(exports) {
+    "use strict";
+    exports.base64 = true;
+    exports.array = true;
+    exports.string = true;
+    exports.arraybuffer = typeof ArrayBuffer !== "undefined" && typeof Uint8Array !== "undefined";
+    exports.nodebuffer = typeof Buffer !== "undefined";
+    exports.uint8array = typeof Uint8Array !== "undefined";
+    if (typeof ArrayBuffer === "undefined") {
+      exports.blob = false;
+    } else {
+      buffer = new ArrayBuffer(0);
+      try {
+        exports.blob = new Blob([buffer], {
+          type: "application/zip"
+        }).size === 0;
+      } catch (_unused) {
+        try {
+          Builder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+          builder = new Builder();
+          builder.append(buffer);
+          exports.blob = builder.getBlob("application/zip").size === 0;
+        } catch (_unused2) {
+          exports.blob = false;
+        }
+      }
+    }
+    var buffer;
+    var Builder;
+    var builder;
+  }
+});
+
+// http-url:https://unpkg.com/pako@2.1.0/dist/pako.es5.min.js
+var require_pako_es5_min = __commonJS({
+  "http-url:https://unpkg.com/pako@2.1.0/dist/pako.es5.min.js"(exports, module) {
+    !function (t, e) {
+      "object" == typeof exports && "undefined" != typeof module ? e(exports) : "function" == typeof define && define.amd ? define(["exports"], e) : e((t = "undefined" != typeof globalThis ? globalThis : t || self).pako = {});
+    }(exports, function (t) {
+      "use strict";
+      function e(t2) {
+        for (var e2 = t2.length; --e2 >= 0;) t2[e2] = 0;
+      }
+      var a = 256, n = 286, i = 30, r = 15, s = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]), o = new Uint8Array([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]), l = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7]), h = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]), d = new Array(576);
+      e(d);
+      var _ = new Array(60);
+      e(_);
+      var f = new Array(512);
+      e(f);
+      var u = new Array(256);
+      e(u);
+      var c = new Array(29);
+      e(c);
+      var w, m, b, g = new Array(i);
+      function p(t2, e2, a2, n2, i2) {
+        this.static_tree = t2, this.extra_bits = e2, this.extra_base = a2, this.elems = n2, this.max_length = i2, this.has_stree = t2 && t2.length;
+      }
+      function v(t2, e2) {
+        this.dyn_tree = t2, this.max_code = 0, this.stat_desc = e2;
+      }
+      e(g);
+      var k = function (t2) {
+        return t2 < 256 ? f[t2] : f[256 + (t2 >>> 7)];
+      }, y = function (t2, e2) {
+        t2.pending_buf[t2.pending++] = 255 & e2, t2.pending_buf[t2.pending++] = e2 >>> 8 & 255;
+      }, x = function (t2, e2, a2) {
+        t2.bi_valid > 16 - a2 ? (t2.bi_buf |= e2 << t2.bi_valid & 65535, y(t2, t2.bi_buf), t2.bi_buf = e2 >> 16 - t2.bi_valid, t2.bi_valid += a2 - 16) : (t2.bi_buf |= e2 << t2.bi_valid & 65535, t2.bi_valid += a2);
+      }, z = function (t2, e2, a2) {
+        x(t2, a2[2 * e2], a2[2 * e2 + 1]);
+      }, A = function (t2, e2) {
+        var a2 = 0;
+        do {
+          a2 |= 1 & t2, t2 >>>= 1, a2 <<= 1;
+        } while (--e2 > 0);
+        return a2 >>> 1;
+      }, E = function (t2, e2, a2) {
+        var n2, i2, s2 = new Array(16), o2 = 0;
+        for (n2 = 1; n2 <= r; n2++) o2 = o2 + a2[n2 - 1] << 1, s2[n2] = o2;
+        for (i2 = 0; i2 <= e2; i2++) {
+          var l2 = t2[2 * i2 + 1];
+          0 !== l2 && (t2[2 * i2] = A(s2[l2]++, l2));
+        }
+      }, R = function (t2) {
+        var e2;
+        for (e2 = 0; e2 < n; e2++) t2.dyn_ltree[2 * e2] = 0;
+        for (e2 = 0; e2 < i; e2++) t2.dyn_dtree[2 * e2] = 0;
+        for (e2 = 0; e2 < 19; e2++) t2.bl_tree[2 * e2] = 0;
+        t2.dyn_ltree[512] = 1, t2.opt_len = t2.static_len = 0, t2.sym_next = t2.matches = 0;
+      }, Z = function (t2) {
+        t2.bi_valid > 8 ? y(t2, t2.bi_buf) : t2.bi_valid > 0 && (t2.pending_buf[t2.pending++] = t2.bi_buf), t2.bi_buf = 0, t2.bi_valid = 0;
+      }, S = function (t2, e2, a2, n2) {
+        var i2 = 2 * e2, r2 = 2 * a2;
+        return t2[i2] < t2[r2] || t2[i2] === t2[r2] && n2[e2] <= n2[a2];
+      }, U = function (t2, e2, a2) {
+        for (var n2 = t2.heap[a2], i2 = a2 << 1; i2 <= t2.heap_len && (i2 < t2.heap_len && S(e2, t2.heap[i2 + 1], t2.heap[i2], t2.depth) && i2++, !S(e2, n2, t2.heap[i2], t2.depth));) t2.heap[a2] = t2.heap[i2], a2 = i2, i2 <<= 1;
+        t2.heap[a2] = n2;
+      }, D = function (t2, e2, n2) {
+        var i2, r2, l2, h2, d2 = 0;
+        if (0 !== t2.sym_next) do {
+          i2 = 255 & t2.pending_buf[t2.sym_buf + d2++], i2 += (255 & t2.pending_buf[t2.sym_buf + d2++]) << 8, r2 = t2.pending_buf[t2.sym_buf + d2++], 0 === i2 ? z(t2, r2, e2) : (l2 = u[r2], z(t2, l2 + a + 1, e2), 0 !== (h2 = s[l2]) && (r2 -= c[l2], x(t2, r2, h2)), i2--, l2 = k(i2), z(t2, l2, n2), 0 !== (h2 = o[l2]) && (i2 -= g[l2], x(t2, i2, h2)));
+        } while (d2 < t2.sym_next);
+        z(t2, 256, e2);
+      }, T = function (t2, e2) {
+        var a2, n2, i2, s2 = e2.dyn_tree, o2 = e2.stat_desc.static_tree, l2 = e2.stat_desc.has_stree, h2 = e2.stat_desc.elems, d2 = -1;
+        for (t2.heap_len = 0, t2.heap_max = 573, a2 = 0; a2 < h2; a2++) 0 !== s2[2 * a2] ? (t2.heap[++t2.heap_len] = d2 = a2, t2.depth[a2] = 0) : s2[2 * a2 + 1] = 0;
+        for (; t2.heap_len < 2;) s2[2 * (i2 = t2.heap[++t2.heap_len] = d2 < 2 ? ++d2 : 0)] = 1, t2.depth[i2] = 0, t2.opt_len--, l2 && (t2.static_len -= o2[2 * i2 + 1]);
+        for (e2.max_code = d2, a2 = t2.heap_len >> 1; a2 >= 1; a2--) U(t2, s2, a2);
+        i2 = h2;
+        do {
+          a2 = t2.heap[1], t2.heap[1] = t2.heap[t2.heap_len--], U(t2, s2, 1), n2 = t2.heap[1], t2.heap[--t2.heap_max] = a2, t2.heap[--t2.heap_max] = n2, s2[2 * i2] = s2[2 * a2] + s2[2 * n2], t2.depth[i2] = (t2.depth[a2] >= t2.depth[n2] ? t2.depth[a2] : t2.depth[n2]) + 1, s2[2 * a2 + 1] = s2[2 * n2 + 1] = i2, t2.heap[1] = i2++, U(t2, s2, 1);
+        } while (t2.heap_len >= 2);
+        t2.heap[--t2.heap_max] = t2.heap[1], function (t3, e3) {
+          var a3, n3, i3, s3, o3, l3, h3 = e3.dyn_tree, d3 = e3.max_code, _2 = e3.stat_desc.static_tree, f2 = e3.stat_desc.has_stree, u2 = e3.stat_desc.extra_bits, c2 = e3.stat_desc.extra_base, w2 = e3.stat_desc.max_length, m2 = 0;
+          for (s3 = 0; s3 <= r; s3++) t3.bl_count[s3] = 0;
+          for (h3[2 * t3.heap[t3.heap_max] + 1] = 0, a3 = t3.heap_max + 1; a3 < 573; a3++) (s3 = h3[2 * h3[2 * (n3 = t3.heap[a3]) + 1] + 1] + 1) > w2 && (s3 = w2, m2++), h3[2 * n3 + 1] = s3, n3 > d3 || (t3.bl_count[s3]++, o3 = 0, n3 >= c2 && (o3 = u2[n3 - c2]), l3 = h3[2 * n3], t3.opt_len += l3 * (s3 + o3), f2 && (t3.static_len += l3 * (_2[2 * n3 + 1] + o3)));
+          if (0 !== m2) {
+            do {
+              for (s3 = w2 - 1; 0 === t3.bl_count[s3];) s3--;
+              t3.bl_count[s3]--, t3.bl_count[s3 + 1] += 2, t3.bl_count[w2]--, m2 -= 2;
+            } while (m2 > 0);
+            for (s3 = w2; 0 !== s3; s3--) for (n3 = t3.bl_count[s3]; 0 !== n3;) (i3 = t3.heap[--a3]) > d3 || (h3[2 * i3 + 1] !== s3 && (t3.opt_len += (s3 - h3[2 * i3 + 1]) * h3[2 * i3], h3[2 * i3 + 1] = s3), n3--);
+          }
+        }(t2, e2), E(s2, d2, t2.bl_count);
+      }, O = function (t2, e2, a2) {
+        var n2, i2, r2 = -1, s2 = e2[1], o2 = 0, l2 = 7, h2 = 4;
+        for (0 === s2 && (l2 = 138, h2 = 3), e2[2 * (a2 + 1) + 1] = 65535, n2 = 0; n2 <= a2; n2++) i2 = s2, s2 = e2[2 * (n2 + 1) + 1], ++o2 < l2 && i2 === s2 || (o2 < h2 ? t2.bl_tree[2 * i2] += o2 : 0 !== i2 ? (i2 !== r2 && t2.bl_tree[2 * i2]++, t2.bl_tree[32]++) : o2 <= 10 ? t2.bl_tree[34]++ : t2.bl_tree[36]++, o2 = 0, r2 = i2, 0 === s2 ? (l2 = 138, h2 = 3) : i2 === s2 ? (l2 = 6, h2 = 3) : (l2 = 7, h2 = 4));
+      }, I = function (t2, e2, a2) {
+        var n2, i2, r2 = -1, s2 = e2[1], o2 = 0, l2 = 7, h2 = 4;
+        for (0 === s2 && (l2 = 138, h2 = 3), n2 = 0; n2 <= a2; n2++) if (i2 = s2, s2 = e2[2 * (n2 + 1) + 1], !(++o2 < l2 && i2 === s2)) {
+          if (o2 < h2) do {
+            z(t2, i2, t2.bl_tree);
+          } while (0 != --o2);
+          else 0 !== i2 ? (i2 !== r2 && (z(t2, i2, t2.bl_tree), o2--), z(t2, 16, t2.bl_tree), x(t2, o2 - 3, 2)) : o2 <= 10 ? (z(t2, 17, t2.bl_tree), x(t2, o2 - 3, 3)) : (z(t2, 18, t2.bl_tree), x(t2, o2 - 11, 7));
+          o2 = 0, r2 = i2, 0 === s2 ? (l2 = 138, h2 = 3) : i2 === s2 ? (l2 = 6, h2 = 3) : (l2 = 7, h2 = 4);
+        }
+      }, F = false, L = function (t2, e2, a2, n2) {
+        x(t2, 0 + (n2 ? 1 : 0), 3), Z(t2), y(t2, a2), y(t2, ~a2), a2 && t2.pending_buf.set(t2.window.subarray(e2, e2 + a2), t2.pending), t2.pending += a2;
+      }, N = function (t2, e2, n2, i2) {
+        var r2, s2, o2 = 0;
+        t2.level > 0 ? (2 === t2.strm.data_type && (t2.strm.data_type = function (t3) {
+          var e3, n3 = 4093624447;
+          for (e3 = 0; e3 <= 31; e3++, n3 >>>= 1) if (1 & n3 && 0 !== t3.dyn_ltree[2 * e3]) return 0;
+          if (0 !== t3.dyn_ltree[18] || 0 !== t3.dyn_ltree[20] || 0 !== t3.dyn_ltree[26]) return 1;
+          for (e3 = 32; e3 < a; e3++) if (0 !== t3.dyn_ltree[2 * e3]) return 1;
+          return 0;
+        }(t2)), T(t2, t2.l_desc), T(t2, t2.d_desc), o2 = function (t3) {
+          var e3;
+          for (O(t3, t3.dyn_ltree, t3.l_desc.max_code), O(t3, t3.dyn_dtree, t3.d_desc.max_code), T(t3, t3.bl_desc), e3 = 18; e3 >= 3 && 0 === t3.bl_tree[2 * h[e3] + 1]; e3--);
+          return t3.opt_len += 3 * (e3 + 1) + 5 + 5 + 4, e3;
+        }(t2), r2 = t2.opt_len + 3 + 7 >>> 3, (s2 = t2.static_len + 3 + 7 >>> 3) <= r2 && (r2 = s2)) : r2 = s2 = n2 + 5, n2 + 4 <= r2 && -1 !== e2 ? L(t2, e2, n2, i2) : 4 === t2.strategy || s2 === r2 ? (x(t2, 2 + (i2 ? 1 : 0), 3), D(t2, d, _)) : (x(t2, 4 + (i2 ? 1 : 0), 3), function (t3, e3, a2, n3) {
+          var i3;
+          for (x(t3, e3 - 257, 5), x(t3, a2 - 1, 5), x(t3, n3 - 4, 4), i3 = 0; i3 < n3; i3++) x(t3, t3.bl_tree[2 * h[i3] + 1], 3);
+          I(t3, t3.dyn_ltree, e3 - 1), I(t3, t3.dyn_dtree, a2 - 1);
+        }(t2, t2.l_desc.max_code + 1, t2.d_desc.max_code + 1, o2 + 1), D(t2, t2.dyn_ltree, t2.dyn_dtree)), R(t2), i2 && Z(t2);
+      }, B = {
+        _tr_init: function (t2) {
+          F || (!function () {
+            var t3, e2, a2, h2, v2, k2 = new Array(16);
+            for (a2 = 0, h2 = 0; h2 < 28; h2++) for (c[h2] = a2, t3 = 0; t3 < 1 << s[h2]; t3++) u[a2++] = h2;
+            for (u[a2 - 1] = h2, v2 = 0, h2 = 0; h2 < 16; h2++) for (g[h2] = v2, t3 = 0; t3 < 1 << o[h2]; t3++) f[v2++] = h2;
+            for (v2 >>= 7; h2 < i; h2++) for (g[h2] = v2 << 7, t3 = 0; t3 < 1 << o[h2] - 7; t3++) f[256 + v2++] = h2;
+            for (e2 = 0; e2 <= r; e2++) k2[e2] = 0;
+            for (t3 = 0; t3 <= 143;) d[2 * t3 + 1] = 8, t3++, k2[8]++;
+            for (; t3 <= 255;) d[2 * t3 + 1] = 9, t3++, k2[9]++;
+            for (; t3 <= 279;) d[2 * t3 + 1] = 7, t3++, k2[7]++;
+            for (; t3 <= 287;) d[2 * t3 + 1] = 8, t3++, k2[8]++;
+            for (E(d, 287, k2), t3 = 0; t3 < i; t3++) _[2 * t3 + 1] = 5, _[2 * t3] = A(t3, 5);
+            w = new p(d, s, 257, n, r), m = new p(_, o, 0, i, r), b = new p(new Array(0), l, 0, 19, 7);
+          }(), F = true), t2.l_desc = new v(t2.dyn_ltree, w), t2.d_desc = new v(t2.dyn_dtree, m), t2.bl_desc = new v(t2.bl_tree, b), t2.bi_buf = 0, t2.bi_valid = 0, R(t2);
+        }, _tr_stored_block: L, _tr_flush_block: N, _tr_tally: function (t2, e2, n2) {
+          return t2.pending_buf[t2.sym_buf + t2.sym_next++] = e2, t2.pending_buf[t2.sym_buf + t2.sym_next++] = e2 >> 8, t2.pending_buf[t2.sym_buf + t2.sym_next++] = n2, 0 === e2 ? t2.dyn_ltree[2 * n2]++ : (t2.matches++, e2--, t2.dyn_ltree[2 * (u[n2] + a + 1)]++, t2.dyn_dtree[2 * k(e2)]++), t2.sym_next === t2.sym_end;
+        }, _tr_align: function (t2) {
+          x(t2, 2, 3), z(t2, 256, d), function (t3) {
+            16 === t3.bi_valid ? (y(t3, t3.bi_buf), t3.bi_buf = 0, t3.bi_valid = 0) : t3.bi_valid >= 8 && (t3.pending_buf[t3.pending++] = 255 & t3.bi_buf, t3.bi_buf >>= 8, t3.bi_valid -= 8);
+          }(t2);
+        }
+      }, C = function (t2, e2, a2, n2) {
+        for (var i2 = 65535 & t2 | 0, r2 = t2 >>> 16 & 65535 | 0, s2 = 0; 0 !== a2;) {
+          a2 -= s2 = a2 > 2e3 ? 2e3 : a2;
+          do {
+            r2 = r2 + (i2 = i2 + e2[n2++] | 0) | 0;
+          } while (--s2);
+          i2 %= 65521, r2 %= 65521;
+        }
+        return i2 | r2 << 16 | 0;
+      }, M = new Uint32Array(function () {
+        for (var t2, e2 = [], a2 = 0; a2 < 256; a2++) {
+          t2 = a2;
+          for (var n2 = 0; n2 < 8; n2++) t2 = 1 & t2 ? 3988292384 ^ t2 >>> 1 : t2 >>> 1;
+          e2[a2] = t2;
+        }
+        return e2;
+      }()), H = function (t2, e2, a2, n2) {
+        var i2 = M, r2 = n2 + a2;
+        t2 ^= -1;
+        for (var s2 = n2; s2 < r2; s2++) t2 = t2 >>> 8 ^ i2[255 & (t2 ^ e2[s2])];
+        return -1 ^ t2;
+      }, j = { 2: "need dictionary", 1: "stream end", 0: "", "-1": "file error", "-2": "stream error", "-3": "data error", "-4": "insufficient memory", "-5": "buffer error", "-6": "incompatible version" }, K = { Z_NO_FLUSH: 0, Z_PARTIAL_FLUSH: 1, Z_SYNC_FLUSH: 2, Z_FULL_FLUSH: 3, Z_FINISH: 4, Z_BLOCK: 5, Z_TREES: 6, Z_OK: 0, Z_STREAM_END: 1, Z_NEED_DICT: 2, Z_ERRNO: -1, Z_STREAM_ERROR: -2, Z_DATA_ERROR: -3, Z_MEM_ERROR: -4, Z_BUF_ERROR: -5, Z_NO_COMPRESSION: 0, Z_BEST_SPEED: 1, Z_BEST_COMPRESSION: 9, Z_DEFAULT_COMPRESSION: -1, Z_FILTERED: 1, Z_HUFFMAN_ONLY: 2, Z_RLE: 3, Z_FIXED: 4, Z_DEFAULT_STRATEGY: 0, Z_BINARY: 0, Z_TEXT: 1, Z_UNKNOWN: 2, Z_DEFLATED: 8 }, P = B._tr_init, Y = B._tr_stored_block, G = B._tr_flush_block, X = B._tr_tally, W = B._tr_align, q = K.Z_NO_FLUSH, J = K.Z_PARTIAL_FLUSH, Q = K.Z_FULL_FLUSH, V = K.Z_FINISH, $ = K.Z_BLOCK, tt = K.Z_OK, et = K.Z_STREAM_END, at = K.Z_STREAM_ERROR, nt = K.Z_DATA_ERROR, it = K.Z_BUF_ERROR, rt = K.Z_DEFAULT_COMPRESSION, st = K.Z_FILTERED, ot = K.Z_HUFFMAN_ONLY, lt = K.Z_RLE, ht = K.Z_FIXED, dt = K.Z_DEFAULT_STRATEGY, _t = K.Z_UNKNOWN, ft = K.Z_DEFLATED, ut = 258, ct = 262, wt = 42, mt = 113, bt = 666, gt = function (t2, e2) {
+        return t2.msg = j[e2], e2;
+      }, pt = function (t2) {
+        return 2 * t2 - (t2 > 4 ? 9 : 0);
+      }, vt = function (t2) {
+        for (var e2 = t2.length; --e2 >= 0;) t2[e2] = 0;
+      }, kt = function (t2) {
+        var e2, a2, n2, i2 = t2.w_size;
+        n2 = e2 = t2.hash_size;
+        do {
+          a2 = t2.head[--n2], t2.head[n2] = a2 >= i2 ? a2 - i2 : 0;
+        } while (--e2);
+        n2 = e2 = i2;
+        do {
+          a2 = t2.prev[--n2], t2.prev[n2] = a2 >= i2 ? a2 - i2 : 0;
+        } while (--e2);
+      }, yt = function (t2, e2, a2) {
+        return (e2 << t2.hash_shift ^ a2) & t2.hash_mask;
+      }, xt = function (t2) {
+        var e2 = t2.state, a2 = e2.pending;
+        a2 > t2.avail_out && (a2 = t2.avail_out), 0 !== a2 && (t2.output.set(e2.pending_buf.subarray(e2.pending_out, e2.pending_out + a2), t2.next_out), t2.next_out += a2, e2.pending_out += a2, t2.total_out += a2, t2.avail_out -= a2, e2.pending -= a2, 0 === e2.pending && (e2.pending_out = 0));
+      }, zt = function (t2, e2) {
+        G(t2, t2.block_start >= 0 ? t2.block_start : -1, t2.strstart - t2.block_start, e2), t2.block_start = t2.strstart, xt(t2.strm);
+      }, At = function (t2, e2) {
+        t2.pending_buf[t2.pending++] = e2;
+      }, Et = function (t2, e2) {
+        t2.pending_buf[t2.pending++] = e2 >>> 8 & 255, t2.pending_buf[t2.pending++] = 255 & e2;
+      }, Rt = function (t2, e2, a2, n2) {
+        var i2 = t2.avail_in;
+        return i2 > n2 && (i2 = n2), 0 === i2 ? 0 : (t2.avail_in -= i2, e2.set(t2.input.subarray(t2.next_in, t2.next_in + i2), a2), 1 === t2.state.wrap ? t2.adler = C(t2.adler, e2, i2, a2) : 2 === t2.state.wrap && (t2.adler = H(t2.adler, e2, i2, a2)), t2.next_in += i2, t2.total_in += i2, i2);
+      }, Zt = function (t2, e2) {
+        var a2, n2, i2 = t2.max_chain_length, r2 = t2.strstart, s2 = t2.prev_length, o2 = t2.nice_match, l2 = t2.strstart > t2.w_size - ct ? t2.strstart - (t2.w_size - ct) : 0, h2 = t2.window, d2 = t2.w_mask, _2 = t2.prev, f2 = t2.strstart + ut, u2 = h2[r2 + s2 - 1], c2 = h2[r2 + s2];
+        t2.prev_length >= t2.good_match && (i2 >>= 2), o2 > t2.lookahead && (o2 = t2.lookahead);
+        do {
+          if (h2[(a2 = e2) + s2] === c2 && h2[a2 + s2 - 1] === u2 && h2[a2] === h2[r2] && h2[++a2] === h2[r2 + 1]) {
+            r2 += 2, a2++;
+            do {
+            } while (h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && h2[++r2] === h2[++a2] && r2 < f2);
+            if (n2 = ut - (f2 - r2), r2 = f2 - ut, n2 > s2) {
+              if (t2.match_start = e2, s2 = n2, n2 >= o2) break;
+              u2 = h2[r2 + s2 - 1], c2 = h2[r2 + s2];
+            }
+          }
+        } while ((e2 = _2[e2 & d2]) > l2 && 0 != --i2);
+        return s2 <= t2.lookahead ? s2 : t2.lookahead;
+      }, St = function (t2) {
+        var e2, a2, n2, i2 = t2.w_size;
+        do {
+          if (a2 = t2.window_size - t2.lookahead - t2.strstart, t2.strstart >= i2 + (i2 - ct) && (t2.window.set(t2.window.subarray(i2, i2 + i2 - a2), 0), t2.match_start -= i2, t2.strstart -= i2, t2.block_start -= i2, t2.insert > t2.strstart && (t2.insert = t2.strstart), kt(t2), a2 += i2), 0 === t2.strm.avail_in) break;
+          if (e2 = Rt(t2.strm, t2.window, t2.strstart + t2.lookahead, a2), t2.lookahead += e2, t2.lookahead + t2.insert >= 3) for (n2 = t2.strstart - t2.insert, t2.ins_h = t2.window[n2], t2.ins_h = yt(t2, t2.ins_h, t2.window[n2 + 1]); t2.insert && (t2.ins_h = yt(t2, t2.ins_h, t2.window[n2 + 3 - 1]), t2.prev[n2 & t2.w_mask] = t2.head[t2.ins_h], t2.head[t2.ins_h] = n2, n2++, t2.insert--, !(t2.lookahead + t2.insert < 3)););
+        } while (t2.lookahead < ct && 0 !== t2.strm.avail_in);
+      }, Ut = function (t2, e2) {
+        var a2, n2, i2, r2 = t2.pending_buf_size - 5 > t2.w_size ? t2.w_size : t2.pending_buf_size - 5, s2 = 0, o2 = t2.strm.avail_in;
+        do {
+          if (a2 = 65535, i2 = t2.bi_valid + 42 >> 3, t2.strm.avail_out < i2) break;
+          if (i2 = t2.strm.avail_out - i2, a2 > (n2 = t2.strstart - t2.block_start) + t2.strm.avail_in && (a2 = n2 + t2.strm.avail_in), a2 > i2 && (a2 = i2), a2 < r2 && (0 === a2 && e2 !== V || e2 === q || a2 !== n2 + t2.strm.avail_in)) break;
+          s2 = e2 === V && a2 === n2 + t2.strm.avail_in ? 1 : 0, Y(t2, 0, 0, s2), t2.pending_buf[t2.pending - 4] = a2, t2.pending_buf[t2.pending - 3] = a2 >> 8, t2.pending_buf[t2.pending - 2] = ~a2, t2.pending_buf[t2.pending - 1] = ~a2 >> 8, xt(t2.strm), n2 && (n2 > a2 && (n2 = a2), t2.strm.output.set(t2.window.subarray(t2.block_start, t2.block_start + n2), t2.strm.next_out), t2.strm.next_out += n2, t2.strm.avail_out -= n2, t2.strm.total_out += n2, t2.block_start += n2, a2 -= n2), a2 && (Rt(t2.strm, t2.strm.output, t2.strm.next_out, a2), t2.strm.next_out += a2, t2.strm.avail_out -= a2, t2.strm.total_out += a2);
+        } while (0 === s2);
+        return (o2 -= t2.strm.avail_in) && (o2 >= t2.w_size ? (t2.matches = 2, t2.window.set(t2.strm.input.subarray(t2.strm.next_in - t2.w_size, t2.strm.next_in), 0), t2.strstart = t2.w_size, t2.insert = t2.strstart) : (t2.window_size - t2.strstart <= o2 && (t2.strstart -= t2.w_size, t2.window.set(t2.window.subarray(t2.w_size, t2.w_size + t2.strstart), 0), t2.matches < 2 && t2.matches++, t2.insert > t2.strstart && (t2.insert = t2.strstart)), t2.window.set(t2.strm.input.subarray(t2.strm.next_in - o2, t2.strm.next_in), t2.strstart), t2.strstart += o2, t2.insert += o2 > t2.w_size - t2.insert ? t2.w_size - t2.insert : o2), t2.block_start = t2.strstart), t2.high_water < t2.strstart && (t2.high_water = t2.strstart), s2 ? 4 : e2 !== q && e2 !== V && 0 === t2.strm.avail_in && t2.strstart === t2.block_start ? 2 : (i2 = t2.window_size - t2.strstart, t2.strm.avail_in > i2 && t2.block_start >= t2.w_size && (t2.block_start -= t2.w_size, t2.strstart -= t2.w_size, t2.window.set(t2.window.subarray(t2.w_size, t2.w_size + t2.strstart), 0), t2.matches < 2 && t2.matches++, i2 += t2.w_size, t2.insert > t2.strstart && (t2.insert = t2.strstart)), i2 > t2.strm.avail_in && (i2 = t2.strm.avail_in), i2 && (Rt(t2.strm, t2.window, t2.strstart, i2), t2.strstart += i2, t2.insert += i2 > t2.w_size - t2.insert ? t2.w_size - t2.insert : i2), t2.high_water < t2.strstart && (t2.high_water = t2.strstart), i2 = t2.bi_valid + 42 >> 3, r2 = (i2 = t2.pending_buf_size - i2 > 65535 ? 65535 : t2.pending_buf_size - i2) > t2.w_size ? t2.w_size : i2, ((n2 = t2.strstart - t2.block_start) >= r2 || (n2 || e2 === V) && e2 !== q && 0 === t2.strm.avail_in && n2 <= i2) && (a2 = n2 > i2 ? i2 : n2, s2 = e2 === V && 0 === t2.strm.avail_in && a2 === n2 ? 1 : 0, Y(t2, t2.block_start, a2, s2), t2.block_start += a2, xt(t2.strm)), s2 ? 3 : 1);
+      }, Dt = function (t2, e2) {
+        for (var a2, n2; ;) {
+          if (t2.lookahead < ct) {
+            if (St(t2), t2.lookahead < ct && e2 === q) return 1;
+            if (0 === t2.lookahead) break;
+          }
+          if (a2 = 0, t2.lookahead >= 3 && (t2.ins_h = yt(t2, t2.ins_h, t2.window[t2.strstart + 3 - 1]), a2 = t2.prev[t2.strstart & t2.w_mask] = t2.head[t2.ins_h], t2.head[t2.ins_h] = t2.strstart), 0 !== a2 && t2.strstart - a2 <= t2.w_size - ct && (t2.match_length = Zt(t2, a2)), t2.match_length >= 3) if (n2 = X(t2, t2.strstart - t2.match_start, t2.match_length - 3), t2.lookahead -= t2.match_length, t2.match_length <= t2.max_lazy_match && t2.lookahead >= 3) {
+            t2.match_length--;
+            do {
+              t2.strstart++, t2.ins_h = yt(t2, t2.ins_h, t2.window[t2.strstart + 3 - 1]), a2 = t2.prev[t2.strstart & t2.w_mask] = t2.head[t2.ins_h], t2.head[t2.ins_h] = t2.strstart;
+            } while (0 != --t2.match_length);
+            t2.strstart++;
+          } else t2.strstart += t2.match_length, t2.match_length = 0, t2.ins_h = t2.window[t2.strstart], t2.ins_h = yt(t2, t2.ins_h, t2.window[t2.strstart + 1]);
+          else n2 = X(t2, 0, t2.window[t2.strstart]), t2.lookahead--, t2.strstart++;
+          if (n2 && (zt(t2, false), 0 === t2.strm.avail_out)) return 1;
+        }
+        return t2.insert = t2.strstart < 2 ? t2.strstart : 2, e2 === V ? (zt(t2, true), 0 === t2.strm.avail_out ? 3 : 4) : t2.sym_next && (zt(t2, false), 0 === t2.strm.avail_out) ? 1 : 2;
+      }, Tt = function (t2, e2) {
+        for (var a2, n2, i2; ;) {
+          if (t2.lookahead < ct) {
+            if (St(t2), t2.lookahead < ct && e2 === q) return 1;
+            if (0 === t2.lookahead) break;
+          }
+          if (a2 = 0, t2.lookahead >= 3 && (t2.ins_h = yt(t2, t2.ins_h, t2.window[t2.strstart + 3 - 1]), a2 = t2.prev[t2.strstart & t2.w_mask] = t2.head[t2.ins_h], t2.head[t2.ins_h] = t2.strstart), t2.prev_length = t2.match_length, t2.prev_match = t2.match_start, t2.match_length = 2, 0 !== a2 && t2.prev_length < t2.max_lazy_match && t2.strstart - a2 <= t2.w_size - ct && (t2.match_length = Zt(t2, a2), t2.match_length <= 5 && (t2.strategy === st || 3 === t2.match_length && t2.strstart - t2.match_start > 4096) && (t2.match_length = 2)), t2.prev_length >= 3 && t2.match_length <= t2.prev_length) {
+            i2 = t2.strstart + t2.lookahead - 3, n2 = X(t2, t2.strstart - 1 - t2.prev_match, t2.prev_length - 3), t2.lookahead -= t2.prev_length - 1, t2.prev_length -= 2;
+            do {
+              ++t2.strstart <= i2 && (t2.ins_h = yt(t2, t2.ins_h, t2.window[t2.strstart + 3 - 1]), a2 = t2.prev[t2.strstart & t2.w_mask] = t2.head[t2.ins_h], t2.head[t2.ins_h] = t2.strstart);
+            } while (0 != --t2.prev_length);
+            if (t2.match_available = 0, t2.match_length = 2, t2.strstart++, n2 && (zt(t2, false), 0 === t2.strm.avail_out)) return 1;
+          } else if (t2.match_available) {
+            if ((n2 = X(t2, 0, t2.window[t2.strstart - 1])) && zt(t2, false), t2.strstart++, t2.lookahead--, 0 === t2.strm.avail_out) return 1;
+          } else t2.match_available = 1, t2.strstart++, t2.lookahead--;
+        }
+        return t2.match_available && (n2 = X(t2, 0, t2.window[t2.strstart - 1]), t2.match_available = 0), t2.insert = t2.strstart < 2 ? t2.strstart : 2, e2 === V ? (zt(t2, true), 0 === t2.strm.avail_out ? 3 : 4) : t2.sym_next && (zt(t2, false), 0 === t2.strm.avail_out) ? 1 : 2;
+      };
+      function Ot(t2, e2, a2, n2, i2) {
+        this.good_length = t2, this.max_lazy = e2, this.nice_length = a2, this.max_chain = n2, this.func = i2;
+      }
+      var It = [new Ot(0, 0, 0, 0, Ut), new Ot(4, 4, 8, 4, Dt), new Ot(4, 5, 16, 8, Dt), new Ot(4, 6, 32, 32, Dt), new Ot(4, 4, 16, 16, Tt), new Ot(8, 16, 32, 32, Tt), new Ot(8, 16, 128, 128, Tt), new Ot(8, 32, 128, 256, Tt), new Ot(32, 128, 258, 1024, Tt), new Ot(32, 258, 258, 4096, Tt)];
+      function Ft() {
+        this.strm = null, this.status = 0, this.pending_buf = null, this.pending_buf_size = 0, this.pending_out = 0, this.pending = 0, this.wrap = 0, this.gzhead = null, this.gzindex = 0, this.method = ft, this.last_flush = -1, this.w_size = 0, this.w_bits = 0, this.w_mask = 0, this.window = null, this.window_size = 0, this.prev = null, this.head = null, this.ins_h = 0, this.hash_size = 0, this.hash_bits = 0, this.hash_mask = 0, this.hash_shift = 0, this.block_start = 0, this.match_length = 0, this.prev_match = 0, this.match_available = 0, this.strstart = 0, this.match_start = 0, this.lookahead = 0, this.prev_length = 0, this.max_chain_length = 0, this.max_lazy_match = 0, this.level = 0, this.strategy = 0, this.good_match = 0, this.nice_match = 0, this.dyn_ltree = new Uint16Array(1146), this.dyn_dtree = new Uint16Array(122), this.bl_tree = new Uint16Array(78), vt(this.dyn_ltree), vt(this.dyn_dtree), vt(this.bl_tree), this.l_desc = null, this.d_desc = null, this.bl_desc = null, this.bl_count = new Uint16Array(16), this.heap = new Uint16Array(573), vt(this.heap), this.heap_len = 0, this.heap_max = 0, this.depth = new Uint16Array(573), vt(this.depth), this.sym_buf = 0, this.lit_bufsize = 0, this.sym_next = 0, this.sym_end = 0, this.opt_len = 0, this.static_len = 0, this.matches = 0, this.insert = 0, this.bi_buf = 0, this.bi_valid = 0;
+      }
+      var Lt = function (t2) {
+        if (!t2) return 1;
+        var e2 = t2.state;
+        return !e2 || e2.strm !== t2 || e2.status !== wt && 57 !== e2.status && 69 !== e2.status && 73 !== e2.status && 91 !== e2.status && 103 !== e2.status && e2.status !== mt && e2.status !== bt ? 1 : 0;
+      }, Nt = function (t2) {
+        if (Lt(t2)) return gt(t2, at);
+        t2.total_in = t2.total_out = 0, t2.data_type = _t;
+        var e2 = t2.state;
+        return e2.pending = 0, e2.pending_out = 0, e2.wrap < 0 && (e2.wrap = -e2.wrap), e2.status = 2 === e2.wrap ? 57 : e2.wrap ? wt : mt, t2.adler = 2 === e2.wrap ? 0 : 1, e2.last_flush = -2, P(e2), tt;
+      }, Bt = function (t2) {
+        var e2, a2 = Nt(t2);
+        return a2 === tt && ((e2 = t2.state).window_size = 2 * e2.w_size, vt(e2.head), e2.max_lazy_match = It[e2.level].max_lazy, e2.good_match = It[e2.level].good_length, e2.nice_match = It[e2.level].nice_length, e2.max_chain_length = It[e2.level].max_chain, e2.strstart = 0, e2.block_start = 0, e2.lookahead = 0, e2.insert = 0, e2.match_length = e2.prev_length = 2, e2.match_available = 0, e2.ins_h = 0), a2;
+      }, Ct = function (t2, e2, a2, n2, i2, r2) {
+        if (!t2) return at;
+        var s2 = 1;
+        if (e2 === rt && (e2 = 6), n2 < 0 ? (s2 = 0, n2 = -n2) : n2 > 15 && (s2 = 2, n2 -= 16), i2 < 1 || i2 > 9 || a2 !== ft || n2 < 8 || n2 > 15 || e2 < 0 || e2 > 9 || r2 < 0 || r2 > ht || 8 === n2 && 1 !== s2) return gt(t2, at);
+        8 === n2 && (n2 = 9);
+        var o2 = new Ft();
+        return t2.state = o2, o2.strm = t2, o2.status = wt, o2.wrap = s2, o2.gzhead = null, o2.w_bits = n2, o2.w_size = 1 << o2.w_bits, o2.w_mask = o2.w_size - 1, o2.hash_bits = i2 + 7, o2.hash_size = 1 << o2.hash_bits, o2.hash_mask = o2.hash_size - 1, o2.hash_shift = ~~((o2.hash_bits + 3 - 1) / 3), o2.window = new Uint8Array(2 * o2.w_size), o2.head = new Uint16Array(o2.hash_size), o2.prev = new Uint16Array(o2.w_size), o2.lit_bufsize = 1 << i2 + 6, o2.pending_buf_size = 4 * o2.lit_bufsize, o2.pending_buf = new Uint8Array(o2.pending_buf_size), o2.sym_buf = o2.lit_bufsize, o2.sym_end = 3 * (o2.lit_bufsize - 1), o2.level = e2, o2.strategy = r2, o2.method = a2, Bt(t2);
+      }, Mt = {
+        deflateInit: function (t2, e2) {
+          return Ct(t2, e2, ft, 15, 8, dt);
+        }, deflateInit2: Ct, deflateReset: Bt, deflateResetKeep: Nt, deflateSetHeader: function (t2, e2) {
+          return Lt(t2) || 2 !== t2.state.wrap ? at : (t2.state.gzhead = e2, tt);
+        }, deflate: function (t2, e2) {
+          if (Lt(t2) || e2 > $ || e2 < 0) return t2 ? gt(t2, at) : at;
+          var a2 = t2.state;
+          if (!t2.output || 0 !== t2.avail_in && !t2.input || a2.status === bt && e2 !== V) return gt(t2, 0 === t2.avail_out ? it : at);
+          var n2 = a2.last_flush;
+          if (a2.last_flush = e2, 0 !== a2.pending) {
+            if (xt(t2), 0 === t2.avail_out) return a2.last_flush = -1, tt;
+          } else if (0 === t2.avail_in && pt(e2) <= pt(n2) && e2 !== V) return gt(t2, it);
+          if (a2.status === bt && 0 !== t2.avail_in) return gt(t2, it);
+          if (a2.status === wt && 0 === a2.wrap && (a2.status = mt), a2.status === wt) {
+            var i2 = ft + (a2.w_bits - 8 << 4) << 8;
+            if (i2 |= (a2.strategy >= ot || a2.level < 2 ? 0 : a2.level < 6 ? 1 : 6 === a2.level ? 2 : 3) << 6, 0 !== a2.strstart && (i2 |= 32), Et(a2, i2 += 31 - i2 % 31), 0 !== a2.strstart && (Et(a2, t2.adler >>> 16), Et(a2, 65535 & t2.adler)), t2.adler = 1, a2.status = mt, xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+          }
+          if (57 === a2.status) {
+            if (t2.adler = 0, At(a2, 31), At(a2, 139), At(a2, 8), a2.gzhead) At(a2, (a2.gzhead.text ? 1 : 0) + (a2.gzhead.hcrc ? 2 : 0) + (a2.gzhead.extra ? 4 : 0) + (a2.gzhead.name ? 8 : 0) + (a2.gzhead.comment ? 16 : 0)), At(a2, 255 & a2.gzhead.time), At(a2, a2.gzhead.time >> 8 & 255), At(a2, a2.gzhead.time >> 16 & 255), At(a2, a2.gzhead.time >> 24 & 255), At(a2, 9 === a2.level ? 2 : a2.strategy >= ot || a2.level < 2 ? 4 : 0), At(a2, 255 & a2.gzhead.os), a2.gzhead.extra && a2.gzhead.extra.length && (At(a2, 255 & a2.gzhead.extra.length), At(a2, a2.gzhead.extra.length >> 8 & 255)), a2.gzhead.hcrc && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending, 0)), a2.gzindex = 0, a2.status = 69;
+            else if (At(a2, 0), At(a2, 0), At(a2, 0), At(a2, 0), At(a2, 0), At(a2, 9 === a2.level ? 2 : a2.strategy >= ot || a2.level < 2 ? 4 : 0), At(a2, 3), a2.status = mt, xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+          }
+          if (69 === a2.status) {
+            if (a2.gzhead.extra) {
+              for (var r2 = a2.pending, s2 = (65535 & a2.gzhead.extra.length) - a2.gzindex; a2.pending + s2 > a2.pending_buf_size;) {
+                var o2 = a2.pending_buf_size - a2.pending;
+                if (a2.pending_buf.set(a2.gzhead.extra.subarray(a2.gzindex, a2.gzindex + o2), a2.pending), a2.pending = a2.pending_buf_size, a2.gzhead.hcrc && a2.pending > r2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - r2, r2)), a2.gzindex += o2, xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+                r2 = 0, s2 -= o2;
+              }
+              var l2 = new Uint8Array(a2.gzhead.extra);
+              a2.pending_buf.set(l2.subarray(a2.gzindex, a2.gzindex + s2), a2.pending), a2.pending += s2, a2.gzhead.hcrc && a2.pending > r2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - r2, r2)), a2.gzindex = 0;
+            }
+            a2.status = 73;
+          }
+          if (73 === a2.status) {
+            if (a2.gzhead.name) {
+              var h2, d2 = a2.pending;
+              do {
+                if (a2.pending === a2.pending_buf_size) {
+                  if (a2.gzhead.hcrc && a2.pending > d2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - d2, d2)), xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+                  d2 = 0;
+                }
+                h2 = a2.gzindex < a2.gzhead.name.length ? 255 & a2.gzhead.name.charCodeAt(a2.gzindex++) : 0, At(a2, h2);
+              } while (0 !== h2);
+              a2.gzhead.hcrc && a2.pending > d2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - d2, d2)), a2.gzindex = 0;
+            }
+            a2.status = 91;
+          }
+          if (91 === a2.status) {
+            if (a2.gzhead.comment) {
+              var _2, f2 = a2.pending;
+              do {
+                if (a2.pending === a2.pending_buf_size) {
+                  if (a2.gzhead.hcrc && a2.pending > f2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - f2, f2)), xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+                  f2 = 0;
+                }
+                _2 = a2.gzindex < a2.gzhead.comment.length ? 255 & a2.gzhead.comment.charCodeAt(a2.gzindex++) : 0, At(a2, _2);
+              } while (0 !== _2);
+              a2.gzhead.hcrc && a2.pending > f2 && (t2.adler = H(t2.adler, a2.pending_buf, a2.pending - f2, f2));
+            }
+            a2.status = 103;
+          }
+          if (103 === a2.status) {
+            if (a2.gzhead.hcrc) {
+              if (a2.pending + 2 > a2.pending_buf_size && (xt(t2), 0 !== a2.pending)) return a2.last_flush = -1, tt;
+              At(a2, 255 & t2.adler), At(a2, t2.adler >> 8 & 255), t2.adler = 0;
+            }
+            if (a2.status = mt, xt(t2), 0 !== a2.pending) return a2.last_flush = -1, tt;
+          }
+          if (0 !== t2.avail_in || 0 !== a2.lookahead || e2 !== q && a2.status !== bt) {
+            var u2 = 0 === a2.level ? Ut(a2, e2) : a2.strategy === ot ? function (t3, e3) {
+              for (var a3; ;) {
+                if (0 === t3.lookahead && (St(t3), 0 === t3.lookahead)) {
+                  if (e3 === q) return 1;
+                  break;
+                }
+                if (t3.match_length = 0, a3 = X(t3, 0, t3.window[t3.strstart]), t3.lookahead--, t3.strstart++, a3 && (zt(t3, false), 0 === t3.strm.avail_out)) return 1;
+              }
+              return t3.insert = 0, e3 === V ? (zt(t3, true), 0 === t3.strm.avail_out ? 3 : 4) : t3.sym_next && (zt(t3, false), 0 === t3.strm.avail_out) ? 1 : 2;
+            }(a2, e2) : a2.strategy === lt ? function (t3, e3) {
+              for (var a3, n3, i3, r3, s3 = t3.window; ;) {
+                if (t3.lookahead <= ut) {
+                  if (St(t3), t3.lookahead <= ut && e3 === q) return 1;
+                  if (0 === t3.lookahead) break;
+                }
+                if (t3.match_length = 0, t3.lookahead >= 3 && t3.strstart > 0 && (n3 = s3[i3 = t3.strstart - 1]) === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3]) {
+                  r3 = t3.strstart + ut;
+                  do {
+                  } while (n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && n3 === s3[++i3] && i3 < r3);
+                  t3.match_length = ut - (r3 - i3), t3.match_length > t3.lookahead && (t3.match_length = t3.lookahead);
+                }
+                if (t3.match_length >= 3 ? (a3 = X(t3, 1, t3.match_length - 3), t3.lookahead -= t3.match_length, t3.strstart += t3.match_length, t3.match_length = 0) : (a3 = X(t3, 0, t3.window[t3.strstart]), t3.lookahead--, t3.strstart++), a3 && (zt(t3, false), 0 === t3.strm.avail_out)) return 1;
+              }
+              return t3.insert = 0, e3 === V ? (zt(t3, true), 0 === t3.strm.avail_out ? 3 : 4) : t3.sym_next && (zt(t3, false), 0 === t3.strm.avail_out) ? 1 : 2;
+            }(a2, e2) : It[a2.level].func(a2, e2);
+            if (3 !== u2 && 4 !== u2 || (a2.status = bt), 1 === u2 || 3 === u2) return 0 === t2.avail_out && (a2.last_flush = -1), tt;
+            if (2 === u2 && (e2 === J ? W(a2) : e2 !== $ && (Y(a2, 0, 0, false), e2 === Q && (vt(a2.head), 0 === a2.lookahead && (a2.strstart = 0, a2.block_start = 0, a2.insert = 0))), xt(t2), 0 === t2.avail_out)) return a2.last_flush = -1, tt;
+          }
+          return e2 !== V ? tt : a2.wrap <= 0 ? et : (2 === a2.wrap ? (At(a2, 255 & t2.adler), At(a2, t2.adler >> 8 & 255), At(a2, t2.adler >> 16 & 255), At(a2, t2.adler >> 24 & 255), At(a2, 255 & t2.total_in), At(a2, t2.total_in >> 8 & 255), At(a2, t2.total_in >> 16 & 255), At(a2, t2.total_in >> 24 & 255)) : (Et(a2, t2.adler >>> 16), Et(a2, 65535 & t2.adler)), xt(t2), a2.wrap > 0 && (a2.wrap = -a2.wrap), 0 !== a2.pending ? tt : et);
+        }, deflateEnd: function (t2) {
+          if (Lt(t2)) return at;
+          var e2 = t2.state.status;
+          return t2.state = null, e2 === mt ? gt(t2, nt) : tt;
+        }, deflateSetDictionary: function (t2, e2) {
+          var a2 = e2.length;
+          if (Lt(t2)) return at;
+          var n2 = t2.state, i2 = n2.wrap;
+          if (2 === i2 || 1 === i2 && n2.status !== wt || n2.lookahead) return at;
+          if (1 === i2 && (t2.adler = C(t2.adler, e2, a2, 0)), n2.wrap = 0, a2 >= n2.w_size) {
+            0 === i2 && (vt(n2.head), n2.strstart = 0, n2.block_start = 0, n2.insert = 0);
+            var r2 = new Uint8Array(n2.w_size);
+            r2.set(e2.subarray(a2 - n2.w_size, a2), 0), e2 = r2, a2 = n2.w_size;
+          }
+          var s2 = t2.avail_in, o2 = t2.next_in, l2 = t2.input;
+          for (t2.avail_in = a2, t2.next_in = 0, t2.input = e2, St(n2); n2.lookahead >= 3;) {
+            var h2 = n2.strstart, d2 = n2.lookahead - 2;
+            do {
+              n2.ins_h = yt(n2, n2.ins_h, n2.window[h2 + 3 - 1]), n2.prev[h2 & n2.w_mask] = n2.head[n2.ins_h], n2.head[n2.ins_h] = h2, h2++;
+            } while (--d2);
+            n2.strstart = h2, n2.lookahead = 2, St(n2);
+          }
+          return n2.strstart += n2.lookahead, n2.block_start = n2.strstart, n2.insert = n2.lookahead, n2.lookahead = 0, n2.match_length = n2.prev_length = 2, n2.match_available = 0, t2.next_in = o2, t2.input = l2, t2.avail_in = s2, n2.wrap = i2, tt;
+        }, deflateInfo: "pako deflate (from Nodeca project)"
+      };
+      function Ht(t2) {
+        return Ht = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (t3) {
+          return typeof t3;
+        } : function (t3) {
+          return t3 && "function" == typeof Symbol && t3.constructor === Symbol && t3 !== Symbol.prototype ? "symbol" : typeof t3;
+        }, Ht(t2);
+      }
+      var jt = function (t2, e2) {
+        return Object.prototype.hasOwnProperty.call(t2, e2);
+      }, Kt = function (t2) {
+        for (var e2 = Array.prototype.slice.call(arguments, 1); e2.length;) {
+          var a2 = e2.shift();
+          if (a2) {
+            if ("object" !== Ht(a2)) throw new TypeError(a2 + "must be non-object");
+            for (var n2 in a2) jt(a2, n2) && (t2[n2] = a2[n2]);
+          }
+        }
+        return t2;
+      }, Pt = function (t2) {
+        for (var e2 = 0, a2 = 0, n2 = t2.length; a2 < n2; a2++) e2 += t2[a2].length;
+        for (var i2 = new Uint8Array(e2), r2 = 0, s2 = 0, o2 = t2.length; r2 < o2; r2++) {
+          var l2 = t2[r2];
+          i2.set(l2, s2), s2 += l2.length;
+        }
+        return i2;
+      }, Yt = true;
+      try {
+        String.fromCharCode.apply(null, new Uint8Array(1));
+      } catch (t2) {
+        Yt = false;
+      }
+      for (var Gt = new Uint8Array(256), Xt = 0; Xt < 256; Xt++) Gt[Xt] = Xt >= 252 ? 6 : Xt >= 248 ? 5 : Xt >= 240 ? 4 : Xt >= 224 ? 3 : Xt >= 192 ? 2 : 1;
+      Gt[254] = Gt[254] = 1;
+      var Wt = function (t2) {
+        if ("function" == typeof TextEncoder && TextEncoder.prototype.encode) return new TextEncoder().encode(t2);
+        var e2, a2, n2, i2, r2, s2 = t2.length, o2 = 0;
+        for (i2 = 0; i2 < s2; i2++) 55296 == (64512 & (a2 = t2.charCodeAt(i2))) && i2 + 1 < s2 && 56320 == (64512 & (n2 = t2.charCodeAt(i2 + 1))) && (a2 = 65536 + (a2 - 55296 << 10) + (n2 - 56320), i2++), o2 += a2 < 128 ? 1 : a2 < 2048 ? 2 : a2 < 65536 ? 3 : 4;
+        for (e2 = new Uint8Array(o2), r2 = 0, i2 = 0; r2 < o2; i2++) 55296 == (64512 & (a2 = t2.charCodeAt(i2))) && i2 + 1 < s2 && 56320 == (64512 & (n2 = t2.charCodeAt(i2 + 1))) && (a2 = 65536 + (a2 - 55296 << 10) + (n2 - 56320), i2++), a2 < 128 ? e2[r2++] = a2 : a2 < 2048 ? (e2[r2++] = 192 | a2 >>> 6, e2[r2++] = 128 | 63 & a2) : a2 < 65536 ? (e2[r2++] = 224 | a2 >>> 12, e2[r2++] = 128 | a2 >>> 6 & 63, e2[r2++] = 128 | 63 & a2) : (e2[r2++] = 240 | a2 >>> 18, e2[r2++] = 128 | a2 >>> 12 & 63, e2[r2++] = 128 | a2 >>> 6 & 63, e2[r2++] = 128 | 63 & a2);
+        return e2;
+      }, qt = function (t2, e2) {
+        var a2, n2, i2 = e2 || t2.length;
+        if ("function" == typeof TextDecoder && TextDecoder.prototype.decode) return new TextDecoder().decode(t2.subarray(0, e2));
+        var r2 = new Array(2 * i2);
+        for (n2 = 0, a2 = 0; a2 < i2;) {
+          var s2 = t2[a2++];
+          if (s2 < 128) r2[n2++] = s2;
+          else {
+            var o2 = Gt[s2];
+            if (o2 > 4) r2[n2++] = 65533, a2 += o2 - 1;
+            else {
+              for (s2 &= 2 === o2 ? 31 : 3 === o2 ? 15 : 7; o2 > 1 && a2 < i2;) s2 = s2 << 6 | 63 & t2[a2++], o2--;
+              o2 > 1 ? r2[n2++] = 65533 : s2 < 65536 ? r2[n2++] = s2 : (s2 -= 65536, r2[n2++] = 55296 | s2 >> 10 & 1023, r2[n2++] = 56320 | 1023 & s2);
+            }
+          }
+        }
+        return function (t3, e3) {
+          if (e3 < 65534 && t3.subarray && Yt) return String.fromCharCode.apply(null, t3.length === e3 ? t3 : t3.subarray(0, e3));
+          for (var a3 = "", n3 = 0; n3 < e3; n3++) a3 += String.fromCharCode(t3[n3]);
+          return a3;
+        }(r2, n2);
+      }, Jt = function (t2, e2) {
+        (e2 = e2 || t2.length) > t2.length && (e2 = t2.length);
+        for (var a2 = e2 - 1; a2 >= 0 && 128 == (192 & t2[a2]);) a2--;
+        return a2 < 0 || 0 === a2 ? e2 : a2 + Gt[t2[a2]] > e2 ? a2 : e2;
+      };
+      var Qt = function () {
+        this.input = null, this.next_in = 0, this.avail_in = 0, this.total_in = 0, this.output = null, this.next_out = 0, this.avail_out = 0, this.total_out = 0, this.msg = "", this.state = null, this.data_type = 2, this.adler = 0;
+      }, Vt = Object.prototype.toString, $t = K.Z_NO_FLUSH, te = K.Z_SYNC_FLUSH, ee = K.Z_FULL_FLUSH, ae = K.Z_FINISH, ne = K.Z_OK, ie = K.Z_STREAM_END, re = K.Z_DEFAULT_COMPRESSION, se = K.Z_DEFAULT_STRATEGY, oe = K.Z_DEFLATED;
+      function le(t2) {
+        this.options = Kt({ level: re, method: oe, chunkSize: 16384, windowBits: 15, memLevel: 8, strategy: se }, t2 || {});
+        var e2 = this.options;
+        e2.raw && e2.windowBits > 0 ? e2.windowBits = -e2.windowBits : e2.gzip && e2.windowBits > 0 && e2.windowBits < 16 && (e2.windowBits += 16), this.err = 0, this.msg = "", this.ended = false, this.chunks = [], this.strm = new Qt(), this.strm.avail_out = 0;
+        var a2 = Mt.deflateInit2(this.strm, e2.level, e2.method, e2.windowBits, e2.memLevel, e2.strategy);
+        if (a2 !== ne) throw new Error(j[a2]);
+        if (e2.header && Mt.deflateSetHeader(this.strm, e2.header), e2.dictionary) {
+          var n2;
+          if (n2 = "string" == typeof e2.dictionary ? Wt(e2.dictionary) : "[object ArrayBuffer]" === Vt.call(e2.dictionary) ? new Uint8Array(e2.dictionary) : e2.dictionary, (a2 = Mt.deflateSetDictionary(this.strm, n2)) !== ne) throw new Error(j[a2]);
+          this._dict_set = true;
+        }
+      }
+      function he(t2, e2) {
+        var a2 = new le(e2);
+        if (a2.push(t2, true), a2.err) throw a2.msg || j[a2.err];
+        return a2.result;
+      }
+      le.prototype.push = function (t2, e2) {
+        var a2, n2, i2 = this.strm, r2 = this.options.chunkSize;
+        if (this.ended) return false;
+        for (n2 = e2 === ~~e2 ? e2 : true === e2 ? ae : $t, "string" == typeof t2 ? i2.input = Wt(t2) : "[object ArrayBuffer]" === Vt.call(t2) ? i2.input = new Uint8Array(t2) : i2.input = t2, i2.next_in = 0, i2.avail_in = i2.input.length; ;) if (0 === i2.avail_out && (i2.output = new Uint8Array(r2), i2.next_out = 0, i2.avail_out = r2), (n2 === te || n2 === ee) && i2.avail_out <= 6) this.onData(i2.output.subarray(0, i2.next_out)), i2.avail_out = 0;
+        else {
+          if ((a2 = Mt.deflate(i2, n2)) === ie) return i2.next_out > 0 && this.onData(i2.output.subarray(0, i2.next_out)), a2 = Mt.deflateEnd(this.strm), this.onEnd(a2), this.ended = true, a2 === ne;
+          if (0 !== i2.avail_out) {
+            if (n2 > 0 && i2.next_out > 0) this.onData(i2.output.subarray(0, i2.next_out)), i2.avail_out = 0;
+            else if (0 === i2.avail_in) break;
+          } else this.onData(i2.output);
+        }
+        return true;
+      }, le.prototype.onData = function (t2) {
+        this.chunks.push(t2);
+      }, le.prototype.onEnd = function (t2) {
+        t2 === ne && (this.result = Pt(this.chunks)), this.chunks = [], this.err = t2, this.msg = this.strm.msg;
+      };
+      var de = {
+        Deflate: le, deflate: he, deflateRaw: function (t2, e2) {
+          return (e2 = e2 || {}).raw = true, he(t2, e2);
+        }, gzip: function (t2, e2) {
+          return (e2 = e2 || {}).gzip = true, he(t2, e2);
+        }, constants: K
+      }, _e = 16209, fe = function (t2, e2) {
+        var a2, n2, i2, r2, s2, o2, l2, h2, d2, _2, f2, u2, c2, w2, m2, b2, g2, p2, v2, k2, y2, x2, z2, A2, E2 = t2.state;
+        a2 = t2.next_in, z2 = t2.input, n2 = a2 + (t2.avail_in - 5), i2 = t2.next_out, A2 = t2.output, r2 = i2 - (e2 - t2.avail_out), s2 = i2 + (t2.avail_out - 257), o2 = E2.dmax, l2 = E2.wsize, h2 = E2.whave, d2 = E2.wnext, _2 = E2.window, f2 = E2.hold, u2 = E2.bits, c2 = E2.lencode, w2 = E2.distcode, m2 = (1 << E2.lenbits) - 1, b2 = (1 << E2.distbits) - 1;
+        t: do {
+          u2 < 15 && (f2 += z2[a2++] << u2, u2 += 8, f2 += z2[a2++] << u2, u2 += 8), g2 = c2[f2 & m2];
+          e: for (; ;) {
+            if (f2 >>>= p2 = g2 >>> 24, u2 -= p2, 0 === (p2 = g2 >>> 16 & 255)) A2[i2++] = 65535 & g2;
+            else {
+              if (!(16 & p2)) {
+                if (0 == (64 & p2)) {
+                  g2 = c2[(65535 & g2) + (f2 & (1 << p2) - 1)];
+                  continue e;
+                }
+                if (32 & p2) {
+                  E2.mode = 16191;
+                  break t;
+                }
+                t2.msg = "invalid literal/length code", E2.mode = _e;
+                break t;
+              }
+              v2 = 65535 & g2, (p2 &= 15) && (u2 < p2 && (f2 += z2[a2++] << u2, u2 += 8), v2 += f2 & (1 << p2) - 1, f2 >>>= p2, u2 -= p2), u2 < 15 && (f2 += z2[a2++] << u2, u2 += 8, f2 += z2[a2++] << u2, u2 += 8), g2 = w2[f2 & b2];
+              a: for (; ;) {
+                if (f2 >>>= p2 = g2 >>> 24, u2 -= p2, !(16 & (p2 = g2 >>> 16 & 255))) {
+                  if (0 == (64 & p2)) {
+                    g2 = w2[(65535 & g2) + (f2 & (1 << p2) - 1)];
+                    continue a;
+                  }
+                  t2.msg = "invalid distance code", E2.mode = _e;
+                  break t;
+                }
+                if (k2 = 65535 & g2, u2 < (p2 &= 15) && (f2 += z2[a2++] << u2, (u2 += 8) < p2 && (f2 += z2[a2++] << u2, u2 += 8)), (k2 += f2 & (1 << p2) - 1) > o2) {
+                  t2.msg = "invalid distance too far back", E2.mode = _e;
+                  break t;
+                }
+                if (f2 >>>= p2, u2 -= p2, k2 > (p2 = i2 - r2)) {
+                  if ((p2 = k2 - p2) > h2 && E2.sane) {
+                    t2.msg = "invalid distance too far back", E2.mode = _e;
+                    break t;
+                  }
+                  if (y2 = 0, x2 = _2, 0 === d2) {
+                    if (y2 += l2 - p2, p2 < v2) {
+                      v2 -= p2;
+                      do {
+                        A2[i2++] = _2[y2++];
+                      } while (--p2);
+                      y2 = i2 - k2, x2 = A2;
+                    }
+                  } else if (d2 < p2) {
+                    if (y2 += l2 + d2 - p2, (p2 -= d2) < v2) {
+                      v2 -= p2;
+                      do {
+                        A2[i2++] = _2[y2++];
+                      } while (--p2);
+                      if (y2 = 0, d2 < v2) {
+                        v2 -= p2 = d2;
+                        do {
+                          A2[i2++] = _2[y2++];
+                        } while (--p2);
+                        y2 = i2 - k2, x2 = A2;
+                      }
+                    }
+                  } else if (y2 += d2 - p2, p2 < v2) {
+                    v2 -= p2;
+                    do {
+                      A2[i2++] = _2[y2++];
+                    } while (--p2);
+                    y2 = i2 - k2, x2 = A2;
+                  }
+                  for (; v2 > 2;) A2[i2++] = x2[y2++], A2[i2++] = x2[y2++], A2[i2++] = x2[y2++], v2 -= 3;
+                  v2 && (A2[i2++] = x2[y2++], v2 > 1 && (A2[i2++] = x2[y2++]));
+                } else {
+                  y2 = i2 - k2;
+                  do {
+                    A2[i2++] = A2[y2++], A2[i2++] = A2[y2++], A2[i2++] = A2[y2++], v2 -= 3;
+                  } while (v2 > 2);
+                  v2 && (A2[i2++] = A2[y2++], v2 > 1 && (A2[i2++] = A2[y2++]));
+                }
+                break;
+              }
+            }
+            break;
+          }
+        } while (a2 < n2 && i2 < s2);
+        a2 -= v2 = u2 >> 3, f2 &= (1 << (u2 -= v2 << 3)) - 1, t2.next_in = a2, t2.next_out = i2, t2.avail_in = a2 < n2 ? n2 - a2 + 5 : 5 - (a2 - n2), t2.avail_out = i2 < s2 ? s2 - i2 + 257 : 257 - (i2 - s2), E2.hold = f2, E2.bits = u2;
+      }, ue = 15, ce = new Uint16Array([3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0]), we = new Uint8Array([16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18, 19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 72, 78]), me = new Uint16Array([1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, 0, 0]), be = new Uint8Array([16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 64, 64]), ge = function (t2, e2, a2, n2, i2, r2, s2, o2) {
+        var l2, h2, d2, _2, f2, u2, c2, w2, m2, b2 = o2.bits, g2 = 0, p2 = 0, v2 = 0, k2 = 0, y2 = 0, x2 = 0, z2 = 0, A2 = 0, E2 = 0, R2 = 0, Z2 = null, S2 = new Uint16Array(16), U2 = new Uint16Array(16), D2 = null;
+        for (g2 = 0; g2 <= ue; g2++) S2[g2] = 0;
+        for (p2 = 0; p2 < n2; p2++) S2[e2[a2 + p2]]++;
+        for (y2 = b2, k2 = ue; k2 >= 1 && 0 === S2[k2]; k2--);
+        if (y2 > k2 && (y2 = k2), 0 === k2) return i2[r2++] = 20971520, i2[r2++] = 20971520, o2.bits = 1, 0;
+        for (v2 = 1; v2 < k2 && 0 === S2[v2]; v2++);
+        for (y2 < v2 && (y2 = v2), A2 = 1, g2 = 1; g2 <= ue; g2++) if (A2 <<= 1, (A2 -= S2[g2]) < 0) return -1;
+        if (A2 > 0 && (0 === t2 || 1 !== k2)) return -1;
+        for (U2[1] = 0, g2 = 1; g2 < ue; g2++) U2[g2 + 1] = U2[g2] + S2[g2];
+        for (p2 = 0; p2 < n2; p2++) 0 !== e2[a2 + p2] && (s2[U2[e2[a2 + p2]]++] = p2);
+        if (0 === t2 ? (Z2 = D2 = s2, u2 = 20) : 1 === t2 ? (Z2 = ce, D2 = we, u2 = 257) : (Z2 = me, D2 = be, u2 = 0), R2 = 0, p2 = 0, g2 = v2, f2 = r2, x2 = y2, z2 = 0, d2 = -1, _2 = (E2 = 1 << y2) - 1, 1 === t2 && E2 > 852 || 2 === t2 && E2 > 592) return 1;
+        for (; ;) {
+          c2 = g2 - z2, s2[p2] + 1 < u2 ? (w2 = 0, m2 = s2[p2]) : s2[p2] >= u2 ? (w2 = D2[s2[p2] - u2], m2 = Z2[s2[p2] - u2]) : (w2 = 96, m2 = 0), l2 = 1 << g2 - z2, v2 = h2 = 1 << x2;
+          do {
+            i2[f2 + (R2 >> z2) + (h2 -= l2)] = c2 << 24 | w2 << 16 | m2 | 0;
+          } while (0 !== h2);
+          for (l2 = 1 << g2 - 1; R2 & l2;) l2 >>= 1;
+          if (0 !== l2 ? (R2 &= l2 - 1, R2 += l2) : R2 = 0, p2++, 0 == --S2[g2]) {
+            if (g2 === k2) break;
+            g2 = e2[a2 + s2[p2]];
+          }
+          if (g2 > y2 && (R2 & _2) !== d2) {
+            for (0 === z2 && (z2 = y2), f2 += v2, A2 = 1 << (x2 = g2 - z2); x2 + z2 < k2 && !((A2 -= S2[x2 + z2]) <= 0);) x2++, A2 <<= 1;
+            if (E2 += 1 << x2, 1 === t2 && E2 > 852 || 2 === t2 && E2 > 592) return 1;
+            i2[d2 = R2 & _2] = y2 << 24 | x2 << 16 | f2 - r2 | 0;
+          }
+        }
+        return 0 !== R2 && (i2[f2 + R2] = g2 - z2 << 24 | 64 << 16 | 0), o2.bits = y2, 0;
+      }, pe = K.Z_FINISH, ve = K.Z_BLOCK, ke = K.Z_TREES, ye = K.Z_OK, xe = K.Z_STREAM_END, ze = K.Z_NEED_DICT, Ae = K.Z_STREAM_ERROR, Ee = K.Z_DATA_ERROR, Re = K.Z_MEM_ERROR, Ze = K.Z_BUF_ERROR, Se = K.Z_DEFLATED, Ue = 16180, De = 16190, Te = 16191, Oe = 16192, Ie = 16194, Fe = 16199, Le = 16200, Ne = 16206, Be = 16209, Ce = function (t2) {
+        return (t2 >>> 24 & 255) + (t2 >>> 8 & 65280) + ((65280 & t2) << 8) + ((255 & t2) << 24);
+      };
+      function Me() {
+        this.strm = null, this.mode = 0, this.last = false, this.wrap = 0, this.havedict = false, this.flags = 0, this.dmax = 0, this.check = 0, this.total = 0, this.head = null, this.wbits = 0, this.wsize = 0, this.whave = 0, this.wnext = 0, this.window = null, this.hold = 0, this.bits = 0, this.length = 0, this.offset = 0, this.extra = 0, this.lencode = null, this.distcode = null, this.lenbits = 0, this.distbits = 0, this.ncode = 0, this.nlen = 0, this.ndist = 0, this.have = 0, this.next = null, this.lens = new Uint16Array(320), this.work = new Uint16Array(288), this.lendyn = null, this.distdyn = null, this.sane = 0, this.back = 0, this.was = 0;
+      }
+      var He, je, Ke = function (t2) {
+        if (!t2) return 1;
+        var e2 = t2.state;
+        return !e2 || e2.strm !== t2 || e2.mode < Ue || e2.mode > 16211 ? 1 : 0;
+      }, Pe = function (t2) {
+        if (Ke(t2)) return Ae;
+        var e2 = t2.state;
+        return t2.total_in = t2.total_out = e2.total = 0, t2.msg = "", e2.wrap && (t2.adler = 1 & e2.wrap), e2.mode = Ue, e2.last = 0, e2.havedict = 0, e2.flags = -1, e2.dmax = 32768, e2.head = null, e2.hold = 0, e2.bits = 0, e2.lencode = e2.lendyn = new Int32Array(852), e2.distcode = e2.distdyn = new Int32Array(592), e2.sane = 1, e2.back = -1, ye;
+      }, Ye = function (t2) {
+        if (Ke(t2)) return Ae;
+        var e2 = t2.state;
+        return e2.wsize = 0, e2.whave = 0, e2.wnext = 0, Pe(t2);
+      }, Ge = function (t2, e2) {
+        var a2;
+        if (Ke(t2)) return Ae;
+        var n2 = t2.state;
+        return e2 < 0 ? (a2 = 0, e2 = -e2) : (a2 = 5 + (e2 >> 4), e2 < 48 && (e2 &= 15)), e2 && (e2 < 8 || e2 > 15) ? Ae : (null !== n2.window && n2.wbits !== e2 && (n2.window = null), n2.wrap = a2, n2.wbits = e2, Ye(t2));
+      }, Xe = function (t2, e2) {
+        if (!t2) return Ae;
+        var a2 = new Me();
+        t2.state = a2, a2.strm = t2, a2.window = null, a2.mode = Ue;
+        var n2 = Ge(t2, e2);
+        return n2 !== ye && (t2.state = null), n2;
+      }, We = true, qe = function (t2) {
+        if (We) {
+          He = new Int32Array(512), je = new Int32Array(32);
+          for (var e2 = 0; e2 < 144;) t2.lens[e2++] = 8;
+          for (; e2 < 256;) t2.lens[e2++] = 9;
+          for (; e2 < 280;) t2.lens[e2++] = 7;
+          for (; e2 < 288;) t2.lens[e2++] = 8;
+          for (ge(1, t2.lens, 0, 288, He, 0, t2.work, { bits: 9 }), e2 = 0; e2 < 32;) t2.lens[e2++] = 5;
+          ge(2, t2.lens, 0, 32, je, 0, t2.work, { bits: 5 }), We = false;
+        }
+        t2.lencode = He, t2.lenbits = 9, t2.distcode = je, t2.distbits = 5;
+      }, Je = function (t2, e2, a2, n2) {
+        var i2, r2 = t2.state;
+        return null === r2.window && (r2.wsize = 1 << r2.wbits, r2.wnext = 0, r2.whave = 0, r2.window = new Uint8Array(r2.wsize)), n2 >= r2.wsize ? (r2.window.set(e2.subarray(a2 - r2.wsize, a2), 0), r2.wnext = 0, r2.whave = r2.wsize) : ((i2 = r2.wsize - r2.wnext) > n2 && (i2 = n2), r2.window.set(e2.subarray(a2 - n2, a2 - n2 + i2), r2.wnext), (n2 -= i2) ? (r2.window.set(e2.subarray(a2 - n2, a2), 0), r2.wnext = n2, r2.whave = r2.wsize) : (r2.wnext += i2, r2.wnext === r2.wsize && (r2.wnext = 0), r2.whave < r2.wsize && (r2.whave += i2))), 0;
+      }, Qe = {
+        inflateReset: Ye, inflateReset2: Ge, inflateResetKeep: Pe, inflateInit: function (t2) {
+          return Xe(t2, 15);
+        }, inflateInit2: Xe, inflate: function (t2, e2) {
+          var a2, n2, i2, r2, s2, o2, l2, h2, d2, _2, f2, u2, c2, w2, m2, b2, g2, p2, v2, k2, y2, x2, z2, A2, E2 = 0, R2 = new Uint8Array(4), Z2 = new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+          if (Ke(t2) || !t2.output || !t2.input && 0 !== t2.avail_in) return Ae;
+          (a2 = t2.state).mode === Te && (a2.mode = Oe), s2 = t2.next_out, i2 = t2.output, l2 = t2.avail_out, r2 = t2.next_in, n2 = t2.input, o2 = t2.avail_in, h2 = a2.hold, d2 = a2.bits, _2 = o2, f2 = l2, x2 = ye;
+          t: for (; ;) switch (a2.mode) {
+            case Ue:
+              if (0 === a2.wrap) {
+                a2.mode = Oe;
+                break;
+              }
+              for (; d2 < 16;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if (2 & a2.wrap && 35615 === h2) {
+                0 === a2.wbits && (a2.wbits = 15), a2.check = 0, R2[0] = 255 & h2, R2[1] = h2 >>> 8 & 255, a2.check = H(a2.check, R2, 2, 0), h2 = 0, d2 = 0, a2.mode = 16181;
+                break;
+              }
+              if (a2.head && (a2.head.done = false), !(1 & a2.wrap) || (((255 & h2) << 8) + (h2 >> 8)) % 31) {
+                t2.msg = "incorrect header check", a2.mode = Be;
+                break;
+              }
+              if ((15 & h2) !== Se) {
+                t2.msg = "unknown compression method", a2.mode = Be;
+                break;
+              }
+              if (d2 -= 4, y2 = 8 + (15 & (h2 >>>= 4)), 0 === a2.wbits && (a2.wbits = y2), y2 > 15 || y2 > a2.wbits) {
+                t2.msg = "invalid window size", a2.mode = Be;
+                break;
+              }
+              a2.dmax = 1 << a2.wbits, a2.flags = 0, t2.adler = a2.check = 1, a2.mode = 512 & h2 ? 16189 : Te, h2 = 0, d2 = 0;
+              break;
+            case 16181:
+              for (; d2 < 16;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if (a2.flags = h2, (255 & a2.flags) !== Se) {
+                t2.msg = "unknown compression method", a2.mode = Be;
+                break;
+              }
+              if (57344 & a2.flags) {
+                t2.msg = "unknown header flags set", a2.mode = Be;
+                break;
+              }
+              a2.head && (a2.head.text = h2 >> 8 & 1), 512 & a2.flags && 4 & a2.wrap && (R2[0] = 255 & h2, R2[1] = h2 >>> 8 & 255, a2.check = H(a2.check, R2, 2, 0)), h2 = 0, d2 = 0, a2.mode = 16182;
+            case 16182:
+              for (; d2 < 32;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              a2.head && (a2.head.time = h2), 512 & a2.flags && 4 & a2.wrap && (R2[0] = 255 & h2, R2[1] = h2 >>> 8 & 255, R2[2] = h2 >>> 16 & 255, R2[3] = h2 >>> 24 & 255, a2.check = H(a2.check, R2, 4, 0)), h2 = 0, d2 = 0, a2.mode = 16183;
+            case 16183:
+              for (; d2 < 16;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              a2.head && (a2.head.xflags = 255 & h2, a2.head.os = h2 >> 8), 512 & a2.flags && 4 & a2.wrap && (R2[0] = 255 & h2, R2[1] = h2 >>> 8 & 255, a2.check = H(a2.check, R2, 2, 0)), h2 = 0, d2 = 0, a2.mode = 16184;
+            case 16184:
+              if (1024 & a2.flags) {
+                for (; d2 < 16;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                a2.length = h2, a2.head && (a2.head.extra_len = h2), 512 & a2.flags && 4 & a2.wrap && (R2[0] = 255 & h2, R2[1] = h2 >>> 8 & 255, a2.check = H(a2.check, R2, 2, 0)), h2 = 0, d2 = 0;
+              } else a2.head && (a2.head.extra = null);
+              a2.mode = 16185;
+            case 16185:
+              if (1024 & a2.flags && ((u2 = a2.length) > o2 && (u2 = o2), u2 && (a2.head && (y2 = a2.head.extra_len - a2.length, a2.head.extra || (a2.head.extra = new Uint8Array(a2.head.extra_len)), a2.head.extra.set(n2.subarray(r2, r2 + u2), y2)), 512 & a2.flags && 4 & a2.wrap && (a2.check = H(a2.check, n2, u2, r2)), o2 -= u2, r2 += u2, a2.length -= u2), a2.length)) break t;
+              a2.length = 0, a2.mode = 16186;
+            case 16186:
+              if (2048 & a2.flags) {
+                if (0 === o2) break t;
+                u2 = 0;
+                do {
+                  y2 = n2[r2 + u2++], a2.head && y2 && a2.length < 65536 && (a2.head.name += String.fromCharCode(y2));
+                } while (y2 && u2 < o2);
+                if (512 & a2.flags && 4 & a2.wrap && (a2.check = H(a2.check, n2, u2, r2)), o2 -= u2, r2 += u2, y2) break t;
+              } else a2.head && (a2.head.name = null);
+              a2.length = 0, a2.mode = 16187;
+            case 16187:
+              if (4096 & a2.flags) {
+                if (0 === o2) break t;
+                u2 = 0;
+                do {
+                  y2 = n2[r2 + u2++], a2.head && y2 && a2.length < 65536 && (a2.head.comment += String.fromCharCode(y2));
+                } while (y2 && u2 < o2);
+                if (512 & a2.flags && 4 & a2.wrap && (a2.check = H(a2.check, n2, u2, r2)), o2 -= u2, r2 += u2, y2) break t;
+              } else a2.head && (a2.head.comment = null);
+              a2.mode = 16188;
+            case 16188:
+              if (512 & a2.flags) {
+                for (; d2 < 16;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                if (4 & a2.wrap && h2 !== (65535 & a2.check)) {
+                  t2.msg = "header crc mismatch", a2.mode = Be;
+                  break;
+                }
+                h2 = 0, d2 = 0;
+              }
+              a2.head && (a2.head.hcrc = a2.flags >> 9 & 1, a2.head.done = true), t2.adler = a2.check = 0, a2.mode = Te;
+              break;
+            case 16189:
+              for (; d2 < 32;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              t2.adler = a2.check = Ce(h2), h2 = 0, d2 = 0, a2.mode = De;
+            case De:
+              if (0 === a2.havedict) return t2.next_out = s2, t2.avail_out = l2, t2.next_in = r2, t2.avail_in = o2, a2.hold = h2, a2.bits = d2, ze;
+              t2.adler = a2.check = 1, a2.mode = Te;
+            case Te:
+              if (e2 === ve || e2 === ke) break t;
+            case Oe:
+              if (a2.last) {
+                h2 >>>= 7 & d2, d2 -= 7 & d2, a2.mode = Ne;
+                break;
+              }
+              for (; d2 < 3;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              switch (a2.last = 1 & h2, d2 -= 1, 3 & (h2 >>>= 1)) {
+                case 0:
+                  a2.mode = 16193;
+                  break;
+                case 1:
+                  if (qe(a2), a2.mode = Fe, e2 === ke) {
+                    h2 >>>= 2, d2 -= 2;
+                    break t;
+                  }
+                  break;
+                case 2:
+                  a2.mode = 16196;
+                  break;
+                case 3:
+                  t2.msg = "invalid block type", a2.mode = Be;
+              }
+              h2 >>>= 2, d2 -= 2;
+              break;
+            case 16193:
+              for (h2 >>>= 7 & d2, d2 -= 7 & d2; d2 < 32;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if ((65535 & h2) != (h2 >>> 16 ^ 65535)) {
+                t2.msg = "invalid stored block lengths", a2.mode = Be;
+                break;
+              }
+              if (a2.length = 65535 & h2, h2 = 0, d2 = 0, a2.mode = Ie, e2 === ke) break t;
+            case Ie:
+              a2.mode = 16195;
+            case 16195:
+              if (u2 = a2.length) {
+                if (u2 > o2 && (u2 = o2), u2 > l2 && (u2 = l2), 0 === u2) break t;
+                i2.set(n2.subarray(r2, r2 + u2), s2), o2 -= u2, r2 += u2, l2 -= u2, s2 += u2, a2.length -= u2;
+                break;
+              }
+              a2.mode = Te;
+              break;
+            case 16196:
+              for (; d2 < 14;) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if (a2.nlen = 257 + (31 & h2), h2 >>>= 5, d2 -= 5, a2.ndist = 1 + (31 & h2), h2 >>>= 5, d2 -= 5, a2.ncode = 4 + (15 & h2), h2 >>>= 4, d2 -= 4, a2.nlen > 286 || a2.ndist > 30) {
+                t2.msg = "too many length or distance symbols", a2.mode = Be;
+                break;
+              }
+              a2.have = 0, a2.mode = 16197;
+            case 16197:
+              for (; a2.have < a2.ncode;) {
+                for (; d2 < 3;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                a2.lens[Z2[a2.have++]] = 7 & h2, h2 >>>= 3, d2 -= 3;
+              }
+              for (; a2.have < 19;) a2.lens[Z2[a2.have++]] = 0;
+              if (a2.lencode = a2.lendyn, a2.lenbits = 7, z2 = { bits: a2.lenbits }, x2 = ge(0, a2.lens, 0, 19, a2.lencode, 0, a2.work, z2), a2.lenbits = z2.bits, x2) {
+                t2.msg = "invalid code lengths set", a2.mode = Be;
+                break;
+              }
+              a2.have = 0, a2.mode = 16198;
+            case 16198:
+              for (; a2.have < a2.nlen + a2.ndist;) {
+                for (; b2 = (E2 = a2.lencode[h2 & (1 << a2.lenbits) - 1]) >>> 16 & 255, g2 = 65535 & E2, !((m2 = E2 >>> 24) <= d2);) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                if (g2 < 16) h2 >>>= m2, d2 -= m2, a2.lens[a2.have++] = g2;
+                else {
+                  if (16 === g2) {
+                    for (A2 = m2 + 2; d2 < A2;) {
+                      if (0 === o2) break t;
+                      o2--, h2 += n2[r2++] << d2, d2 += 8;
+                    }
+                    if (h2 >>>= m2, d2 -= m2, 0 === a2.have) {
+                      t2.msg = "invalid bit length repeat", a2.mode = Be;
+                      break;
+                    }
+                    y2 = a2.lens[a2.have - 1], u2 = 3 + (3 & h2), h2 >>>= 2, d2 -= 2;
+                  } else if (17 === g2) {
+                    for (A2 = m2 + 3; d2 < A2;) {
+                      if (0 === o2) break t;
+                      o2--, h2 += n2[r2++] << d2, d2 += 8;
+                    }
+                    d2 -= m2, y2 = 0, u2 = 3 + (7 & (h2 >>>= m2)), h2 >>>= 3, d2 -= 3;
+                  } else {
+                    for (A2 = m2 + 7; d2 < A2;) {
+                      if (0 === o2) break t;
+                      o2--, h2 += n2[r2++] << d2, d2 += 8;
+                    }
+                    d2 -= m2, y2 = 0, u2 = 11 + (127 & (h2 >>>= m2)), h2 >>>= 7, d2 -= 7;
+                  }
+                  if (a2.have + u2 > a2.nlen + a2.ndist) {
+                    t2.msg = "invalid bit length repeat", a2.mode = Be;
+                    break;
+                  }
+                  for (; u2--;) a2.lens[a2.have++] = y2;
+                }
+              }
+              if (a2.mode === Be) break;
+              if (0 === a2.lens[256]) {
+                t2.msg = "invalid code -- missing end-of-block", a2.mode = Be;
+                break;
+              }
+              if (a2.lenbits = 9, z2 = { bits: a2.lenbits }, x2 = ge(1, a2.lens, 0, a2.nlen, a2.lencode, 0, a2.work, z2), a2.lenbits = z2.bits, x2) {
+                t2.msg = "invalid literal/lengths set", a2.mode = Be;
+                break;
+              }
+              if (a2.distbits = 6, a2.distcode = a2.distdyn, z2 = { bits: a2.distbits }, x2 = ge(2, a2.lens, a2.nlen, a2.ndist, a2.distcode, 0, a2.work, z2), a2.distbits = z2.bits, x2) {
+                t2.msg = "invalid distances set", a2.mode = Be;
+                break;
+              }
+              if (a2.mode = Fe, e2 === ke) break t;
+            case Fe:
+              a2.mode = Le;
+            case Le:
+              if (o2 >= 6 && l2 >= 258) {
+                t2.next_out = s2, t2.avail_out = l2, t2.next_in = r2, t2.avail_in = o2, a2.hold = h2, a2.bits = d2, fe(t2, f2), s2 = t2.next_out, i2 = t2.output, l2 = t2.avail_out, r2 = t2.next_in, n2 = t2.input, o2 = t2.avail_in, h2 = a2.hold, d2 = a2.bits, a2.mode === Te && (a2.back = -1);
+                break;
+              }
+              for (a2.back = 0; b2 = (E2 = a2.lencode[h2 & (1 << a2.lenbits) - 1]) >>> 16 & 255, g2 = 65535 & E2, !((m2 = E2 >>> 24) <= d2);) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if (b2 && 0 == (240 & b2)) {
+                for (p2 = m2, v2 = b2, k2 = g2; b2 = (E2 = a2.lencode[k2 + ((h2 & (1 << p2 + v2) - 1) >> p2)]) >>> 16 & 255, g2 = 65535 & E2, !(p2 + (m2 = E2 >>> 24) <= d2);) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                h2 >>>= p2, d2 -= p2, a2.back += p2;
+              }
+              if (h2 >>>= m2, d2 -= m2, a2.back += m2, a2.length = g2, 0 === b2) {
+                a2.mode = 16205;
+                break;
+              }
+              if (32 & b2) {
+                a2.back = -1, a2.mode = Te;
+                break;
+              }
+              if (64 & b2) {
+                t2.msg = "invalid literal/length code", a2.mode = Be;
+                break;
+              }
+              a2.extra = 15 & b2, a2.mode = 16201;
+            case 16201:
+              if (a2.extra) {
+                for (A2 = a2.extra; d2 < A2;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                a2.length += h2 & (1 << a2.extra) - 1, h2 >>>= a2.extra, d2 -= a2.extra, a2.back += a2.extra;
+              }
+              a2.was = a2.length, a2.mode = 16202;
+            case 16202:
+              for (; b2 = (E2 = a2.distcode[h2 & (1 << a2.distbits) - 1]) >>> 16 & 255, g2 = 65535 & E2, !((m2 = E2 >>> 24) <= d2);) {
+                if (0 === o2) break t;
+                o2--, h2 += n2[r2++] << d2, d2 += 8;
+              }
+              if (0 == (240 & b2)) {
+                for (p2 = m2, v2 = b2, k2 = g2; b2 = (E2 = a2.distcode[k2 + ((h2 & (1 << p2 + v2) - 1) >> p2)]) >>> 16 & 255, g2 = 65535 & E2, !(p2 + (m2 = E2 >>> 24) <= d2);) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                h2 >>>= p2, d2 -= p2, a2.back += p2;
+              }
+              if (h2 >>>= m2, d2 -= m2, a2.back += m2, 64 & b2) {
+                t2.msg = "invalid distance code", a2.mode = Be;
+                break;
+              }
+              a2.offset = g2, a2.extra = 15 & b2, a2.mode = 16203;
+            case 16203:
+              if (a2.extra) {
+                for (A2 = a2.extra; d2 < A2;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                a2.offset += h2 & (1 << a2.extra) - 1, h2 >>>= a2.extra, d2 -= a2.extra, a2.back += a2.extra;
+              }
+              if (a2.offset > a2.dmax) {
+                t2.msg = "invalid distance too far back", a2.mode = Be;
+                break;
+              }
+              a2.mode = 16204;
+            case 16204:
+              if (0 === l2) break t;
+              if (u2 = f2 - l2, a2.offset > u2) {
+                if ((u2 = a2.offset - u2) > a2.whave && a2.sane) {
+                  t2.msg = "invalid distance too far back", a2.mode = Be;
+                  break;
+                }
+                u2 > a2.wnext ? (u2 -= a2.wnext, c2 = a2.wsize - u2) : c2 = a2.wnext - u2, u2 > a2.length && (u2 = a2.length), w2 = a2.window;
+              } else w2 = i2, c2 = s2 - a2.offset, u2 = a2.length;
+              u2 > l2 && (u2 = l2), l2 -= u2, a2.length -= u2;
+              do {
+                i2[s2++] = w2[c2++];
+              } while (--u2);
+              0 === a2.length && (a2.mode = Le);
+              break;
+            case 16205:
+              if (0 === l2) break t;
+              i2[s2++] = a2.length, l2--, a2.mode = Le;
+              break;
+            case Ne:
+              if (a2.wrap) {
+                for (; d2 < 32;) {
+                  if (0 === o2) break t;
+                  o2--, h2 |= n2[r2++] << d2, d2 += 8;
+                }
+                if (f2 -= l2, t2.total_out += f2, a2.total += f2, 4 & a2.wrap && f2 && (t2.adler = a2.check = a2.flags ? H(a2.check, i2, f2, s2 - f2) : C(a2.check, i2, f2, s2 - f2)), f2 = l2, 4 & a2.wrap && (a2.flags ? h2 : Ce(h2)) !== a2.check) {
+                  t2.msg = "incorrect data check", a2.mode = Be;
+                  break;
+                }
+                h2 = 0, d2 = 0;
+              }
+              a2.mode = 16207;
+            case 16207:
+              if (a2.wrap && a2.flags) {
+                for (; d2 < 32;) {
+                  if (0 === o2) break t;
+                  o2--, h2 += n2[r2++] << d2, d2 += 8;
+                }
+                if (4 & a2.wrap && h2 !== (4294967295 & a2.total)) {
+                  t2.msg = "incorrect length check", a2.mode = Be;
+                  break;
+                }
+                h2 = 0, d2 = 0;
+              }
+              a2.mode = 16208;
+            case 16208:
+              x2 = xe;
+              break t;
+            case Be:
+              x2 = Ee;
+              break t;
+            case 16210:
+              return Re;
+            default:
+              return Ae;
+          }
+          return t2.next_out = s2, t2.avail_out = l2, t2.next_in = r2, t2.avail_in = o2, a2.hold = h2, a2.bits = d2, (a2.wsize || f2 !== t2.avail_out && a2.mode < Be && (a2.mode < Ne || e2 !== pe)) && Je(t2, t2.output, t2.next_out, f2 - t2.avail_out), _2 -= t2.avail_in, f2 -= t2.avail_out, t2.total_in += _2, t2.total_out += f2, a2.total += f2, 4 & a2.wrap && f2 && (t2.adler = a2.check = a2.flags ? H(a2.check, i2, f2, t2.next_out - f2) : C(a2.check, i2, f2, t2.next_out - f2)), t2.data_type = a2.bits + (a2.last ? 64 : 0) + (a2.mode === Te ? 128 : 0) + (a2.mode === Fe || a2.mode === Ie ? 256 : 0), (0 === _2 && 0 === f2 || e2 === pe) && x2 === ye && (x2 = Ze), x2;
+        }, inflateEnd: function (t2) {
+          if (Ke(t2)) return Ae;
+          var e2 = t2.state;
+          return e2.window && (e2.window = null), t2.state = null, ye;
+        }, inflateGetHeader: function (t2, e2) {
+          if (Ke(t2)) return Ae;
+          var a2 = t2.state;
+          return 0 == (2 & a2.wrap) ? Ae : (a2.head = e2, e2.done = false, ye);
+        }, inflateSetDictionary: function (t2, e2) {
+          var a2, n2 = e2.length;
+          return Ke(t2) || 0 !== (a2 = t2.state).wrap && a2.mode !== De ? Ae : a2.mode === De && C(1, e2, n2, 0) !== a2.check ? Ee : Je(t2, e2, n2, n2) ? (a2.mode = 16210, Re) : (a2.havedict = 1, ye);
+        }, inflateInfo: "pako inflate (from Nodeca project)"
+      };
+      var Ve = function () {
+        this.text = 0, this.time = 0, this.xflags = 0, this.os = 0, this.extra = null, this.extra_len = 0, this.name = "", this.comment = "", this.hcrc = 0, this.done = false;
+      }, $e = Object.prototype.toString, ta = K.Z_NO_FLUSH, ea = K.Z_FINISH, aa = K.Z_OK, na = K.Z_STREAM_END, ia = K.Z_NEED_DICT, ra = K.Z_STREAM_ERROR, sa = K.Z_DATA_ERROR, oa = K.Z_MEM_ERROR;
+      function la(t2) {
+        this.options = Kt({ chunkSize: 65536, windowBits: 15, to: "" }, t2 || {});
+        var e2 = this.options;
+        e2.raw && e2.windowBits >= 0 && e2.windowBits < 16 && (e2.windowBits = -e2.windowBits, 0 === e2.windowBits && (e2.windowBits = -15)), !(e2.windowBits >= 0 && e2.windowBits < 16) || t2 && t2.windowBits || (e2.windowBits += 32), e2.windowBits > 15 && e2.windowBits < 48 && 0 == (15 & e2.windowBits) && (e2.windowBits |= 15), this.err = 0, this.msg = "", this.ended = false, this.chunks = [], this.strm = new Qt(), this.strm.avail_out = 0;
+        var a2 = Qe.inflateInit2(this.strm, e2.windowBits);
+        if (a2 !== aa) throw new Error(j[a2]);
+        if (this.header = new Ve(), Qe.inflateGetHeader(this.strm, this.header), e2.dictionary && ("string" == typeof e2.dictionary ? e2.dictionary = Wt(e2.dictionary) : "[object ArrayBuffer]" === $e.call(e2.dictionary) && (e2.dictionary = new Uint8Array(e2.dictionary)), e2.raw && (a2 = Qe.inflateSetDictionary(this.strm, e2.dictionary)) !== aa)) throw new Error(j[a2]);
+      }
+      function ha(t2, e2) {
+        var a2 = new la(e2);
+        if (a2.push(t2), a2.err) throw a2.msg || j[a2.err];
+        return a2.result;
+      }
+      la.prototype.push = function (t2, e2) {
+        var a2, n2, i2, r2 = this.strm, s2 = this.options.chunkSize, o2 = this.options.dictionary;
+        if (this.ended) return false;
+        for (n2 = e2 === ~~e2 ? e2 : true === e2 ? ea : ta, "[object ArrayBuffer]" === $e.call(t2) ? r2.input = new Uint8Array(t2) : r2.input = t2, r2.next_in = 0, r2.avail_in = r2.input.length; ;) {
+          for (0 === r2.avail_out && (r2.output = new Uint8Array(s2), r2.next_out = 0, r2.avail_out = s2), (a2 = Qe.inflate(r2, n2)) === ia && o2 && ((a2 = Qe.inflateSetDictionary(r2, o2)) === aa ? a2 = Qe.inflate(r2, n2) : a2 === sa && (a2 = ia)); r2.avail_in > 0 && a2 === na && r2.state.wrap > 0 && 0 !== t2[r2.next_in];) Qe.inflateReset(r2), a2 = Qe.inflate(r2, n2);
+          switch (a2) {
+            case ra:
+            case sa:
+            case ia:
+            case oa:
+              return this.onEnd(a2), this.ended = true, false;
+          }
+          if (i2 = r2.avail_out, r2.next_out && (0 === r2.avail_out || a2 === na)) if ("string" === this.options.to) {
+            var l2 = Jt(r2.output, r2.next_out), h2 = r2.next_out - l2, d2 = qt(r2.output, l2);
+            r2.next_out = h2, r2.avail_out = s2 - h2, h2 && r2.output.set(r2.output.subarray(l2, l2 + h2), 0), this.onData(d2);
+          } else this.onData(r2.output.length === r2.next_out ? r2.output : r2.output.subarray(0, r2.next_out));
+          if (a2 !== aa || 0 !== i2) {
+            if (a2 === na) return a2 = Qe.inflateEnd(this.strm), this.onEnd(a2), this.ended = true, true;
+            if (0 === r2.avail_in) break;
+          }
+        }
+        return true;
+      }, la.prototype.onData = function (t2) {
+        this.chunks.push(t2);
+      }, la.prototype.onEnd = function (t2) {
+        t2 === aa && ("string" === this.options.to ? this.result = this.chunks.join("") : this.result = Pt(this.chunks)), this.chunks = [], this.err = t2, this.msg = this.strm.msg;
+      };
+      var da = {
+        Inflate: la, inflate: ha, inflateRaw: function (t2, e2) {
+          return (e2 = e2 || {}).raw = true, ha(t2, e2);
+        }, ungzip: ha, constants: K
+      }, _a = de.Deflate, fa = de.deflate, ua = de.deflateRaw, ca = de.gzip, wa = da.Inflate, ma = da.inflate, ba = da.inflateRaw, ga = da.ungzip, pa = K, va = { Deflate: _a, deflate: fa, deflateRaw: ua, gzip: ca, Inflate: wa, inflate: ma, inflateRaw: ba, ungzip: ga, constants: pa };
+      t.Deflate = _a, t.Inflate = wa, t.constants = pa, t.default = va, t.deflate = fa, t.deflateRaw = ua, t.gzip = ca, t.inflate = ma, t.inflateRaw = ba, t.ungzip = ga, Object.defineProperty(t, "__esModule", { value: true });
+    });
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/flate.js
+var require_flate = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/flate.js"(exports) {
+    "use strict";
+    var USE_TYPEDARRAY = typeof Uint8Array !== "undefined" && typeof Uint16Array !== "undefined" && typeof Uint32Array !== "undefined";
+    var pako = require_pako_es5_min();
+    exports.uncompressInputType = USE_TYPEDARRAY ? "uint8array" : "array";
+    exports.compressInputType = USE_TYPEDARRAY ? "uint8array" : "array";
+    exports.magic = "\b\0";
+    exports.compress = function (input, compressionOptions) {
+      return pako.deflateRaw(input, {
+        level: compressionOptions.level || -1
+        // default compression
+      });
+    };
+    exports.uncompress = function (input) {
+      return pako.inflateRaw(input);
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/compressions.js
+var require_compressions = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/compressions.js"(exports) {
+    "use strict";
+    exports.STORE = {
+      magic: "\0\0",
+      compress: function compress(content) {
+        return content;
+      },
+      uncompress: function uncompress(content) {
+        return content;
+      },
+      compressInputType: null,
+      uncompressInputType: null
+    };
+    exports.DEFLATE = require_flate();
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/nodeBuffer.js
+var require_nodeBuffer = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/nodeBuffer.js"(exports, module) {
+    "use strict";
+    module.exports = function (data, encoding) {
+      if (typeof data === "number") {
+        return Buffer.alloc(data);
+      }
+      return Buffer.from(data, encoding);
+    };
+    module.exports.test = function (b) {
+      return Buffer.isBuffer(b);
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/utils.js
+var require_utils = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/utils.js"(exports) {
+    "use strict";
+    function _typeof(o) {
+      "@babel/helpers - typeof";
+      return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o2) {
+        return typeof o2;
+      } : function (o2) {
+        return o2 && "function" == typeof Symbol && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
+      }, _typeof(o);
+    }
+    var support = require_support();
+    var compressions = require_compressions();
+    var nodeBuffer = require_nodeBuffer();
+    exports.string2binary = function (str) {
+      var result = "";
+      for (var i = 0; i < str.length; i++) {
+        result += String.fromCharCode(str.charCodeAt(i) & 255);
+      }
+      return result;
+    };
+    exports.arrayBuffer2Blob = function (buffer, mimeType) {
+      exports.checkSupport("blob");
+      mimeType = mimeType || "application/zip";
+      try {
+        return new Blob([buffer], {
+          type: mimeType
+        });
+      } catch (_unused) {
+        try {
+          var Builder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+          var builder = new Builder();
+          builder.append(buffer);
+          return builder.getBlob(mimeType);
+        } catch (_unused2) {
+          throw new Error("Bug : can't construct the Blob.");
+        }
+      }
+    };
+    function identity(input) {
+      return input;
+    }
+    function stringToArrayLike(str, array) {
+      for (var i = 0; i < str.length; ++i) {
+        array[i] = str.charCodeAt(i) & 255;
+      }
+      return array;
+    }
+    function arrayLikeToString(array) {
+      var chunk = 65536;
+      var result = [], len = array.length, type = exports.getTypeOf(array);
+      var k = 0, canUseApply = true;
+      try {
+        switch (type) {
+          case "uint8array":
+            String.fromCharCode.apply(null, new Uint8Array(0));
+            break;
+          case "nodebuffer":
+            String.fromCharCode.apply(null, nodeBuffer(0));
+            break;
+        }
+      } catch (_unused3) {
+        canUseApply = false;
+      }
+      if (!canUseApply) {
+        var resultStr = "";
+        for (var i = 0; i < array.length; i++) {
+          resultStr += String.fromCharCode(array[i]);
+        }
+        return resultStr;
+      }
+      while (k < len && chunk > 1) {
+        try {
+          if (type === "array" || type === "nodebuffer") {
+            result.push(String.fromCharCode.apply(null, array.slice(k, Math.min(k + chunk, len))));
+          } else {
+            result.push(String.fromCharCode.apply(null, array.subarray(k, Math.min(k + chunk, len))));
+          }
+          k += chunk;
+        } catch (_unused4) {
+          chunk = Math.floor(chunk / 2);
+        }
+      }
+      return result.join("");
+    }
+    exports.applyFromCharCode = arrayLikeToString;
+    function arrayLikeToArrayLike(arrayFrom, arrayTo) {
+      for (var i = 0; i < arrayFrom.length; i++) {
+        arrayTo[i] = arrayFrom[i];
+      }
+      return arrayTo;
+    }
+    var transform = {};
+    transform.string = {
+      string: identity,
+      array: function array(input) {
+        return stringToArrayLike(input, new Array(input.length));
+      },
+      arraybuffer: function arraybuffer(input) {
+        return transform.string.uint8array(input).buffer;
+      },
+      uint8array: function uint8array(input) {
+        return stringToArrayLike(input, new Uint8Array(input.length));
+      },
+      nodebuffer: function nodebuffer(input) {
+        return stringToArrayLike(input, nodeBuffer(input.length));
+      }
+    };
+    transform.array = {
+      string: arrayLikeToString,
+      array: identity,
+      arraybuffer: function arraybuffer(input) {
+        return new Uint8Array(input).buffer;
+      },
+      uint8array: function uint8array(input) {
+        return new Uint8Array(input);
+      },
+      nodebuffer: function nodebuffer(input) {
+        return nodeBuffer(input);
+      }
+    };
+    transform.arraybuffer = {
+      string: function string(input) {
+        return arrayLikeToString(new Uint8Array(input));
+      },
+      array: function array(input) {
+        return arrayLikeToArrayLike(new Uint8Array(input), new Array(input.byteLength));
+      },
+      arraybuffer: identity,
+      uint8array: function uint8array(input) {
+        return new Uint8Array(input);
+      },
+      nodebuffer: function nodebuffer(input) {
+        return nodeBuffer(new Uint8Array(input));
+      }
+    };
+    transform.uint8array = {
+      string: arrayLikeToString,
+      array: function array(input) {
+        return arrayLikeToArrayLike(input, new Array(input.length));
+      },
+      arraybuffer: function arraybuffer(input) {
+        return input.buffer;
+      },
+      uint8array: identity,
+      nodebuffer: function nodebuffer(input) {
+        return nodeBuffer(input);
+      }
+    };
+    transform.nodebuffer = {
+      string: arrayLikeToString,
+      array: function array(input) {
+        return arrayLikeToArrayLike(input, new Array(input.length));
+      },
+      arraybuffer: function arraybuffer(input) {
+        return transform.nodebuffer.uint8array(input).buffer;
+      },
+      uint8array: function uint8array(input) {
+        return arrayLikeToArrayLike(input, new Uint8Array(input.length));
+      },
+      nodebuffer: identity
+    };
+    exports.transformTo = function (outputType, input) {
+      if (!input) {
+        input = "";
+      }
+      if (!outputType) {
+        return input;
+      }
+      exports.checkSupport(outputType);
+      var inputType = exports.getTypeOf(input);
+      var result = transform[inputType][outputType](input);
+      return result;
+    };
+    exports.getTypeOf = function (input) {
+      if (input == null) {
+        return;
+      }
+      if (typeof input === "string") {
+        return "string";
+      }
+      var protoResult = Object.prototype.toString.call(input);
+      if (protoResult === "[object Array]") {
+        return "array";
+      }
+      if (support.nodebuffer && nodeBuffer.test(input)) {
+        return "nodebuffer";
+      }
+      if (support.uint8array && protoResult === "[object Uint8Array]") {
+        return "uint8array";
+      }
+      if (support.arraybuffer && protoResult === "[object ArrayBuffer]") {
+        return "arraybuffer";
+      }
+      if (protoResult === "[object Promise]") {
+        throw new Error("Cannot read data from a promise, you probably are running new PizZip(data) with a promise");
+      }
+      if (_typeof(input) === "object" && typeof input.file === "function") {
+        throw new Error("Cannot read data from a pizzip instance, you probably are running new PizZip(zip) with a zipinstance");
+      }
+      if (protoResult === "[object Date]") {
+        throw new Error("Cannot read data from a Date, you probably are running new PizZip(data) with a date");
+      }
+      if (_typeof(input) === "object" && input.crc32 == null) {
+        throw new Error("Unsupported data given to new PizZip(data) (object given)");
+      }
+    };
+    exports.checkSupport = function (type) {
+      var supported = support[type.toLowerCase()];
+      if (!supported) {
+        throw new Error(type + " is not supported by this browser");
+      }
+    };
+    exports.MAX_VALUE_16BITS = 65535;
+    exports.MAX_VALUE_32BITS = -1;
+    exports.pretty = function (str) {
+      var res = "", code, i;
+      for (i = 0; i < (str || "").length; i++) {
+        code = str.charCodeAt(i);
+        res += "\\x" + (code < 16 ? "0" : "") + code.toString(16).toUpperCase();
+      }
+      return res;
+    };
+    exports.findCompression = function (compressionMethod) {
+      for (var method in compressions) {
+        if (!compressions.hasOwnProperty(method)) {
+          continue;
+        }
+        if (compressions[method].magic === compressionMethod) {
+          return compressions[method];
+        }
+      }
+      return null;
+    };
+    exports.isRegExp = function (object) {
+      return Object.prototype.toString.call(object) === "[object RegExp]";
+    };
+    exports.extend = function () {
+      var result = {};
+      var i, attr;
+      for (i = 0; i < arguments.length; i++) {
+        for (attr in arguments[i]) {
+          if (arguments[i].hasOwnProperty(attr) && typeof result[attr] === "undefined") {
+            result[attr] = arguments[i][attr];
+          }
+        }
+      }
+      return result;
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/crc32.js
+var require_crc32 = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/crc32.js"(exports, module) {
+    "use strict";
+    var utils = require_utils();
+    var table = [0, 1996959894, 3993919788, 2567524794, 124634137, 1886057615, 3915621685, 2657392035, 249268274, 2044508324, 3772115230, 2547177864, 162941995, 2125561021, 3887607047, 2428444049, 498536548, 1789927666, 4089016648, 2227061214, 450548861, 1843258603, 4107580753, 2211677639, 325883990, 1684777152, 4251122042, 2321926636, 335633487, 1661365465, 4195302755, 2366115317, 997073096, 1281953886, 3579855332, 2724688242, 1006888145, 1258607687, 3524101629, 2768942443, 901097722, 1119000684, 3686517206, 2898065728, 853044451, 1172266101, 3705015759, 2882616665, 651767980, 1373503546, 3369554304, 3218104598, 565507253, 1454621731, 3485111705, 3099436303, 671266974, 1594198024, 3322730930, 2970347812, 795835527, 1483230225, 3244367275, 3060149565, 1994146192, 31158534, 2563907772, 4023717930, 1907459465, 112637215, 2680153253, 3904427059, 2013776290, 251722036, 2517215374, 3775830040, 2137656763, 141376813, 2439277719, 3865271297, 1802195444, 476864866, 2238001368, 4066508878, 1812370925, 453092731, 2181625025, 4111451223, 1706088902, 314042704, 2344532202, 4240017532, 1658658271, 366619977, 2362670323, 4224994405, 1303535960, 984961486, 2747007092, 3569037538, 1256170817, 1037604311, 2765210733, 3554079995, 1131014506, 879679996, 2909243462, 3663771856, 1141124467, 855842277, 2852801631, 3708648649, 1342533948, 654459306, 3188396048, 3373015174, 1466479909, 544179635, 3110523913, 3462522015, 1591671054, 702138776, 2966460450, 3352799412, 1504918807, 783551873, 3082640443, 3233442989, 3988292384, 2596254646, 62317068, 1957810842, 3939845945, 2647816111, 81470997, 1943803523, 3814918930, 2489596804, 225274430, 2053790376, 3826175755, 2466906013, 167816743, 2097651377, 4027552580, 2265490386, 503444072, 1762050814, 4150417245, 2154129355, 426522225, 1852507879, 4275313526, 2312317920, 282753626, 1742555852, 4189708143, 2394877945, 397917763, 1622183637, 3604390888, 2714866558, 953729732, 1340076626, 3518719985, 2797360999, 1068828381, 1219638859, 3624741850, 2936675148, 906185462, 1090812512, 3747672003, 2825379669, 829329135, 1181335161, 3412177804, 3160834842, 628085408, 1382605366, 3423369109, 3138078467, 570562233, 1426400815, 3317316542, 2998733608, 733239954, 1555261956, 3268935591, 3050360625, 752459403, 1541320221, 2607071920, 3965973030, 1969922972, 40735498, 2617837225, 3943577151, 1913087877, 83908371, 2512341634, 3803740692, 2075208622, 213261112, 2463272603, 3855990285, 2094854071, 198958881, 2262029012, 4057260610, 1759359992, 534414190, 2176718541, 4139329115, 1873836001, 414664567, 2282248934, 4279200368, 1711684554, 285281116, 2405801727, 4167216745, 1634467795, 376229701, 2685067896, 3608007406, 1308918612, 956543938, 2808555105, 3495958263, 1231636301, 1047427035, 2932959818, 3654703836, 1088359270, 936918e3, 2847714899, 3736837829, 1202900863, 817233897, 3183342108, 3401237130, 1404277552, 615818150, 3134207493, 3453421203, 1423857449, 601450431, 3009837614, 3294710456, 1567103746, 711928724, 3020668471, 3272380065, 1510334235, 755167117];
+    module.exports = function crc32(input, crc) {
+      if (typeof input === "undefined" || !input.length) {
+        return 0;
+      }
+      var isArray = utils.getTypeOf(input) !== "string";
+      if (typeof crc == "undefined") {
+        crc = 0;
+      }
+      var x = 0;
+      var y = 0;
+      var b = 0;
+      crc ^= -1;
+      for (var i = 0, iTop = input.length; i < iTop; i++) {
+        b = isArray ? input[i] : input.charCodeAt(i);
+        y = (crc ^ b) & 255;
+        x = table[y];
+        crc = crc >>> 8 ^ x;
+      }
+      return crc ^ -1;
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/signature.js
+var require_signature = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/signature.js"(exports) {
+    "use strict";
+    exports.LOCAL_FILE_HEADER = "PK";
+    exports.CENTRAL_FILE_HEADER = "PK";
+    exports.CENTRAL_DIRECTORY_END = "PK";
+    exports.ZIP64_CENTRAL_DIRECTORY_LOCATOR = "PK\x07";
+    exports.ZIP64_CENTRAL_DIRECTORY_END = "PK";
+    exports.DATA_DESCRIPTOR = "PK\x07\b";
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/defaults.js
+var require_defaults = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/defaults.js"(exports) {
+    "use strict";
+    exports.base64 = false;
+    exports.binary = false;
+    exports.dir = false;
+    exports.createFolders = false;
+    exports.date = null;
+    exports.compression = null;
+    exports.compressionOptions = null;
+    exports.comment = null;
+    exports.unixPermissions = null;
+    exports.dosPermissions = null;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/compressedObject.js
+var require_compressedObject = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/compressedObject.js"(exports, module) {
+    "use strict";
+    function CompressedObject() {
+      this.compressedSize = 0;
+      this.uncompressedSize = 0;
+      this.crc32 = 0;
+      this.compressionMethod = null;
+      this.compressedContent = null;
+    }
+    CompressedObject.prototype = {
+      /**
+       * Return the decompressed content in an unspecified format.
+       * The format will depend on the decompressor.
+       * @return {Object} the decompressed content.
+       */
+      getContent: function getContent() {
+        return null;
+      },
+      /**
+       * Return the compressed content in an unspecified format.
+       * The format will depend on the compressed conten source.
+       * @return {Object} the compressed content.
+       */
+      getCompressedContent: function getCompressedContent() {
+        return null;
+      }
+    };
+    module.exports = CompressedObject;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/utf8.js
+var require_utf8 = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/utf8.js"(exports) {
+    "use strict";
+    var utils = require_utils();
+    var support = require_support();
+    var nodeBuffer = require_nodeBuffer();
+    var _utf8len = new Array(256);
+    for (i = 0; i < 256; i++) {
+      _utf8len[i] = i >= 252 ? 6 : i >= 248 ? 5 : i >= 240 ? 4 : i >= 224 ? 3 : i >= 192 ? 2 : 1;
+    }
+    var i;
+    _utf8len[254] = _utf8len[254] = 1;
+    function string2buf(str) {
+      var buf, c, c2, mPos, i2, bufLen = 0;
+      var strLen = str.length;
+      for (mPos = 0; mPos < strLen; mPos++) {
+        c = str.charCodeAt(mPos);
+        if ((c & 64512) === 55296 && mPos + 1 < strLen) {
+          c2 = str.charCodeAt(mPos + 1);
+          if ((c2 & 64512) === 56320) {
+            c = 65536 + (c - 55296 << 10) + (c2 - 56320);
+            mPos++;
+          }
+        }
+        bufLen += c < 128 ? 1 : c < 2048 ? 2 : c < 65536 ? 3 : 4;
+      }
+      if (support.uint8array) {
+        buf = new Uint8Array(bufLen);
+      } else {
+        buf = new Array(bufLen);
+      }
+      for (i2 = 0, mPos = 0; i2 < bufLen; mPos++) {
+        c = str.charCodeAt(mPos);
+        if ((c & 64512) === 55296 && mPos + 1 < strLen) {
+          c2 = str.charCodeAt(mPos + 1);
+          if ((c2 & 64512) === 56320) {
+            c = 65536 + (c - 55296 << 10) + (c2 - 56320);
+            mPos++;
+          }
+        }
+        if (c < 128) {
+          buf[i2++] = c;
+        } else if (c < 2048) {
+          buf[i2++] = 192 | c >>> 6;
+          buf[i2++] = 128 | c & 63;
+        } else if (c < 65536) {
+          buf[i2++] = 224 | c >>> 12;
+          buf[i2++] = 128 | c >>> 6 & 63;
+          buf[i2++] = 128 | c & 63;
+        } else {
+          buf[i2++] = 240 | c >>> 18;
+          buf[i2++] = 128 | c >>> 12 & 63;
+          buf[i2++] = 128 | c >>> 6 & 63;
+          buf[i2++] = 128 | c & 63;
+        }
+      }
+      return buf;
+    }
+    function utf8border(buf, max) {
+      var pos;
+      max = max || buf.length;
+      if (max > buf.length) {
+        max = buf.length;
+      }
+      pos = max - 1;
+      while (pos >= 0 && (buf[pos] & 192) === 128) {
+        pos--;
+      }
+      if (pos < 0) {
+        return max;
+      }
+      if (pos === 0) {
+        return max;
+      }
+      return pos + _utf8len[buf[pos]] > max ? pos : max;
+    }
+    function buf2string(buf) {
+      var i2, out, c, cLen;
+      var len = buf.length;
+      var utf16buf = new Array(len * 2);
+      for (out = 0, i2 = 0; i2 < len;) {
+        c = buf[i2++];
+        if (c < 128) {
+          utf16buf[out++] = c;
+          continue;
+        }
+        cLen = _utf8len[c];
+        if (cLen > 4) {
+          utf16buf[out++] = 65533;
+          i2 += cLen - 1;
+          continue;
+        }
+        c &= cLen === 2 ? 31 : cLen === 3 ? 15 : 7;
+        while (cLen > 1 && i2 < len) {
+          c = c << 6 | buf[i2++] & 63;
+          cLen--;
+        }
+        if (cLen > 1) {
+          utf16buf[out++] = 65533;
+          continue;
+        }
+        if (c < 65536) {
+          utf16buf[out++] = c;
+        } else {
+          c -= 65536;
+          utf16buf[out++] = 55296 | c >> 10 & 1023;
+          utf16buf[out++] = 56320 | c & 1023;
+        }
+      }
+      if (utf16buf.length !== out) {
+        if (utf16buf.subarray) {
+          utf16buf = utf16buf.subarray(0, out);
+        } else {
+          utf16buf.length = out;
+        }
+      }
+      return utils.applyFromCharCode(utf16buf);
+    }
+    exports.utf8encode = function utf8encode(str) {
+      if (support.nodebuffer) {
+        return nodeBuffer(str, "utf-8");
+      }
+      return string2buf(str);
+    };
+    exports.utf8decode = function utf8decode(buf) {
+      if (support.nodebuffer) {
+        return utils.transformTo("nodebuffer", buf).toString("utf-8");
+      }
+      buf = utils.transformTo(support.uint8array ? "uint8array" : "array", buf);
+      var result = [], len = buf.length, chunk = 65536;
+      var k = 0;
+      while (k < len) {
+        var nextBoundary = utf8border(buf, Math.min(k + chunk, len));
+        if (support.uint8array) {
+          result.push(buf2string(buf.subarray(k, nextBoundary)));
+        } else {
+          result.push(buf2string(buf.slice(k, nextBoundary)));
+        }
+        k = nextBoundary;
+      }
+      return result.join("");
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/stringWriter.js
+var require_stringWriter = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/stringWriter.js"(exports, module) {
+    "use strict";
+    var utils = require_utils();
+    function StringWriter() {
+      this.data = [];
+    }
+    StringWriter.prototype = {
+      /**
+       * Append any content to the current string.
+       * @param {Object} input the content to add.
+       */
+      append: function append(input) {
+        input = utils.transformTo("string", input);
+        this.data.push(input);
+      },
+      /**
+       * Finalize the construction an return the result.
+       * @return {string} the generated string.
+       */
+      finalize: function finalize() {
+        return this.data.join("");
+      }
+    };
+    module.exports = StringWriter;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/uint8ArrayWriter.js
+var require_uint8ArrayWriter = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/uint8ArrayWriter.js"(exports, module) {
+    "use strict";
+    var utils = require_utils();
+    function Uint8ArrayWriter(length) {
+      this.data = new Uint8Array(length);
+      this.index = 0;
+    }
+    Uint8ArrayWriter.prototype = {
+      /**
+       * Append any content to the current array.
+       * @param {Object} input the content to add.
+       */
+      append: function append(input) {
+        if (input.length !== 0) {
+          input = utils.transformTo("uint8array", input);
+          this.data.set(input, this.index);
+          this.index += input.length;
+        }
+      },
+      /**
+       * Finalize the construction an return the result.
+       * @return {Uint8Array} the generated array.
+       */
+      finalize: function finalize() {
+        return this.data;
+      }
+    };
+    module.exports = Uint8ArrayWriter;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/object.js
+var require_object = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/object.js"(exports, module) {
+    "use strict";
+    function _createForOfIteratorHelper(r, e) {
+      var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+      if (!t) {
+        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
+          t && (r = t);
+          var _n = 0, F = function F2() {
+          };
+          return {
+            s: F, n: function n() {
+              return _n >= r.length ? { done: true } : { done: false, value: r[_n++] };
+            }, e: function e2(r2) {
+              throw r2;
+            }, f: F
+          };
+        }
+        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+      }
+      var o, a = true, u = false;
+      return {
+        s: function s() {
+          t = t.call(r);
+        }, n: function n() {
+          var r2 = t.next();
+          return a = r2.done, r2;
+        }, e: function e2(r2) {
+          u = true, o = r2;
+        }, f: function f() {
+          try {
+            a || null == t["return"] || t["return"]();
+          } finally {
+            if (u) throw o;
+          }
+        }
+      };
+    }
+    function _unsupportedIterableToArray(r, a) {
+      if (r) {
+        if ("string" == typeof r) return _arrayLikeToArray(r, a);
+        var t = {}.toString.call(r).slice(8, -1);
+        return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+      }
+    }
+    function _arrayLikeToArray(r, a) {
+      (null == a || a > r.length) && (a = r.length);
+      for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+      return n;
+    }
+    var support = require_support();
+    var utils = require_utils();
+    var _crc = require_crc32();
+    var signature = require_signature();
+    var defaults = require_defaults();
+    var base64 = require_base64();
+    var compressions = require_compressions();
+    var CompressedObject = require_compressedObject();
+    var nodeBuffer = require_nodeBuffer();
+    var utf8 = require_utf8();
+    var StringWriter = require_stringWriter();
+    var Uint8ArrayWriter = require_uint8ArrayWriter();
+    function getRawData(file) {
+      if (file._data instanceof CompressedObject) {
+        file._data = file._data.getContent();
+        file.options.binary = true;
+        file.options.base64 = false;
+        if (utils.getTypeOf(file._data) === "uint8array") {
+          var copy = file._data;
+          file._data = new Uint8Array(copy.length);
+          if (copy.length !== 0) {
+            file._data.set(copy, 0);
+          }
+        }
+      }
+      return file._data;
+    }
+    function getBinaryData(file) {
+      var result = getRawData(file), type = utils.getTypeOf(result);
+      if (type === "string") {
+        if (!file.options.binary) {
+          if (support.nodebuffer) {
+            return nodeBuffer(result, "utf-8");
+          }
+        }
+        return file.asBinary();
+      }
+      return result;
+    }
+    var out = {
+      /**
+       * Read an existing zip and merge the data in the current PizZip object.
+       * The implementation is in pizzip-load.js, don't forget to include it.
+       * @param {String|ArrayBuffer|Uint8Array|Buffer} stream  The stream to load
+       * @param {Object} options Options for loading the stream.
+       *  options.base64 : is the stream in base64 ? default : false
+       * @return {PizZip} the current PizZip object
+       */
+      load: function load() {
+        throw new Error("Load method is not defined. Is the file pizzip-load.js included ?");
+      },
+      /**
+       * Filter nested files/folders with the specified function.
+       * @param {Function} search the predicate to use :
+       * function (relativePath, file) {...}
+       * It takes 2 arguments : the relative path and the file.
+       * @return {Array} An array of matching elements.
+       */
+      filter: function filter(search) {
+        var result = [];
+        var filename, relativePath, file, fileClone;
+        for (filename in this.files) {
+          if (!this.files.hasOwnProperty(filename)) {
+            continue;
+          }
+          file = this.files[filename];
+          fileClone = new ZipObject(file.name, file._data, utils.extend(file.options));
+          relativePath = filename.slice(this.root.length, filename.length);
+          if (filename.slice(0, this.root.length) === this.root && // the file is in the current root
+            search(relativePath, fileClone)) {
+            result.push(fileClone);
+          }
+        }
+        return result;
+      },
+      /**
+       * Add a file to the zip file, or search a file.
+       * @param   {string|RegExp} name The name of the file to add (if data is defined),
+       * the name of the file to find (if no data) or a regex to match files.
+       * @param   {String|ArrayBuffer|Uint8Array|Buffer} data  The file data, either raw or base64 encoded
+       * @param   {Object} o     File options
+       * @return  {PizZip|Object|Array} this PizZip object (when adding a file),
+       * a file (when searching by string) or an array of files (when searching by regex).
+       */
+      file: function file(name, data, o) {
+        if (arguments.length === 1) {
+          if (utils.isRegExp(name)) {
+            var regexp = name;
+            return this.filter(function (relativePath, file2) {
+              return !file2.dir && regexp.test(relativePath);
+            });
+          }
+          return this.filter(function (relativePath, file2) {
+            return !file2.dir && relativePath === name;
+          })[0] || null;
+        }
+        name = this.root + name;
+        fileAdd.call(this, name, data, o);
+        return this;
+      },
+      /**
+       * Add a directory to the zip file, or search.
+       * @param   {String|RegExp} arg The name of the directory to add, or a regex to search folders.
+       * @return  {PizZip} an object with the new directory as the root, or an array containing matching folders.
+       */
+      folder: function folder(arg) {
+        if (!arg) {
+          return this;
+        }
+        if (utils.isRegExp(arg)) {
+          return this.filter(function (relativePath, file) {
+            return file.dir && arg.test(relativePath);
+          });
+        }
+        var name = this.root + arg;
+        var newFolder = folderAdd.call(this, name);
+        var ret = this.shallowClone();
+        ret.root = newFolder.name;
+        return ret;
+      },
+      /**
+       * Delete a file, or a directory and all sub-files, from the zip
+       * @param {string} name the name of the file to delete
+       * @return {PizZip} this PizZip object
+       */
+      remove: function remove(name) {
+        name = this.root + name;
+        var file = this.files[name];
+        if (!file) {
+          if (name.slice(-1) !== "/") {
+            name += "/";
+          }
+          file = this.files[name];
+        }
+        if (file && !file.dir) {
+          delete this.files[name];
+        } else {
+          var kids = this.filter(function (relativePath, file2) {
+            return file2.name.slice(0, name.length) === name;
+          });
+          for (var i = 0; i < kids.length; i++) {
+            delete this.files[kids[i].name];
+          }
+        }
+        return this;
+      },
+      /**
+       * Generate the complete zip file
+       * @param {Object} options the options to generate the zip file :
+       * - base64, (deprecated, use type instead) true to generate base64.
+       * - compression, "STORE" by default.
+       * - type, "base64" by default. Values are : string, base64, uint8array, arraybuffer, blob.
+       * @return {String|Uint8Array|ArrayBuffer|Buffer|Blob} the zip file
+       */
+      generate: function generate(options) {
+        options = utils.extend(options || {}, {
+          base64: true,
+          compression: "STORE",
+          compressionOptions: null,
+          type: "base64",
+          platform: "DOS",
+          comment: null,
+          mimeType: "application/zip",
+          encodeFileName: utf8.utf8encode
+        });
+        utils.checkSupport(options.type);
+        if (options.platform === "darwin" || options.platform === "freebsd" || options.platform === "linux" || options.platform === "sunos") {
+          options.platform = "UNIX";
+        }
+        if (options.platform === "win32") {
+          options.platform = "DOS";
+        }
+        var zipData = [], encodedComment = utils.transformTo("string", options.encodeFileName(options.comment || this.comment || ""));
+        var localDirLength = 0, centralDirLength = 0, writer, i;
+        var fileNames = [];
+        if (options.fileOrder instanceof Array) {
+          fileNames = options.fileOrder;
+        }
+        for (var name in this.files) {
+          if (fileNames.indexOf(name) === -1) {
+            fileNames.push(name);
+          }
+        }
+        if (typeof options.fileOrder === "function") {
+          fileNames = options.fileOrder(this.files);
+        }
+        var _iterator = _createForOfIteratorHelper(fileNames), _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var _name = _step.value;
+            if (!this.files.hasOwnProperty(_name)) {
+              continue;
+            }
+            var file = this.files[_name];
+            var compressionName = file.options.compression || options.compression.toUpperCase();
+            var compression = compressions[compressionName];
+            if (!compression) {
+              throw new Error(compressionName + " is not a valid compression method !");
+            }
+            var compressionOptions = file.options.compressionOptions || options.compressionOptions || {};
+            var compressedObject = generateCompressedObjectFrom.call(this, file, compression, compressionOptions);
+            var zipPart = generateZipParts.call(this, _name, file, compressedObject, localDirLength, options.platform, options.encodeFileName);
+            localDirLength += zipPart.fileRecord.length + compressedObject.compressedSize;
+            centralDirLength += zipPart.dirRecord.length;
+            zipData.push(zipPart);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+        var dirEnd = "";
+        dirEnd = signature.CENTRAL_DIRECTORY_END + // number of this disk
+          "\0\0\0\0" + // total number of entries in the central directory on this disk
+          decToHex(zipData.length, 2) + // total number of entries in the central directory
+          decToHex(zipData.length, 2) + // size of the central directory   4 bytes
+          decToHex(centralDirLength, 4) + // offset of start of central directory with respect to the starting disk number
+          decToHex(localDirLength, 4) + // .ZIP file comment length
+          decToHex(encodedComment.length, 2) + // .ZIP file comment
+          encodedComment;
+        var typeName = options.type.toLowerCase();
+        if (typeName === "uint8array" || typeName === "arraybuffer" || typeName === "blob" || typeName === "nodebuffer") {
+          writer = new Uint8ArrayWriter(localDirLength + centralDirLength + dirEnd.length);
+        } else {
+          writer = new StringWriter(localDirLength + centralDirLength + dirEnd.length);
+        }
+        for (i = 0; i < zipData.length; i++) {
+          writer.append(zipData[i].fileRecord);
+          writer.append(zipData[i].compressedObject.compressedContent);
+        }
+        for (i = 0; i < zipData.length; i++) {
+          writer.append(zipData[i].dirRecord);
+        }
+        writer.append(dirEnd);
+        var zip = writer.finalize();
+        switch (options.type.toLowerCase()) {
+          // case "zip is an Uint8Array"
+          case "uint8array":
+          case "arraybuffer":
+          case "nodebuffer":
+            return utils.transformTo(options.type.toLowerCase(), zip);
+          case "blob":
+            return utils.arrayBuffer2Blob(utils.transformTo("arraybuffer", zip), options.mimeType);
+          // case "zip is a string"
+          case "base64":
+            return options.base64 ? base64.encode(zip) : zip;
+          default:
+            return zip;
+        }
+      },
+      /**
+       * @deprecated
+       * This method will be removed in a future version without replacement.
+       */
+      crc32: function crc32(input, crc) {
+        return _crc(input, crc);
+      },
+      /**
+       * @deprecated
+       * This method will be removed in a future version without replacement.
+       */
+      utf8encode: function utf8encode(string) {
+        return utils.transformTo("string", utf8.utf8encode(string));
+      },
+      /**
+       * @deprecated
+       * This method will be removed in a future version without replacement.
+       */
+      utf8decode: function utf8decode(input) {
+        return utf8.utf8decode(input);
+      }
+    };
+    function dataToString(asUTF8) {
+      var result = getRawData(this);
+      if (result === null || typeof result === "undefined") {
+        return "";
+      }
+      if (this.options.base64) {
+        result = base64.decode(result);
+      }
+      if (asUTF8 && this.options.binary) {
+        result = out.utf8decode(result);
+      } else {
+        result = utils.transformTo("string", result);
+      }
+      if (!asUTF8 && !this.options.binary) {
+        result = utils.transformTo("string", out.utf8encode(result));
+      }
+      return result;
+    }
+    function ZipObject(name, data, options) {
+      this.name = name;
+      this.dir = options.dir;
+      this.date = options.date;
+      this.comment = options.comment;
+      this.unixPermissions = options.unixPermissions;
+      this.dosPermissions = options.dosPermissions;
+      this._data = data;
+      this.options = options;
+      this._initialMetadata = {
+        dir: options.dir,
+        date: options.date
+      };
+    }
+    ZipObject.prototype = {
+      /**
+       * Return the content as UTF8 string.
+       * @return {string} the UTF8 string.
+       */
+      asText: function asText() {
+        return dataToString.call(this, true);
+      },
+      /**
+       * Returns the binary content.
+       * @return {string} the content as binary.
+       */
+      asBinary: function asBinary() {
+        return dataToString.call(this, false);
+      },
+      /**
+       * Returns the content as a nodejs Buffer.
+       * @return {Buffer} the content as a Buffer.
+       */
+      asNodeBuffer: function asNodeBuffer() {
+        var result = getBinaryData(this);
+        return utils.transformTo("nodebuffer", result);
+      },
+      /**
+       * Returns the content as an Uint8Array.
+       * @return {Uint8Array} the content as an Uint8Array.
+       */
+      asUint8Array: function asUint8Array() {
+        var result = getBinaryData(this);
+        return utils.transformTo("uint8array", result);
+      },
+      /**
+       * Returns the content as an ArrayBuffer.
+       * @return {ArrayBuffer} the content as an ArrayBufer.
+       */
+      asArrayBuffer: function asArrayBuffer() {
+        return this.asUint8Array().buffer;
+      }
+    };
+    function decToHex(dec, bytes) {
+      var hex = "", i;
+      for (i = 0; i < bytes; i++) {
+        hex += String.fromCharCode(dec & 255);
+        dec >>>= 8;
+      }
+      return hex;
+    }
+    function prepareFileAttrs(o) {
+      o = o || {};
+      if (o.base64 === true && (o.binary === null || o.binary === void 0)) {
+        o.binary = true;
+      }
+      o = utils.extend(o, defaults);
+      o.date = o.date || /* @__PURE__ */ new Date();
+      if (o.compression !== null) {
+        o.compression = o.compression.toUpperCase();
+      }
+      return o;
+    }
+    function fileAdd(name, data, o) {
+      var dataType = utils.getTypeOf(data), parent;
+      o = prepareFileAttrs(o);
+      if (typeof o.unixPermissions === "string") {
+        o.unixPermissions = parseInt(o.unixPermissions, 8);
+      }
+      if (o.unixPermissions && o.unixPermissions & 16384) {
+        o.dir = true;
+      }
+      if (o.dosPermissions && o.dosPermissions & 16) {
+        o.dir = true;
+      }
+      if (o.dir) {
+        name = forceTrailingSlash(name);
+      }
+      if (o.createFolders && (parent = parentFolder(name))) {
+        folderAdd.call(this, parent, true);
+      }
+      if (o.dir || data === null || typeof data === "undefined") {
+        o.base64 = false;
+        o.binary = false;
+        data = null;
+        dataType = null;
+      } else if (dataType === "string") {
+        if (o.binary && !o.base64) {
+          if (o.optimizedBinaryString !== true) {
+            data = utils.string2binary(data);
+          }
+        }
+      } else {
+        o.base64 = false;
+        o.binary = true;
+        if (!dataType && !(data instanceof CompressedObject)) {
+          throw new Error("The data of '" + name + "' is in an unsupported format !");
+        }
+        if (dataType === "arraybuffer") {
+          data = utils.transformTo("uint8array", data);
+        }
+      }
+      var object = new ZipObject(name, data, o);
+      this.files[name] = object;
+      return object;
+    }
+    function parentFolder(path) {
+      if (path.slice(-1) === "/") {
+        path = path.substring(0, path.length - 1);
+      }
+      var lastSlash = path.lastIndexOf("/");
+      return lastSlash > 0 ? path.substring(0, lastSlash) : "";
+    }
+    function forceTrailingSlash(path) {
+      if (path.slice(-1) !== "/") {
+        path += "/";
+      }
+      return path;
+    }
+    function folderAdd(name, createFolders) {
+      createFolders = typeof createFolders !== "undefined" ? createFolders : false;
+      name = forceTrailingSlash(name);
+      if (!this.files[name]) {
+        fileAdd.call(this, name, null, {
+          dir: true,
+          createFolders
+        });
+      }
+      return this.files[name];
+    }
+    function generateCompressedObjectFrom(file, compression, compressionOptions) {
+      var result = new CompressedObject();
+      var content;
+      if (file._data instanceof CompressedObject) {
+        result.uncompressedSize = file._data.uncompressedSize;
+        result.crc32 = file._data.crc32;
+        if (result.uncompressedSize === 0 || file.dir) {
+          compression = compressions.STORE;
+          result.compressedContent = "";
+          result.crc32 = 0;
+        } else if (file._data.compressionMethod === compression.magic) {
+          result.compressedContent = file._data.getCompressedContent();
+        } else {
+          content = file._data.getContent();
+          result.compressedContent = compression.compress(utils.transformTo(compression.compressInputType, content), compressionOptions);
+        }
+      } else {
+        content = getBinaryData(file);
+        if (!content || content.length === 0 || file.dir) {
+          compression = compressions.STORE;
+          content = "";
+        }
+        result.uncompressedSize = content.length;
+        result.crc32 = _crc(content);
+        result.compressedContent = compression.compress(utils.transformTo(compression.compressInputType, content), compressionOptions);
+      }
+      result.compressedSize = result.compressedContent.length;
+      result.compressionMethod = compression.magic;
+      return result;
+    }
+    function generateUnixExternalFileAttr(unixPermissions, isDir) {
+      var result = unixPermissions;
+      if (!unixPermissions) {
+        result = isDir ? 16893 : 33204;
+      }
+      return (result & 65535) << 16;
+    }
+    function generateDosExternalFileAttr(dosPermissions) {
+      return (dosPermissions || 0) & 63;
+    }
+    function generateZipParts(name, file, compressedObject, offset, platform, encodeFileName) {
+      var useCustomEncoding = encodeFileName !== utf8.utf8encode, encodedFileName = utils.transformTo("string", encodeFileName(file.name)), utfEncodedFileName = utils.transformTo("string", utf8.utf8encode(file.name)), comment = file.comment || "", encodedComment = utils.transformTo("string", encodeFileName(comment)), utfEncodedComment = utils.transformTo("string", utf8.utf8encode(comment)), useUTF8ForFileName = utfEncodedFileName.length !== file.name.length, useUTF8ForComment = utfEncodedComment.length !== comment.length, o = file.options;
+      var dosTime, dosDate, extraFields = "", unicodePathExtraField = "", unicodeCommentExtraField = "", dir, date;
+      if (file._initialMetadata.dir !== file.dir) {
+        dir = file.dir;
+      } else {
+        dir = o.dir;
+      }
+      if (file._initialMetadata.date !== file.date) {
+        date = file.date;
+      } else {
+        date = o.date;
+      }
+      var extFileAttr = 0;
+      var versionMadeBy = 0;
+      if (dir) {
+        extFileAttr |= 16;
+      }
+      if (platform === "UNIX") {
+        versionMadeBy = 798;
+        extFileAttr |= generateUnixExternalFileAttr(file.unixPermissions, dir);
+      } else {
+        versionMadeBy = 20;
+        extFileAttr |= generateDosExternalFileAttr(file.dosPermissions, dir);
+      }
+      dosTime = date.getHours();
+      dosTime <<= 6;
+      dosTime |= date.getMinutes();
+      dosTime <<= 5;
+      dosTime |= date.getSeconds() / 2;
+      dosDate = date.getFullYear() - 1980;
+      dosDate <<= 4;
+      dosDate |= date.getMonth() + 1;
+      dosDate <<= 5;
+      dosDate |= date.getDate();
+      if (useUTF8ForFileName) {
+        unicodePathExtraField = // Version
+          decToHex(1, 1) + // NameCRC32
+          decToHex(_crc(encodedFileName), 4) + // UnicodeName
+          utfEncodedFileName;
+        extraFields += // Info-ZIP Unicode Path Extra Field
+          "up" + // size
+          decToHex(unicodePathExtraField.length, 2) + // content
+          unicodePathExtraField;
+      }
+      if (useUTF8ForComment) {
+        unicodeCommentExtraField = // Version
+          decToHex(1, 1) + // CommentCRC32
+          decToHex(this.crc32(encodedComment), 4) + // UnicodeName
+          utfEncodedComment;
+        extraFields += // Info-ZIP Unicode Path Extra Field
+          "uc" + // size
+          decToHex(unicodeCommentExtraField.length, 2) + // content
+          unicodeCommentExtraField;
+      }
+      var header = "";
+      header += "\n\0";
+      header += !useCustomEncoding && (useUTF8ForFileName || useUTF8ForComment) ? "\0\b" : "\0\0";
+      header += compressedObject.compressionMethod;
+      header += decToHex(dosTime, 2);
+      header += decToHex(dosDate, 2);
+      header += decToHex(compressedObject.crc32, 4);
+      header += decToHex(compressedObject.compressedSize, 4);
+      header += decToHex(compressedObject.uncompressedSize, 4);
+      header += decToHex(encodedFileName.length, 2);
+      header += decToHex(extraFields.length, 2);
+      var fileRecord = signature.LOCAL_FILE_HEADER + header + encodedFileName + extraFields;
+      var dirRecord = signature.CENTRAL_FILE_HEADER + // version made by (00: DOS)
+        decToHex(versionMadeBy, 2) + // file header (common to file and central directory)
+        header + // file comment length
+        decToHex(encodedComment.length, 2) + // disk number start
+        "\0\0\0\0" + // external file attributes
+        decToHex(extFileAttr, 4) + // relative offset of local header
+        decToHex(offset, 4) + // file name
+        encodedFileName + // extra field
+        extraFields + // file comment
+        encodedComment;
+      return {
+        fileRecord,
+        dirRecord,
+        compressedObject
+      };
+    }
+    module.exports = out;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/dataReader.js
+var require_dataReader = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/dataReader.js"(exports, module) {
+    "use strict";
+    var utils = require_utils();
+    function DataReader() {
+      this.data = null;
+      this.length = 0;
+      this.index = 0;
+      this.zero = 0;
+    }
+    DataReader.prototype = {
+      /**
+       * Check that the offset will not go too far.
+       * @param {string} offset the additional offset to check.
+       * @throws {Error} an Error if the offset is out of bounds.
+       */
+      checkOffset: function checkOffset(offset) {
+        this.checkIndex(this.index + offset);
+      },
+      /**
+       * Check that the specifed index will not be too far.
+       * @param {string} newIndex the index to check.
+       * @throws {Error} an Error if the index is out of bounds.
+       */
+      checkIndex: function checkIndex(newIndex) {
+        if (this.length < this.zero + newIndex || newIndex < 0) {
+          throw new Error("End of data reached (data length = " + this.length + ", asked index = " + newIndex + "). Corrupted zip ?");
+        }
+      },
+      /**
+       * Change the index.
+       * @param {number} newIndex The new index.
+       * @throws {Error} if the new index is out of the data.
+       */
+      setIndex: function setIndex(newIndex) {
+        this.checkIndex(newIndex);
+        this.index = newIndex;
+      },
+      /**
+       * Skip the next n bytes.
+       * @param {number} n the number of bytes to skip.
+       * @throws {Error} if the new index is out of the data.
+       */
+      skip: function skip(n) {
+        this.setIndex(this.index + n);
+      },
+      /**
+       * Get the byte at the specified index.
+       * @param {number} i the index to use.
+       * @return {number} a byte.
+       */
+      byteAt: function byteAt() {
+      },
+      /**
+       * Get the next number with a given byte size.
+       * @param {number} size the number of bytes to read.
+       * @return {number} the corresponding number.
+       */
+      readInt: function readInt(size) {
+        var result = 0, i;
+        this.checkOffset(size);
+        for (i = this.index + size - 1; i >= this.index; i--) {
+          result = (result << 8) + this.byteAt(i);
+        }
+        this.index += size;
+        return result;
+      },
+      /**
+       * Get the next string with a given byte size.
+       * @param {number} size the number of bytes to read.
+       * @return {string} the corresponding string.
+       */
+      readString: function readString(size) {
+        return utils.transformTo("string", this.readData(size));
+      },
+      /**
+       * Get raw data without conversion, <size> bytes.
+       * @param {number} size the number of bytes to read.
+       * @return {Object} the raw data, implementation specific.
+       */
+      readData: function readData() {
+      },
+      /**
+       * Find the last occurence of a zip signature (4 bytes).
+       * @param {string} sig the signature to find.
+       * @return {number} the index of the last occurence, -1 if not found.
+       */
+      lastIndexOfSignature: function lastIndexOfSignature() {
+      },
+      /**
+       * Get the next date.
+       * @return {Date} the date.
+       */
+      readDate: function readDate() {
+        var dostime = this.readInt(4);
+        return new Date(
+          (dostime >> 25 & 127) + 1980,
+          // year
+          (dostime >> 21 & 15) - 1,
+          // month
+          dostime >> 16 & 31,
+          // day
+          dostime >> 11 & 31,
+          // hour
+          dostime >> 5 & 63,
+          // minute
+          (dostime & 31) << 1
+        );
+      }
+    };
+    module.exports = DataReader;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/stringReader.js
+var require_stringReader = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/stringReader.js"(exports, module) {
+    "use strict";
+    var DataReader = require_dataReader();
+    var utils = require_utils();
+    function StringReader(data, optimizedBinaryString) {
+      this.data = data;
+      if (!optimizedBinaryString) {
+        this.data = utils.string2binary(this.data);
+      }
+      this.length = this.data.length;
+      this.index = 0;
+      this.zero = 0;
+    }
+    StringReader.prototype = new DataReader();
+    StringReader.prototype.byteAt = function (i) {
+      return this.data.charCodeAt(this.zero + i);
+    };
+    StringReader.prototype.lastIndexOfSignature = function (sig) {
+      return this.data.lastIndexOf(sig) - this.zero;
+    };
+    StringReader.prototype.readData = function (size) {
+      this.checkOffset(size);
+      var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
+      this.index += size;
+      return result;
+    };
+    module.exports = StringReader;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/arrayReader.js
+var require_arrayReader = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/arrayReader.js"(exports, module) {
+    "use strict";
+    var DataReader = require_dataReader();
+    function ArrayReader(data) {
+      if (data) {
+        this.data = data;
+        this.length = this.data.length;
+        this.index = 0;
+        this.zero = 0;
+        for (var i = 0; i < this.data.length; i++) {
+          data[i] &= data[i];
+        }
+      }
+    }
+    ArrayReader.prototype = new DataReader();
+    ArrayReader.prototype.byteAt = function (i) {
+      return this.data[this.zero + i];
+    };
+    ArrayReader.prototype.lastIndexOfSignature = function (sig) {
+      var sig0 = sig.charCodeAt(0), sig1 = sig.charCodeAt(1), sig2 = sig.charCodeAt(2), sig3 = sig.charCodeAt(3);
+      for (var i = this.length - 4; i >= 0; --i) {
+        if (this.data[i] === sig0 && this.data[i + 1] === sig1 && this.data[i + 2] === sig2 && this.data[i + 3] === sig3) {
+          return i - this.zero;
+        }
+      }
+      return -1;
+    };
+    ArrayReader.prototype.readData = function (size) {
+      this.checkOffset(size);
+      if (size === 0) {
+        return [];
+      }
+      var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
+      this.index += size;
+      return result;
+    };
+    module.exports = ArrayReader;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/uint8ArrayReader.js
+var require_uint8ArrayReader = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/uint8ArrayReader.js"(exports, module) {
+    "use strict";
+    var ArrayReader = require_arrayReader();
+    function Uint8ArrayReader(data) {
+      if (data) {
+        this.data = data;
+        this.length = this.data.length;
+        this.index = 0;
+        this.zero = 0;
+      }
+    }
+    Uint8ArrayReader.prototype = new ArrayReader();
+    Uint8ArrayReader.prototype.readData = function (size) {
+      this.checkOffset(size);
+      if (size === 0) {
+        return new Uint8Array(0);
+      }
+      var result = this.data.subarray(this.zero + this.index, this.zero + this.index + size);
+      this.index += size;
+      return result;
+    };
+    module.exports = Uint8ArrayReader;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/nodeBufferReader.js
+var require_nodeBufferReader = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/nodeBufferReader.js"(exports, module) {
+    "use strict";
+    var Uint8ArrayReader = require_uint8ArrayReader();
+    function NodeBufferReader(data) {
+      this.data = data;
+      this.length = this.data.length;
+      this.index = 0;
+      this.zero = 0;
+    }
+    NodeBufferReader.prototype = new Uint8ArrayReader();
+    NodeBufferReader.prototype.readData = function (size) {
+      this.checkOffset(size);
+      var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
+      this.index += size;
+      return result;
+    };
+    module.exports = NodeBufferReader;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/zipEntry.js
+var require_zipEntry = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/zipEntry.js"(exports, module) {
+    "use strict";
+    var StringReader = require_stringReader();
+    var utils = require_utils();
+    var CompressedObject = require_compressedObject();
+    var pizzipProto = require_object();
+    var support = require_support();
+    var MADE_BY_DOS = 0;
+    var MADE_BY_UNIX = 3;
+    function ZipEntry(options, loadOptions) {
+      this.options = options;
+      this.loadOptions = loadOptions;
+    }
+    ZipEntry.prototype = {
+      /**
+       * say if the file is encrypted.
+       * @return {boolean} true if the file is encrypted, false otherwise.
+       */
+      isEncrypted: function isEncrypted() {
+        return (this.bitFlag & 1) === 1;
+      },
+      /**
+       * say if the file has utf-8 filename/comment.
+       * @return {boolean} true if the filename/comment is in utf-8, false otherwise.
+       */
+      useUTF8: function useUTF8() {
+        return (this.bitFlag & 2048) === 2048;
+      },
+      /**
+       * Prepare the function used to generate the compressed content from this ZipFile.
+       * @param {DataReader} reader the reader to use.
+       * @param {number} from the offset from where we should read the data.
+       * @param {number} length the length of the data to read.
+       * @return {Function} the callback to get the compressed content (the type depends of the DataReader class).
+       */
+      prepareCompressedContent: function prepareCompressedContent(reader, from, length) {
+        return function () {
+          var previousIndex = reader.index;
+          reader.setIndex(from);
+          var compressedFileData = reader.readData(length);
+          reader.setIndex(previousIndex);
+          return compressedFileData;
+        };
+      },
+      /**
+       * Prepare the function used to generate the uncompressed content from this ZipFile.
+       * @param {DataReader} reader the reader to use.
+       * @param {number} from the offset from where we should read the data.
+       * @param {number} length the length of the data to read.
+       * @param {PizZip.compression} compression the compression used on this file.
+       * @param {number} uncompressedSize the uncompressed size to expect.
+       * @return {Function} the callback to get the uncompressed content (the type depends of the DataReader class).
+       */
+      prepareContent: function prepareContent(reader, from, length, compression, uncompressedSize) {
+        return function () {
+          var compressedFileData = utils.transformTo(compression.uncompressInputType, this.getCompressedContent());
+          var uncompressedFileData = compression.uncompress(compressedFileData);
+          if (uncompressedFileData.length !== uncompressedSize) {
+            throw new Error("Bug : uncompressed data size mismatch");
+          }
+          return uncompressedFileData;
+        };
+      },
+      /**
+       * Read the local part of a zip file and add the info in this object.
+       * @param {DataReader} reader the reader to use.
+       */
+      readLocalPart: function readLocalPart(reader) {
+        reader.skip(22);
+        this.fileNameLength = reader.readInt(2);
+        var localExtraFieldsLength = reader.readInt(2);
+        this.fileName = reader.readData(this.fileNameLength);
+        reader.skip(localExtraFieldsLength);
+        if (this.compressedSize === -1 || this.uncompressedSize === -1) {
+          throw new Error("Bug or corrupted zip : didn't get enough informations from the central directory (compressedSize == -1 || uncompressedSize == -1)");
+        }
+        var compression = utils.findCompression(this.compressionMethod);
+        if (compression === null) {
+          throw new Error("Corrupted zip : compression " + utils.pretty(this.compressionMethod) + " unknown (inner file : " + utils.transformTo("string", this.fileName) + ")");
+        }
+        this.decompressed = new CompressedObject();
+        this.decompressed.compressedSize = this.compressedSize;
+        this.decompressed.uncompressedSize = this.uncompressedSize;
+        this.decompressed.crc32 = this.crc32;
+        this.decompressed.compressionMethod = this.compressionMethod;
+        this.decompressed.getCompressedContent = this.prepareCompressedContent(reader, reader.index, this.compressedSize, compression);
+        this.decompressed.getContent = this.prepareContent(reader, reader.index, this.compressedSize, compression, this.uncompressedSize);
+        if (this.loadOptions.checkCRC32) {
+          this.decompressed = utils.transformTo("string", this.decompressed.getContent());
+          if (pizzipProto.crc32(this.decompressed) !== this.crc32) {
+            throw new Error("Corrupted zip : CRC32 mismatch");
+          }
+        }
+      },
+      /**
+       * Read the central part of a zip file and add the info in this object.
+       * @param {DataReader} reader the reader to use.
+       */
+      readCentralPart: function readCentralPart(reader) {
+        this.versionMadeBy = reader.readInt(2);
+        this.versionNeeded = reader.readInt(2);
+        this.bitFlag = reader.readInt(2);
+        this.compressionMethod = reader.readString(2);
+        this.date = reader.readDate();
+        this.crc32 = reader.readInt(4);
+        this.compressedSize = reader.readInt(4);
+        this.uncompressedSize = reader.readInt(4);
+        this.fileNameLength = reader.readInt(2);
+        this.extraFieldsLength = reader.readInt(2);
+        this.fileCommentLength = reader.readInt(2);
+        this.diskNumberStart = reader.readInt(2);
+        this.internalFileAttributes = reader.readInt(2);
+        this.externalFileAttributes = reader.readInt(4);
+        this.localHeaderOffset = reader.readInt(4);
+        if (this.isEncrypted()) {
+          throw new Error("Encrypted zip are not supported");
+        }
+        this.fileName = reader.readData(this.fileNameLength);
+        this.readExtraFields(reader);
+        this.parseZIP64ExtraField(reader);
+        this.fileComment = reader.readData(this.fileCommentLength);
+      },
+      /**
+       * Parse the external file attributes and get the unix/dos permissions.
+       */
+      processAttributes: function processAttributes() {
+        this.unixPermissions = null;
+        this.dosPermissions = null;
+        var madeBy = this.versionMadeBy >> 8;
+        this.dir = !!(this.externalFileAttributes & 16);
+        if (madeBy === MADE_BY_DOS) {
+          this.dosPermissions = this.externalFileAttributes & 63;
+        }
+        if (madeBy === MADE_BY_UNIX) {
+          this.unixPermissions = this.externalFileAttributes >> 16 & 65535;
+        }
+        if (!this.dir && this.fileNameStr.slice(-1) === "/") {
+          this.dir = true;
+        }
+      },
+      /**
+       * Parse the ZIP64 extra field and merge the info in the current ZipEntry.
+       */
+      parseZIP64ExtraField: function parseZIP64ExtraField() {
+        if (!this.extraFields[1]) {
+          return;
+        }
+        var extraReader = new StringReader(this.extraFields[1].value);
+        if (this.uncompressedSize === utils.MAX_VALUE_32BITS) {
+          this.uncompressedSize = extraReader.readInt(8);
+        }
+        if (this.compressedSize === utils.MAX_VALUE_32BITS) {
+          this.compressedSize = extraReader.readInt(8);
+        }
+        if (this.localHeaderOffset === utils.MAX_VALUE_32BITS) {
+          this.localHeaderOffset = extraReader.readInt(8);
+        }
+        if (this.diskNumberStart === utils.MAX_VALUE_32BITS) {
+          this.diskNumberStart = extraReader.readInt(4);
+        }
+      },
+      /**
+       * Read the central part of a zip file and add the info in this object.
+       * @param {DataReader} reader the reader to use.
+       */
+      readExtraFields: function readExtraFields(reader) {
+        var start = reader.index;
+        var extraFieldId, extraFieldLength, extraFieldValue;
+        this.extraFields = this.extraFields || {};
+        while (reader.index < start + this.extraFieldsLength) {
+          extraFieldId = reader.readInt(2);
+          extraFieldLength = reader.readInt(2);
+          extraFieldValue = reader.readString(extraFieldLength);
+          this.extraFields[extraFieldId] = {
+            id: extraFieldId,
+            length: extraFieldLength,
+            value: extraFieldValue
+          };
+        }
+      },
+      /**
+       * Apply an UTF8 transformation if needed.
+       */
+      handleUTF8: function handleUTF8() {
+        var decodeParamType = support.uint8array ? "uint8array" : "array";
+        if (this.useUTF8()) {
+          this.fileNameStr = pizzipProto.utf8decode(this.fileName);
+          this.fileCommentStr = pizzipProto.utf8decode(this.fileComment);
+        } else {
+          var upath = this.findExtraFieldUnicodePath();
+          if (upath !== null) {
+            this.fileNameStr = upath;
+          } else {
+            var fileNameByteArray = utils.transformTo(decodeParamType, this.fileName);
+            this.fileNameStr = this.loadOptions.decodeFileName(fileNameByteArray);
+          }
+          var ucomment = this.findExtraFieldUnicodeComment();
+          if (ucomment !== null) {
+            this.fileCommentStr = ucomment;
+          } else {
+            var commentByteArray = utils.transformTo(decodeParamType, this.fileComment);
+            this.fileCommentStr = this.loadOptions.decodeFileName(commentByteArray);
+          }
+        }
+      },
+      /**
+       * Find the unicode path declared in the extra field, if any.
+       * @return {String} the unicode path, null otherwise.
+       */
+      findExtraFieldUnicodePath: function findExtraFieldUnicodePath() {
+        var upathField = this.extraFields[28789];
+        if (upathField) {
+          var extraReader = new StringReader(upathField.value);
+          if (extraReader.readInt(1) !== 1) {
+            return null;
+          }
+          if (pizzipProto.crc32(this.fileName) !== extraReader.readInt(4)) {
+            return null;
+          }
+          return pizzipProto.utf8decode(extraReader.readString(upathField.length - 5));
+        }
+        return null;
+      },
+      /**
+       * Find the unicode comment declared in the extra field, if any.
+       * @return {String} the unicode comment, null otherwise.
+       */
+      findExtraFieldUnicodeComment: function findExtraFieldUnicodeComment() {
+        var ucommentField = this.extraFields[25461];
+        if (ucommentField) {
+          var extraReader = new StringReader(ucommentField.value);
+          if (extraReader.readInt(1) !== 1) {
+            return null;
+          }
+          if (pizzipProto.crc32(this.fileComment) !== extraReader.readInt(4)) {
+            return null;
+          }
+          return pizzipProto.utf8decode(extraReader.readString(ucommentField.length - 5));
+        }
+        return null;
+      }
+    };
+    module.exports = ZipEntry;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/zipEntries.js
+var require_zipEntries = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/zipEntries.js"(exports, module) {
+    "use strict";
+    var StringReader = require_stringReader();
+    var NodeBufferReader = require_nodeBufferReader();
+    var Uint8ArrayReader = require_uint8ArrayReader();
+    var ArrayReader = require_arrayReader();
+    var utils = require_utils();
+    var sig = require_signature();
+    var ZipEntry = require_zipEntry();
+    var support = require_support();
+    function ZipEntries(data, loadOptions) {
+      this.files = [];
+      this.loadOptions = loadOptions;
+      if (data) {
+        this.load(data);
+      }
+    }
+    ZipEntries.prototype = {
+      /**
+       * Check that the reader is on the speficied signature.
+       * @param {string} expectedSignature the expected signature.
+       * @throws {Error} if it is an other signature.
+       */
+      checkSignature: function checkSignature(expectedSignature) {
+        var signature = this.reader.readString(4);
+        if (signature !== expectedSignature) {
+          throw new Error("Corrupted zip or bug : unexpected signature (" + utils.pretty(signature) + ", expected " + utils.pretty(expectedSignature) + ")");
+        }
+      },
+      /**
+       * Check if the given signature is at the given index.
+       * @param {number} askedIndex the index to check.
+       * @param {string} expectedSignature the signature to expect.
+       * @return {boolean} true if the signature is here, false otherwise.
+       */
+      isSignature: function isSignature(askedIndex, expectedSignature) {
+        var currentIndex = this.reader.index;
+        this.reader.setIndex(askedIndex);
+        var signature = this.reader.readString(4);
+        var result = signature === expectedSignature;
+        this.reader.setIndex(currentIndex);
+        return result;
+      },
+      /**
+       * Read the end of the central directory.
+       */
+      readBlockEndOfCentral: function readBlockEndOfCentral() {
+        this.diskNumber = this.reader.readInt(2);
+        this.diskWithCentralDirStart = this.reader.readInt(2);
+        this.centralDirRecordsOnThisDisk = this.reader.readInt(2);
+        this.centralDirRecords = this.reader.readInt(2);
+        this.centralDirSize = this.reader.readInt(4);
+        this.centralDirOffset = this.reader.readInt(4);
+        this.zipCommentLength = this.reader.readInt(2);
+        var zipComment = this.reader.readData(this.zipCommentLength);
+        var decodeParamType = support.uint8array ? "uint8array" : "array";
+        var decodeContent = utils.transformTo(decodeParamType, zipComment);
+        this.zipComment = this.loadOptions.decodeFileName(decodeContent);
+      },
+      /**
+       * Read the end of the Zip 64 central directory.
+       * Not merged with the method readEndOfCentral :
+       * The end of central can coexist with its Zip64 brother,
+       * I don't want to read the wrong number of bytes !
+       */
+      readBlockZip64EndOfCentral: function readBlockZip64EndOfCentral() {
+        this.zip64EndOfCentralSize = this.reader.readInt(8);
+        this.versionMadeBy = this.reader.readString(2);
+        this.versionNeeded = this.reader.readInt(2);
+        this.diskNumber = this.reader.readInt(4);
+        this.diskWithCentralDirStart = this.reader.readInt(4);
+        this.centralDirRecordsOnThisDisk = this.reader.readInt(8);
+        this.centralDirRecords = this.reader.readInt(8);
+        this.centralDirSize = this.reader.readInt(8);
+        this.centralDirOffset = this.reader.readInt(8);
+        this.zip64ExtensibleData = {};
+        var extraDataSize = this.zip64EndOfCentralSize - 44;
+        var index = 0;
+        var extraFieldId, extraFieldLength, extraFieldValue;
+        while (index < extraDataSize) {
+          extraFieldId = this.reader.readInt(2);
+          extraFieldLength = this.reader.readInt(4);
+          extraFieldValue = this.reader.readString(extraFieldLength);
+          this.zip64ExtensibleData[extraFieldId] = {
+            id: extraFieldId,
+            length: extraFieldLength,
+            value: extraFieldValue
+          };
+        }
+      },
+      /**
+       * Read the end of the Zip 64 central directory locator.
+       */
+      readBlockZip64EndOfCentralLocator: function readBlockZip64EndOfCentralLocator() {
+        this.diskWithZip64CentralDirStart = this.reader.readInt(4);
+        this.relativeOffsetEndOfZip64CentralDir = this.reader.readInt(8);
+        this.disksCount = this.reader.readInt(4);
+        if (this.disksCount > 1) {
+          throw new Error("Multi-volumes zip are not supported");
+        }
+      },
+      /**
+       * Read the local files, based on the offset read in the central part.
+       */
+      readLocalFiles: function readLocalFiles() {
+        var i, file;
+        for (i = 0; i < this.files.length; i++) {
+          file = this.files[i];
+          this.reader.setIndex(file.localHeaderOffset);
+          this.checkSignature(sig.LOCAL_FILE_HEADER);
+          file.readLocalPart(this.reader);
+          file.handleUTF8();
+          file.processAttributes();
+        }
+      },
+      /**
+       * Read the central directory.
+       */
+      readCentralDir: function readCentralDir() {
+        var file;
+        this.reader.setIndex(this.centralDirOffset);
+        while (this.reader.readString(4) === sig.CENTRAL_FILE_HEADER) {
+          file = new ZipEntry({
+            zip64: this.zip64
+          }, this.loadOptions);
+          file.readCentralPart(this.reader);
+          this.files.push(file);
+        }
+        if (this.centralDirRecords !== this.files.length) {
+          if (this.centralDirRecords !== 0 && this.files.length === 0) {
+            throw new Error("Corrupted zip or bug: expected " + this.centralDirRecords + " records in central dir, got " + this.files.length);
+          } else {
+          }
+        }
+      },
+      /**
+       * Read the end of central directory.
+       */
+      readEndOfCentral: function readEndOfCentral() {
+        var offset = this.reader.lastIndexOfSignature(sig.CENTRAL_DIRECTORY_END);
+        if (offset < 0) {
+          var isGarbage = !this.isSignature(0, sig.LOCAL_FILE_HEADER);
+          if (isGarbage) {
+            throw new Error("Can't find end of central directory : is this a zip file ?");
+          } else {
+            throw new Error("Corrupted zip : can't find end of central directory");
+          }
+        }
+        this.reader.setIndex(offset);
+        var endOfCentralDirOffset = offset;
+        this.checkSignature(sig.CENTRAL_DIRECTORY_END);
+        this.readBlockEndOfCentral();
+        if (this.diskNumber === utils.MAX_VALUE_16BITS || this.diskWithCentralDirStart === utils.MAX_VALUE_16BITS || this.centralDirRecordsOnThisDisk === utils.MAX_VALUE_16BITS || this.centralDirRecords === utils.MAX_VALUE_16BITS || this.centralDirSize === utils.MAX_VALUE_32BITS || this.centralDirOffset === utils.MAX_VALUE_32BITS) {
+          this.zip64 = true;
+          offset = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_LOCATOR);
+          if (offset < 0) {
+            throw new Error("Corrupted zip : can't find the ZIP64 end of central directory locator");
+          }
+          this.reader.setIndex(offset);
+          this.checkSignature(sig.ZIP64_CENTRAL_DIRECTORY_LOCATOR);
+          this.readBlockZip64EndOfCentralLocator();
+          if (!this.isSignature(this.relativeOffsetEndOfZip64CentralDir, sig.ZIP64_CENTRAL_DIRECTORY_END)) {
+            this.relativeOffsetEndOfZip64CentralDir = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);
+            if (this.relativeOffsetEndOfZip64CentralDir < 0) {
+              throw new Error("Corrupted zip : can't find the ZIP64 end of central directory");
+            }
+          }
+          this.reader.setIndex(this.relativeOffsetEndOfZip64CentralDir);
+          this.checkSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);
+          this.readBlockZip64EndOfCentral();
+        }
+        var expectedEndOfCentralDirOffset = this.centralDirOffset + this.centralDirSize;
+        if (this.zip64) {
+          expectedEndOfCentralDirOffset += 20;
+          expectedEndOfCentralDirOffset += 12 + this.zip64EndOfCentralSize;
+        }
+        var extraBytes = endOfCentralDirOffset - expectedEndOfCentralDirOffset;
+        if (extraBytes > 0) {
+          if (this.isSignature(endOfCentralDirOffset, sig.CENTRAL_FILE_HEADER)) {
+          } else {
+            this.reader.zero = extraBytes;
+          }
+        } else if (extraBytes < 0) {
+          throw new Error("Corrupted zip: missing " + Math.abs(extraBytes) + " bytes.");
+        }
+      },
+      prepareReader: function prepareReader(data) {
+        var type = utils.getTypeOf(data);
+        utils.checkSupport(type);
+        if (type === "string" && !support.uint8array) {
+          this.reader = new StringReader(data, this.loadOptions.optimizedBinaryString);
+        } else if (type === "nodebuffer") {
+          this.reader = new NodeBufferReader(data);
+        } else if (support.uint8array) {
+          this.reader = new Uint8ArrayReader(utils.transformTo("uint8array", data));
+        } else if (support.array) {
+          this.reader = new ArrayReader(utils.transformTo("array", data));
+        } else {
+          throw new Error("Unexpected error: unsupported type '" + type + "'");
+        }
+      },
+      /**
+       * Read a zip file and create ZipEntries.
+       * @param {String|ArrayBuffer|Uint8Array|Buffer} data the binary string representing a zip file.
+       */
+      load: function load(data) {
+        this.prepareReader(data);
+        this.readEndOfCentral();
+        this.readCentralDir();
+        this.readLocalFiles();
+      }
+    };
+    module.exports = ZipEntries;
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/load.js
+var require_load = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/load.js"(exports, module) {
+    "use strict";
+    var base64 = require_base64();
+    var utf8 = require_utf8();
+    var utils = require_utils();
+    var ZipEntries = require_zipEntries();
+    module.exports = function (data, options) {
+      var i, input;
+      options = utils.extend(options || {}, {
+        base64: false,
+        checkCRC32: false,
+        optimizedBinaryString: false,
+        createFolders: false,
+        decodeFileName: utf8.utf8decode
+      });
+      if (options.base64) {
+        data = base64.decode(data);
+      }
+      var zipEntries = new ZipEntries(data, options);
+      var files = zipEntries.files;
+      for (i = 0; i < files.length; i++) {
+        input = files[i];
+        this.file(input.fileNameStr, input.decompressed, {
+          binary: true,
+          optimizedBinaryString: true,
+          date: input.date,
+          dir: input.dir,
+          comment: input.fileCommentStr.length ? input.fileCommentStr : null,
+          unixPermissions: input.unixPermissions,
+          dosPermissions: input.dosPermissions,
+          createFolders: options.createFolders
+        });
+      }
+      if (zipEntries.zipComment.length) {
+        this.comment = zipEntries.zipComment;
+      }
+      return this;
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/deprecatedPublicUtils.js
+var require_deprecatedPublicUtils = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/deprecatedPublicUtils.js"(exports) {
+    "use strict";
+    var utils = require_utils();
+    exports.string2binary = function (str) {
+      return utils.string2binary(str);
+    };
+    exports.string2Uint8Array = function (str) {
+      return utils.transformTo("uint8array", str);
+    };
+    exports.uint8Array2String = function (array) {
+      return utils.transformTo("string", array);
+    };
+    exports.string2Blob = function (str) {
+      var buffer = utils.transformTo("arraybuffer", str);
+      return utils.arrayBuffer2Blob(buffer);
+    };
+    exports.arrayBuffer2Blob = function (buffer) {
+      return utils.arrayBuffer2Blob(buffer);
+    };
+    exports.transformTo = function (outputType, input) {
+      return utils.transformTo(outputType, input);
+    };
+    exports.getTypeOf = function (input) {
+      return utils.getTypeOf(input);
+    };
+    exports.checkSupport = function (type) {
+      return utils.checkSupport(type);
+    };
+    exports.MAX_VALUE_16BITS = utils.MAX_VALUE_16BITS;
+    exports.MAX_VALUE_32BITS = utils.MAX_VALUE_32BITS;
+    exports.pretty = function (str) {
+      return utils.pretty(str);
+    };
+    exports.findCompression = function (compressionMethod) {
+      return utils.findCompression(compressionMethod);
+    };
+    exports.isRegExp = function (object) {
+      return utils.isRegExp(object);
+    };
+  }
+});
+
+// http-url:https://unpkg.com/pizzip@3.2.0/js/index.js
+var require_js = __commonJS({
+  "http-url:https://unpkg.com/pizzip@3.2.0/js/index.js"(exports, module) {
+    "use strict";
+    var base64 = require_base64();
+    function PizZip(data, options) {
+      if (!(this instanceof PizZip)) {
+        return new PizZip(data, options);
+      }
+      this.files = {};
+      this.comment = null;
+      this.root = "";
+      if (data) {
+        this.load(data, options);
+      }
+      this.clone = function () {
+        var _this = this;
+        var newObj = new PizZip();
+        Object.keys(this.files).forEach(function (file) {
+          newObj.file(file, _this.files[file].asUint8Array());
+        });
+        return newObj;
+      };
+      this.shallowClone = function () {
+        var newObj = new PizZip();
+        for (var i in this) {
+          if (typeof this[i] !== "function") {
+            newObj[i] = this[i];
+          }
+        }
+        return newObj;
+      };
+    }
+    PizZip.prototype = require_object();
+    PizZip.prototype.load = require_load();
+    PizZip.support = require_support();
+    PizZip.defaults = require_defaults();
+    PizZip.utils = require_deprecatedPublicUtils();
+    PizZip.base64 = {
+      /**
+       * @deprecated
+       * This method will be removed in a future version without replacement.
+       */
+      encode: function encode(input) {
+        return base64.encode(input);
+      },
+      /**
+       * @deprecated
+       * This method will be removed in a future version without replacement.
+       */
+      decode: function decode(input) {
+        return base64.decode(input);
+      }
+    };
+    PizZip.compressions = require_compressions();
+    module.exports = PizZip;
+    module.exports["default"] = PizZip;
+  }
+});
+
+// /input.ts
+// For static resource usage in Salesforce LWC, assign to window object
+// This allows the library to be accessed as window.PizZip after loading via loadScript
+var pizzipModule = require_js();
+window.PizZip = pizzipModule.default || pizzipModule;
+/*! pako 2.1.0 https://github.com/nodeca/pako @license (MIT AND Zlib) */

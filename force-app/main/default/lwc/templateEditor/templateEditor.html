@@ -1,4 +1,14 @@
 <template>
+    <!-- Hidden resource loaders - workaround for known Salesforce issue -->
+    <!-- https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
+    <c-resource-loader resource-url={pizzipUrl} onresourceloaded={handlePizzipLoaded}
+        onresourceerror={handleResourceError}></c-resource-loader>
+    <!-- Load docxtemplater only after PizZip is loaded (dependency) -->
+    <template if:true={pizzipLoaded}>
+        <c-resource-loader resource-url={docxtemplaterUrl} onresourceloaded={handleDocxtemplaterLoaded}
+            onresourceerror={handleResourceError}></c-resource-loader>
+    </template>
+
     <lightning-card title={template.Name} icon-name="custom:custom55">
         <div class="slds-p-around_medium">
             <!-- Editor Section -->
@@ -11,10 +21,10 @@
                             <div class="slds-box slds-m-bottom_small">
                                 <h3 class="slds-text-heading_small slds-m-bottom_x-small">Upload Word Template</h3>
                                 <p class="slds-text-body_small slds-m-bottom_small">
-                                    Upload a .docx file with docxtemplater syntax (e.g., Name, Opportunities with StageName)
+                                    Upload a .docx file with template syntax
                                 </p>
-                                <lightning-input type="file" accept=".docx" label="Word Document" 
-                                    onchange={handleFileUpload} disabled={isLoading}>
+                                <lightning-input type="file" accept=".docx" label="Word Document"
+                                    onchange={handleFileUpload}>
                                 </lightning-input>
                                 <template if:true={uploadedFileName}>
                                     <p class="slds-text-body_small slds-m-top_x-small slds-text-color_success">
@@ -30,10 +40,11 @@
                                 <h3 class="slds-text-heading_small slds-m-bottom_x-small">Word Template File</h3>
                                 <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
                                     <div>
-                                        <lightning-icon icon-name="doctype:word" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                        <lightning-icon icon-name="doctype:word" size="small"
+                                            class="slds-m-right_x-small"></lightning-icon>
                                         <span class="slds-text-body_regular">{templateFileName}</span>
                                     </div>
-                                    <lightning-button-icon icon-name="utility:delete" variant="destructive" 
+                                    <lightning-button-icon icon-name="utility:delete" variant="destructive"
                                         alternative-text="Delete file" onclick={handleDeleteFile} disabled={isLoading}>
                                     </lightning-button-icon>
                                 </div>
@@ -48,7 +59,7 @@
                     <template if:true={showHtmlEditor}>
                         <lightning-textarea label="HTML Template" value={htmlBody} onchange={handleHtmlChange} rows="20"
                             class="editor-textarea"
-                            placeholder="Enter HTML template with docxtemplater syntax (e.g., Name, Opportunities with StageName)">
+                            placeholder="Enter HTML template with variable syntax (e.g., {Name}, {Opportunities} with {StageName})">
                         </lightning-textarea>
                     </template>
 
@@ -63,10 +74,14 @@
                 <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
                     <div class="slds-box">
                         <h3 class="slds-text-heading_small slds-m-bottom_small">Template Info</h3>
-                        <p><strong>Source Type:</strong> {template.Source_Type__c}</p>
+                        <lightning-combobox label="Source Type" value={sourceType} options={sourceTypeOptions}
+                            onchange={handleSourceTypeChange} disabled={isLoading} class="slds-m-bottom_small">
+                        </lightning-combobox>
+                        <lightning-combobox label="Status" value={status} options={statusOptions}
+                            onchange={handleStatusChange} disabled={isLoading} class="slds-m-bottom_small">
+                        </lightning-combobox>
                         <p><strong>Primary Object:</strong> {template.Primary_Object__c}</p>
                         <p><strong>Version:</strong> {template.Version__c}</p>
-                        <p><strong>Status:</strong> {template.Status__c}</p>
                     </div>
 
                     <div class="slds-box slds-m-top_small">
@@ -96,13 +111,12 @@
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
             <div class="slds-modal__container">
                 <header class="slds-modal__header">
-                    <h2 class="slds-text-heading_medium">HTML Preview</h2>
+                    <h2 class="slds-text-heading_medium">Document Preview</h2>
                 </header>
 
-                <div class="slds-modal__content slds-p-around_medium" style="min-height: 400px;">
-                    <div class="preview-container">
-                        <lightning-formatted-rich-text value={previewHtml}></lightning-formatted-rich-text>
-                    </div>
+                <div class="slds-modal__content slds-p-around_medium"
+                    style="min-height: 400px; max-height: 70vh; overflow-y: auto;">
+                    <div class="preview-container" lwc:dom="manual"></div>
                 </div>
 
                 <footer class="slds-modal__footer">

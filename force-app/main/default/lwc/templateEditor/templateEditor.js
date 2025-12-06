@@ -1,9 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { loadScript } from 'lightning/platformResourceLoader';
-import docxtemplater from '@salesforce/resourceUrl/docxtemplater';
-import pizzip from '@salesforce/resourceUrl/pizzip';
-import docx_preview from '@salesforce/resourceUrl/docx_preview';
 import getTemplate from '@salesforce/apex/TemplateController.getTemplate';
 import getTemplateFile from '@salesforce/apex/TemplateController.getTemplateFile';
 import uploadTemplateFile from '@salesforce/apex/TemplateController.uploadTemplateFile';
@@ -15,6 +11,8 @@ import getUserSettings from '@salesforce/apex/TemplateController.getUserSettings
 import getChildRelationships from '@salesforce/apex/TemplateController.getChildRelationships';
 import { discoverFields } from 'c/discoveryUtils';
 import { render as renderTemplate } from 'c/templateEngine';
+import PIZZIP from '@salesforce/resourceUrl/pizzip';
+import DOCXTEMPLATER from '@salesforce/resourceUrl/docxtemplater';
 
 const MAX_HTML_LENGTH = 131072; // Max characters for Html_Body__c field
 
@@ -31,12 +29,29 @@ export default class TemplateEditor extends LightningElement {
     @track relationships = [];
     @track uploadedFile = null;
     @track uploadedFileName = '';
+    @track extractedFields = [];
     @track hasTemplateFile = false;
     @track templateFileName = '';
+    @track sourceType = 'HTML';
+    @track status = 'Draft';
 
     userSettings = {};
     sampleRecordId = '';
-    docxLibrariesLoaded = false;
+
+    // Script loading flags (tracked for template reactivity)
+    @track pizzipLoaded = false;
+    @track docxtemplaterLoaded = false;
+    pizzipLoadPromise = null;
+    docxtemplaterLoadPromise = null;
+
+    // Resource URLs for resourceLoader components
+    get pizzipUrl() {
+        return PIZZIP;
+    }
+
+    get docxtemplaterUrl() {
+        return DOCXTEMPLATER;
+    }
 
     connectedCallback() {
         this.loadUserSettings();
@@ -46,12 +61,93 @@ export default class TemplateEditor extends LightningElement {
         }
     }
 
+    renderedCallback() {
+        // Update preview container when preview HTML changes
+        if (this.showPreview && this.previewHtml) {
+            this.updatePreviewContainer();
+        }
+    }
+
+    // Event handlers for resourceLoader components
+    handlePizzipLoaded() {
+        this.pizzipLoaded = true;
+        // eslint-disable-next-line no-console
+        console.log('PizZip loaded successfully');
+        // Resolve the promise if it exists
+        if (this.pizzipLoadPromise) {
+            this.pizzipLoadPromise.resolve();
+        }
+    }
+
+    handleDocxtemplaterLoaded() {
+        this.docxtemplaterLoaded = true;
+        // eslint-disable-next-line no-console
+        console.log('Docxtemplater loaded successfully', typeof window.docxtemplater);
+        // Resolve the promise if it exists
+        if (this.docxtemplaterLoadPromise) {
+            this.docxtemplaterLoadPromise.resolve();
+        }
+    }
+
+    handleResourceError(event) {
+        const error = event.detail?.error || 'Unknown error';
+        // eslint-disable-next-line no-console
+        console.error('Error loading resource:', error);
+        this.showToast(
+            'Error',
+            'Failed to load Word template libraries: ' + error,
+            'error'
+        );
+    }
+
+    /**
+     * Wait for libraries to be loaded via resourceLoader components
+     * Returns immediately if already loaded
+     */
+    waitForLibraries() {
+        // If already loaded, return immediately
+        if (this.pizzipLoaded && this.docxtemplaterLoaded) {
+            return Promise.resolve();
+        }
+
+        // Create promises that will be resolved by event handlers
+        const pizzipPromise = this.pizzipLoaded
+            ? Promise.resolve()
+            : new Promise((resolve) => {
+                this.pizzipLoadPromise = { resolve };
+            });
+
+        const docxtemplaterPromise = this.docxtemplaterLoaded
+            ? Promise.resolve()
+            : new Promise((resolve) => {
+                this.docxtemplaterLoadPromise = { resolve };
+            });
+
+        // Wait for both to load
+        return Promise.all([pizzipPromise, docxtemplaterPromise]);
+    }
+
     get isWordTemplate() {
-        return this.template.Source_Type__c === 'Word';
+        return this.sourceType === 'Word';
     }
 
     get isHtmlTemplate() {
-        return this.template.Source_Type__c === 'HTML' || !this.template.Source_Type__c;
+        return this.sourceType === 'HTML' || !this.sourceType;
+    }
+
+    get sourceTypeOptions() {
+        return [
+            { label: 'HTML', value: 'HTML' },
+            { label: 'Word', value: 'Word' }
+        ];
+    }
+
+    get statusOptions() {
+        return [
+            { label: 'Draft', value: 'Draft' },
+            { label: 'Active', value: 'Active' },
+            { label: 'Archived', value: 'Archived' }
+        ];
     }
 
     get showFileUpload() {
@@ -70,6 +166,7 @@ export default class TemplateEditor extends LightningElement {
         try {
             this.userSettings = await getUserSettings();
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Failed to load user settings:', error);
         }
     }
@@ -79,6 +176,8 @@ export default class TemplateEditor extends LightningElement {
         try {
             this.template = await getTemplate({ templateId: this.recordId });
             this.htmlBody = this.template.Html_Body__c || '';
+            this.sourceType = this.template.Source_Type__c || 'HTML';
+            this.status = this.template.Status__c || 'Draft';
 
             // Load relationships for primary object
             if (this.template.Primary_Object__c) {
@@ -90,11 +189,13 @@ export default class TemplateEditor extends LightningElement {
             // Check if Word template has a file
             if (this.isWordTemplate) {
                 await this.checkTemplateFile();
-                // Load DOCX libraries for Word templates
-                await this.loadDocxLibraries();
             }
         } catch (error) {
-            this.showToast('Error', 'Failed to load template: ' + error.body?.message, 'error');
+            this.showToast(
+                'Error',
+                'Failed to load template: ' + (error.body?.message || error.message || error),
+                'error'
+            );
         } finally {
             this.isLoading = false;
         }
@@ -111,33 +212,9 @@ export default class TemplateEditor extends LightningElement {
                 this.templateFileName = '';
             }
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.warn('Failed to check template file:', error);
             this.hasTemplateFile = false;
-        }
-    }
-
-    async loadDocxLibraries() {
-        if (this.docxLibrariesLoaded) {
-            return;
-        }
-
-        try {
-            // Load PizZip first (required by docxtemplater)
-            await loadScript(this, pizzip);
-            console.log('✅ PizZip loaded successfully');
-
-            // Load docxtemplater
-            await loadScript(this, docxtemplater);
-            console.log('✅ docxtemplater loaded successfully');
-
-            // Load docx-preview
-            await loadScript(this, docx_preview);
-            console.log('✅ docx-preview loaded successfully');
-
-            this.docxLibrariesLoaded = true;
-        } catch (error) {
-            console.error('❌ Failed to load DOCX libraries:', error);
-            this.showToast('Error', 'Failed to load DOCX processing libraries', 'error');
         }
     }
 
@@ -147,6 +224,25 @@ export default class TemplateEditor extends LightningElement {
 
     handleSampleRecordChange(event) {
         this.sampleRecordId = event.target.value;
+    }
+
+    handleStatusChange(event) {
+        this.status = event.detail.value;
+    }
+
+    async handleSourceTypeChange(event) {
+        const newSourceType = event.detail.value;
+
+        // If switching to Word template, check for existing file
+        if (newSourceType === 'Word') {
+            await this.checkTemplateFile();
+        }
+
+        this.sourceType = newSourceType;
+
+        // Reset discovery artefacts when switching
+        this.discoveredFields = [];
+        this.queryPlan = null;
     }
 
     async handleDiscoverFields() {
@@ -160,23 +256,14 @@ export default class TemplateEditor extends LightningElement {
             let templateText = '';
 
             if (this.isWordTemplate) {
-                // For Word templates, extract text from DOCX file
-                if (!this.hasTemplateFile) {
-                    this.showToast('Error', 'Please upload a DOCX file first', 'error');
-                    this.isLoading = false;
-                    return;
-                }
-
-                const fileData = await getTemplateFile({ templateId: this.recordId });
-                if (!fileData) {
-                    this.showToast('Error', 'Template file not found', 'error');
-                    this.isLoading = false;
-                    return;
-                }
-
-                templateText = await this.extractTextFromDocx(fileData.base64Data);
+                this.showToast(
+                    'Error',
+                    'Word templates are not supported yet. Please use HTML templates.',
+                    'error'
+                );
+                this.isLoading = false;
+                return;
             } else {
-                // For HTML templates, use HTML body
                 if (!this.htmlBody) {
                     this.showToast('Error', 'HTML body is required', 'error');
                     this.isLoading = false;
@@ -185,15 +272,14 @@ export default class TemplateEditor extends LightningElement {
                 templateText = this.htmlBody;
             }
 
-            // Discover fields from template text
             const discovery = discoverFields(templateText, this.template.Primary_Object__c);
 
-            // Debug: Log the discovery payload BEFORE sending to Apex
-            console.log('📤 Sending to Apex (before JSON.stringify):', discovery);
-            const payloadJson = JSON.stringify(discovery);
-            console.log('📤 JSON string being sent to Apex:', payloadJson);
+            // Debug
+            // eslint-disable-next-line no-console
+            console.log('📤 Discovery payload:', discovery);
 
-            // Build query plan
+            const payloadJson = JSON.stringify(discovery);
+
             const queryPlanJson = await buildQueryPlan({
                 payloadJson: payloadJson,
                 templateId: this.recordId
@@ -201,7 +287,6 @@ export default class TemplateEditor extends LightningElement {
 
             this.queryPlan = JSON.parse(queryPlanJson);
 
-            // Extract discovered fields for display
             this.discoveredFields = [
                 ...discovery.scalarPaths.map(p => ({ type: 'Scalar', path: p })),
                 ...discovery.collections.map(c => ({
@@ -212,50 +297,14 @@ export default class TemplateEditor extends LightningElement {
             ];
 
             this.showToast('Success', 'Fields discovered successfully', 'success');
-
         } catch (error) {
-            this.showToast('Error', 'Discovery failed: ' + (error.body?.message || error.message), 'error');
+            this.showToast(
+                'Error',
+                'Discovery failed: ' + (error.body?.message || error.message || error),
+                'error'
+            );
         } finally {
             this.isLoading = false;
-        }
-    }
-
-    async extractTextFromDocx(base64Data) {
-        try {
-            if (!window.PizZip) {
-                throw new Error('PizZip library not loaded');
-            }
-
-            // Convert base64 to binary
-            const binaryString = atob(base64Data);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-
-            // Load DOCX with PizZip
-            const zip = new window.PizZip(bytes);
-            
-            // Extract text from document.xml
-            const documentXml = zip.files['word/document.xml'];
-            if (!documentXml) {
-                console.warn('Could not find document.xml in DOCX');
-                return '';
-            }
-
-            // Get XML content as text
-            const xmlText = documentXml.asText();
-            
-            // Simple extraction: remove XML tags and get text content
-            let text = xmlText
-                .replace(/<[^>]+>/g, ' ') // Remove XML tags
-                .replace(/\s+/g, ' ') // Normalize whitespace
-                .trim();
-
-            return text;
-        } catch (error) {
-            console.warn('Failed to extract text from DOCX:', error);
-            return '';
         }
     }
 
@@ -272,168 +321,46 @@ export default class TemplateEditor extends LightningElement {
 
         this.isLoading = true;
         try {
-            // Log the query for debugging
+            // eslint-disable-next-line no-console
             console.log('📊 SOQL Query:', this.queryPlan.soqlQuery);
+            // eslint-disable-next-line no-console
             console.log('📋 Full Query Plan:', JSON.stringify(this.queryPlan, null, 2));
 
-            // Fetch data
             const dataJson = await fetchData({
                 recordId: this.sampleRecordId,
                 queryPlanJson: JSON.stringify(this.queryPlan)
             });
 
-            // Log the returned data
+            // eslint-disable-next-line no-console
             console.log('✅ Fetched Data JSON:', dataJson);
-            const data = JSON.parse(dataJson);
-            console.log('📦 Parsed Data Object:', data);
 
             let html = '';
 
             if (this.isWordTemplate) {
-                // For Word templates, process DOCX and convert to HTML
                 html = await this.previewWordTemplate(dataJson);
             } else {
-                // For HTML templates, compile normally
                 html = await this.compileTemplate(this.htmlBody, dataJson);
             }
 
             this.previewHtml = html;
             this.showPreview = true;
-
+            this.updatePreviewContainer();
         } catch (error) {
-            this.showToast('Error', 'Preview failed: ' + (error.body?.message || error.message), 'error');
+            this.showToast(
+                'Error',
+                'Preview failed: ' + (error.body?.message || error.message || error),
+                'error'
+            );
         } finally {
             this.isLoading = false;
         }
     }
 
-    async previewWordTemplate(dataJson) {
-        if (!this.hasTemplateFile) {
-            throw new Error('No DOCX file found for this template');
-        }
-
-        // Ensure libraries are loaded
-        await this.loadDocxLibraries();
-
-        // Get DOCX file
-        const fileData = await getTemplateFile({ templateId: this.recordId });
-        if (!fileData) {
-            throw new Error('Template file not found');
-        }
-
-        // Process DOCX with docxtemplater
-        const processedDocx = await this.processDocx(fileData.base64Data, dataJson);
-
-        // Convert DOCX to HTML
-        const html = await this.docxToHtml(processedDocx);
-
-        return html;
-    }
-
-    async processDocx(base64Data, dataJson) {
-        try {
-            if (!window.PizZip || !window.Docxtemplater) {
-                throw new Error('DOCX libraries not loaded');
-            }
-
-            // Convert base64 to binary
-            const binaryString = atob(base64Data);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-
-            // Load DOCX with PizZip
-            const zip = new window.PizZip(bytes);
-            const doc = new window.Docxtemplater(zip, {
-                paragraphLoop: true,
-                linebreaks: true
-            });
-
-            // Parse data for docxtemplater
-            const data = JSON.parse(dataJson);
-            const docxData = this.convertDataForDocxtemplater(data);
-
-            // Render template
-            doc.setData(docxData);
-            doc.render();
-
-            // Get processed DOCX as binary
-            const processedZip = doc.getZip();
-            const processedDocx = processedZip.generate({ type: 'uint8array' });
-
-            return processedDocx;
-        } catch (error) {
-            console.error('DOCX processing failed:', error);
-            throw new Error('Failed to process DOCX template: ' + error.message);
-        }
-    }
-
-    convertDataForDocxtemplater(data) {
-        const result = {};
-        for (const [key, value] of Object.entries(data)) {
-            if (Array.isArray(value)) {
-                if (value.length > 0 && value[0].records) {
-                    result[key] = value[0].records;
-                } else {
-                    result[key] = value;
-                }
-            } else if (typeof value === 'object' && value !== null) {
-                if (value.records) {
-                    result[key] = value.records;
-                } else {
-                    for (const [nestedKey, nestedValue] of Object.entries(value)) {
-                        result[`${key}.${nestedKey}`] = nestedValue;
-                    }
-                }
-            } else {
-                result[key] = value;
-            }
-        }
-        return result;
-    }
-
-    async docxToHtml(docxArray) {
-        try {
-            const docxLib = window.docx || window.docxPreview;
-            if (!docxLib) {
-                throw new Error('docx-preview library not loaded');
-            }
-
-            const container = document.createElement('div');
-            container.style.width = '210mm';
-            container.style.padding = '20mm';
-            container.style.fontFamily = 'Arial, sans-serif';
-            container.style.backgroundColor = '#ffffff';
-            document.body.appendChild(container);
-
-            if (docxLib.renderAsync) {
-                await docxLib.renderAsync(docxArray, container, {
-                    className: 'docx-wrapper',
-                    inWrapper: true,
-                    ignoreWidth: false,
-                    ignoreHeight: false,
-                    ignoreFonts: false,
-                    breakPages: true,
-                    ignoreLastRenderedPageBreak: true
-                });
-            } else if (docxLib.render) {
-                docxLib.render(docxArray, container);
-            } else {
-                throw new Error('docx-preview render method not found');
-            }
-
-            const html = container.innerHTML;
-            document.body.removeChild(container);
-            return html;
-        } catch (error) {
-            console.error('DOCX to HTML conversion failed:', error);
-            throw new Error('Failed to convert DOCX to HTML: ' + error.message);
-        }
+    async previewWordTemplate() {
+        throw new Error('Word templates are not supported yet. Please use HTML templates.');
     }
 
     async compileTemplate(htmlTemplate, dataJson) {
-        // Use our custom Locker Service-compliant template engine
         const data = JSON.parse(dataJson);
         return renderTemplate(htmlTemplate, data);
     }
@@ -445,7 +372,7 @@ export default class TemplateEditor extends LightningElement {
         }
 
         if (this.isWordTemplate && !this.hasTemplateFile && !this.uploadedFile) {
-            this.showToast('Error', 'Please upload a DOCX file for Word templates', 'error');
+            this.showToast('Error', 'Word templates are not supported yet', 'error');
             return;
         }
 
@@ -454,35 +381,61 @@ export default class TemplateEditor extends LightningElement {
             const updatedTemplate = {
                 Id: this.recordId,
                 Html_Body__c: this.htmlBody,
+                Source_Type__c: this.sourceType,
+                Status__c: this.status,
                 Version__c: this.template.Version__c
             };
 
             const savedTemplateId = await saveTemplate({ template: updatedTemplate });
 
-            // If Word template and file is uploaded, upload the file
             if (this.isWordTemplate && this.uploadedFile) {
                 try {
                     const base64Data = await this.readFileAsBase64(this.uploadedFile);
+
+                    const fieldsString =
+                        this.extractedFields && this.extractedFields.length > 0
+                            ? this.extractedFields.join(', ')
+                            : '';
+
+                    // eslint-disable-next-line no-console
+                    console.log('💾 Saving template with fields:', fieldsString);
+
                     await uploadTemplateFile({
                         templateId: savedTemplateId || this.recordId,
                         fileName: this.uploadedFileName,
-                        base64Data
+                        base64Data,
+                        templateFields: fieldsString
                     });
-                    this.showToast('Success', 'Template and file saved successfully', 'success');
+
+                    this.showToast(
+                        'Success',
+                        'Template and file saved successfully',
+                        'success'
+                    );
+                    this.hasTemplateFile = true;
+                    this.templateFileName = this.uploadedFileName;
                 } catch (fileError) {
-                    this.showToast('Warning', 'Template saved but file upload failed: ' + fileError.body?.message, 'warning');
+                    this.showToast(
+                        'Warning',
+                        'Template saved but file upload failed: ' +
+                        (fileError.body?.message || fileError.message || fileError),
+                        'warning'
+                    );
                 }
             } else {
                 this.showToast('Success', 'Template saved successfully', 'success');
             }
 
-            // Reload template to get new version
             await this.loadTemplate();
             this.uploadedFile = null;
             this.uploadedFileName = '';
-
+            this.extractedFields = [];
         } catch (error) {
-            this.showToast('Error', 'Save failed: ' + (error.body?.message || error.message), 'error');
+            this.showToast(
+                'Error',
+                'Save failed: ' + (error.body?.message || error.message || error),
+                'error'
+            );
         } finally {
             this.isLoading = false;
         }
@@ -500,21 +453,19 @@ export default class TemplateEditor extends LightningElement {
         });
     }
 
-    handleFileUpload(event) {
+    async handleFileUpload(event) {
         const files = event.target.files;
         if (!files || files.length === 0) {
             return;
         }
 
         const file = files[0];
-        
-        // Validate file type
+
         if (!file.name.endsWith('.docx')) {
             this.showToast('Error', 'Please upload a .docx file', 'error');
             return;
         }
 
-        // Validate file size (max 10MB)
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             this.showToast('Error', 'File size must be less than 10MB', 'error');
@@ -523,10 +474,81 @@ export default class TemplateEditor extends LightningElement {
 
         this.uploadedFile = file;
         this.uploadedFileName = file.name;
-        this.showToast('Success', `File "${file.name}" ready for upload`, 'success');
+
+        try {
+            const base64Data = await this.readFileAsBase64(file);
+
+            // Wait for libraries to be loaded via resourceLoader
+            await this.waitForLibraries();
+
+            if (!window.PizZip || !window.docxtemplater) {
+                this.showToast(
+                    'Error',
+                    'Required libraries not loaded. Please refresh the page.',
+                    'error'
+                );
+                return;
+            }
+
+            const binaryString = atob(base64Data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            const pizzip = new window.PizZip(bytes);
+            const doc = new window.docxtemplater(pizzip);
+
+            const zip = doc.getZip();
+            const documentXml = zip.files['word/document.xml']?.asText();
+
+            if (documentXml) {
+                const templateText = documentXml
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                if (this.template.Primary_Object__c) {
+                    const discovery = discoverFields(
+                        templateText,
+                        this.template.Primary_Object__c
+                    );
+                    let fields = [...discovery.scalarPaths];
+                    discovery.collections.forEach(collection => {
+                        fields.push(...collection.fieldPaths);
+                    });
+                    this.extractedFields = [...new Set(fields)].sort();
+                } else {
+                    this.extractedFields = this.extractFieldPatterns(templateText);
+                }
+
+                this.showToast(
+                    'Success',
+                    `File "${file.name}" ready. Found ${this.extractedFields.length} fields.`,
+                    'success'
+                );
+            } else {
+                this.showToast(
+                    'Warning',
+                    `File "${file.name}" processed but no document content found.`,
+                    'warning'
+                );
+                this.extractedFields = [];
+            }
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to process DOCX file:', error);
+            this.showToast(
+                'Error',
+                `Failed to process file: ${error.message || error}`,
+                'error'
+            );
+            this.extractedFields = [];
+        }
     }
 
     async handleDeleteFile() {
+        // eslint-disable-next-line no-alert
         if (!confirm(`Are you sure you want to delete "${this.templateFileName}"?`)) {
             return;
         }
@@ -537,15 +559,35 @@ export default class TemplateEditor extends LightningElement {
             this.showToast('Success', 'File deleted successfully', 'success');
             await this.checkTemplateFile();
         } catch (error) {
-            this.showToast('Error', 'Failed to delete file: ' + (error.body?.message || error.message), 'error');
+            this.showToast(
+                'Error',
+                'Failed to delete file: ' + (error.body?.message || error.message || error),
+                'error'
+            );
         } finally {
             this.isLoading = false;
         }
     }
 
+    updatePreviewContainer() {
+        setTimeout(() => {
+            const container = this.template.querySelector('.preview-container');
+            if (container && this.previewHtml) {
+                container.innerHTML = this.previewHtml;
+            }
+        }, 0);
+    }
+
     handleClosePreview() {
         this.showPreview = false;
         this.previewHtml = '';
+
+        setTimeout(() => {
+            const container = this.template.querySelector('.preview-container');
+            if (container) {
+                container.innerHTML = '';
+            }
+        }, 0);
     }
 
     get discoveredFieldsColumns() {
@@ -561,7 +603,53 @@ export default class TemplateEditor extends LightningElement {
     }
 
     showToast(title, message, variant) {
-        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+        this.dispatchEvent(
+            new ShowToastEvent({
+                title,
+                message,
+                variant
+            })
+        );
+    }
+
+    /**
+     * Extract field patterns from template text (simple regex-based extraction)
+     * Used when primary object is not set
+     */
+    extractFieldPatterns(templateText) {
+        // eslint-disable-next-line no-console
+        console.log('🔍 extractFieldPatterns called with text length:', templateText.length);
+        const fields = new Set();
+
+        // Match {field} or {nested.path}, but not {#...} or {/...}
+        const variableRegex = /\{(?![#\/])([\w.]+)\}/g;
+        let match;
+        let matchCount = 0;
+
+        // eslint-disable-next-line no-cond-assign
+        while ((match = variableRegex.exec(templateText)) !== null) {
+            matchCount++;
+            const path = match[1].trim();
+            // eslint-disable-next-line no-console
+            console.log(`  Found match ${matchCount}: "${path}"`);
+            if (
+                path &&
+                path !== 'each' &&
+                path !== 'if' &&
+                path !== 'unless' &&
+                path !== 'with'
+            ) {
+                fields.add(path);
+                // eslint-disable-next-line no-console
+                console.log(`  ✅ Added field: "${path}"`);
+            } else {
+                // eslint-disable-next-line no-console
+                console.log(`  ⏭️ Skipped keyword: "${path}"`);
+            }
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(`📊 Total matches found: ${matchCount}, unique fields: ${fields.size}`);
+        return Array.from(fields).sort();
     }
 }
-
