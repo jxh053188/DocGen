@@ -136,7 +136,7 @@ export default class PdfViewerTest extends LightningElement {
         // This avoids "Caching an empty reference is prohibited" error
         let container;
         try {
-            container = this.template.querySelector('[data-id="pdf-container"]');
+            container = this.querySelector('[data-id="pdf-container"]');
         } catch (e) {
             // Locker Service restriction - just return silently
             console.warn('[pdfViewerTest] Cannot query template yet:', e.message);
@@ -278,7 +278,7 @@ export default class PdfViewerTest extends LightningElement {
         // Query container FRESH each time - never store on `this`
         let container;
         try {
-            container = this.template.querySelector('[data-id="pdf-container"]');
+            container = this.querySelector('[data-id="pdf-container"]');
         } catch (e) {
             console.error('❌ Failed to get container (Locker restriction):', e.message);
             return;
@@ -351,7 +351,7 @@ export default class PdfViewerTest extends LightningElement {
             }).promise;
 
             // Re-query container to ensure it still exists before appending
-            const finalContainer = this.template.querySelector('[data-id="pdf-container"]');
+            const finalContainer = this.querySelector('[data-id="pdf-container"]');
             if (finalContainer) {
                 finalContainer.appendChild(canvas);
                 console.log('✅ PDF rendered successfully with LWS');
