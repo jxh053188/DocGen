@@ -1,0 +1,38 @@
+<template>
+    <!-- Hidden resource loader - workaround for known Salesforce issue -->
+    <!-- https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
+    <template if:false={skipResourceLoader}>
+        <c-resource-loader resource-url={pdfjsUrl} onresourceloaded={handlePdfjsLoaded}
+            onresourceerror={handleResourceError}></c-resource-loader>
+    </template>
+
+    <template if:true={errorMessage}>
+        <div class="slds-p-around_medium">
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <h2>{errorMessage}</h2>
+            </div>
+        </div>
+    </template>
+
+    <template if:false={errorMessage}>
+        <div class="pdf-viewer-container slds-is-relative slds-size_full">
+            <template if:true={loading}>
+                <div class="pdf-loading-container slds-grid slds-grid_align-center slds-media_center">
+                    <lightning-spinner alternative-text="Loading PDF..."></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:false={loading}>
+                <template if:true={pageCount}>
+                    <div class="slds-p-around_medium">
+                        <div class="slds-text-heading_small">
+                            {fileName} - Page {currentPage} of {pageCount}
+                        </div>
+                    </div>
+                </template>
+
+                <div class="pdf-pages-container slds-size_full slds-text-align_center" lwc:dom="manual"></div>
+            </template>
+        </div>
+    </template>
+</template>

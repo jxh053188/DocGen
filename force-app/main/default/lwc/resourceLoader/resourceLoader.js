@@ -26,7 +26,7 @@ export default class ResourceLoader extends LightningElement {
             .catch((error) => {
                 console.error('❌ Failed to load resource:', this.resourceUrl, error);
                 this.dispatchEvent(new CustomEvent('resourceerror', {
-                    detail: { error: error.message }
+                    detail: { error: error?.message || String(error) || 'Unknown error' }
                 }));
             });
     }

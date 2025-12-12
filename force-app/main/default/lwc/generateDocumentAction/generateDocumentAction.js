@@ -1,11 +1,6 @@
 import { LightningElement, api, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
-import { loadScript } from 'lightning/platformResourceLoader';
-import html2pdf from '@salesforce/resourceUrl/html2pdf';
-
-
-
 import getTemplatesForObject from '@salesforce/apex/TemplateController.getTemplatesForObject';
 import getTemplate from '@salesforce/apex/TemplateController.getTemplate';
 import getTemplateFile from '@salesforce/apex/TemplateController.getTemplateFile';
@@ -18,6 +13,7 @@ import { discoverFields } from 'c/discoveryUtils';
 import { render as renderTemplate } from 'c/templateEngine';
 
 export default class GenerateDocumentAction extends LightningElement {
+    static renderMode = 'light';
     @api recordId;
     @api objectApiName;
 
@@ -30,7 +26,6 @@ export default class GenerateDocumentAction extends LightningElement {
     @track fileName = 'document.pdf';
 
     userSettings = {};
-    html2pdfLoaded = false;
 
 
 
@@ -53,19 +48,6 @@ export default class GenerateDocumentAction extends LightningElement {
     async connectedCallback() {
         this.loadUserSettings();
         this.loadTemplates();
-
-        // Load html2pdf library
-        try {
-            await loadScript(this, html2pdf);
-            this.html2pdfLoaded = true;
-            console.log('✅ html2pdf loaded successfully');
-        } catch (error) {
-            console.error('❌ Failed to load html2pdf:', error);
-            this.showToast('Error', 'Failed to load PDF library', 'error');
-        }
-
-        // Load HTML2PDF library (lazy load when needed)
-        // We'll load them when a Word template is selected
     }
 
     async loadUserSettings() {
@@ -90,7 +72,8 @@ export default class GenerateDocumentAction extends LightningElement {
             this.templates = await getTemplatesForObject({ sObjectName: this.objectApiName });
 
             if (this.templates.length === 0) {
-                this.showToast('Info', `No active templates found for ${this.objectApiName}`, 'info');
+                // Removed toast - it was annoying on page load
+                // this.showToast('Info', `No active templates found for ${this.objectApiName}`, 'info');
             }
         } catch (error) {
             this.showToast('Error', 'Failed to load templates: ' + error.body?.message, 'error');
@@ -181,47 +164,118 @@ export default class GenerateDocumentAction extends LightningElement {
 
     async renderPdf(html) {
         try {
-            // Check if html2pdf is loaded
-            if (!this.html2pdfLoaded || !window.html2pdf) {
-                throw new Error('PDF library not loaded. Please refresh the page.');
+            // Check if html2canvas and PDFLib are available
+            if (!window.html2canvas) {
+                throw new Error('html2canvas library not loaded. Please refresh the page.');
+            }
+            if (!window.PDFLib) {
+                throw new Error('PDFLib library not loaded. Please refresh the page.');
             }
 
             // Create a temporary container for the HTML
+            // Based on https://github.com/niklasvh/html2canvas/issues/2929
+            // html2canvas requires elements to be fully visible, not transformed, and in viewport
             const container = document.createElement('div');
+            container.classList.add('pdf-render-container');
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
             container.innerHTML = html;
-            container.style.position = 'absolute';
-            container.style.left = '-9999px';
-            container.style.width = '210mm'; // A4 width
+            
+            // Style the container - must be fully visible, no transforms, in viewport
+            container.style.position = 'fixed';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.width = '794px'; // A4 width in pixels (210mm at 96 DPI)
+            container.style.minHeight = '1123px'; // A4 height in pixels (297mm at 96 DPI)
+            container.style.backgroundColor = 'white';
+            container.style.padding = '20px';
+            container.style.boxSizing = 'border-box';
+            container.style.overflow = 'visible';
+            container.style.zIndex = '999999';
+            // Make it very small but fully visible (no transform, no opacity)
+            // Use width/height instead of transform to avoid iframe cloning issues
+            container.style.width = '79px'; // 10% of original size
+            container.style.minHeight = '112px'; // 10% of original size
+            container.style.fontSize = '1px'; // Scale down font proportionally
+            
             document.body.appendChild(container);
 
-            // Configure pdf options
-            const options = {
-                margin: 10,
-                filename: this.fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true
-                },
-                jsPDF: {
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                }
-            };
+            // Force a reflow to ensure element is laid out
+            // eslint-disable-next-line no-unused-expressions
+            container.offsetHeight;
 
-            // Generate PDF and get as blob
-            const pdf = await window.html2pdf()
-                .set(options)
-                .from(container)
-                .outputPdf('blob');
+            // Wait for content to render and layout to settle
+            await new Promise((resolve) => {
+                // eslint-disable-next-line @lwc/lwc/no-async-operation
+                setTimeout(() => {
+                    resolve();
+                }, 500);
+            });
+
+            // Convert HTML to canvas using html2canvas
+            // Use onclone to ensure element is accessible in cloned document
+            // The element parameter is the cloned element itself
+            const canvas = await window.html2canvas(container, {
+                scale: 10, // Scale up to compensate for small size
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                removeContainer: false,
+                onclone: (clonedDoc, clonedElement) => {
+                    // clonedElement is the cloned container element
+                    // Based on https://github.com/niklasvh/html2canvas/issues/2929
+                    if (clonedElement) {
+                        // Reset styles in cloned document to ensure it's visible and accessible
+                        clonedElement.style.position = 'absolute';
+                        clonedElement.style.top = '0';
+                        clonedElement.style.left = '0';
+                        clonedElement.style.width = '794px';
+                        clonedElement.style.minHeight = '1123px';
+                        clonedElement.style.fontSize = '16px'; // Reset font size
+                        clonedElement.style.visibility = 'visible';
+                        clonedElement.style.opacity = '1';
+                    }
+                }
+            });
 
             // Remove temporary container
-            document.body.removeChild(container);
+            if (container.parentNode) {
+                document.body.removeChild(container);
+            }
 
-            // Convert blob to base64
-            const pdfBase64 = await this.blobToBase64(pdf);
+            // Convert canvas to image data
+            const imgData = canvas.toDataURL('image/png');
+
+            // Create PDF using pdf-lib
+            const { PDFDocument } = window.PDFLib;
+            const pdfDoc = await PDFDocument.create();
+            
+            // A4 dimensions in points (1 point = 1/72 inch)
+            const pageWidth = 595.28; // A4 width in points
+            const pageHeight = 841.89; // A4 height in points
+            
+            // Calculate dimensions to fit page
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+            const scaledWidth = imgWidth * scale;
+            const scaledHeight = imgHeight * scale;
+            
+            // Add page and embed image
+            const page = pdfDoc.addPage([pageWidth, pageHeight]);
+            const pngImage = await pdfDoc.embedPng(imgData);
+            page.drawImage(pngImage, {
+                x: 0,
+                y: pageHeight - scaledHeight, // Top-left origin in pdf-lib
+                width: scaledWidth,
+                height: scaledHeight
+            });
+
+            // Generate PDF bytes
+            const pdfBytes = await pdfDoc.save();
+
+            // Convert Uint8Array to base64 efficiently
+            const pdfBase64 = this.uint8ArrayToBase64(pdfBytes);
 
             return pdfBase64;
 
@@ -242,6 +296,20 @@ export default class GenerateDocumentAction extends LightningElement {
             reader.onerror = reject;
             reader.readAsDataURL(blob);
         });
+    }
+
+    /**
+     * Convert Uint8Array to base64 string efficiently
+     * Handles large arrays without stack overflow
+     */
+    uint8ArrayToBase64(uint8Array) {
+        let binary = '';
+        const chunkSize = 8192; // Process in chunks to avoid stack overflow
+        for (let i = 0; i < uint8Array.length; i += chunkSize) {
+            const chunk = uint8Array.subarray(i, i + chunkSize);
+            binary += String.fromCharCode.apply(null, chunk);
+        }
+        return btoa(binary);
     }
 
     async handleSave() {

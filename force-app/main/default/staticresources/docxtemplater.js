@@ -25045,17 +25045,35 @@ var require_js2 = __commonJS({
 // /input.ts
 // For static resource usage in Salesforce LWC, assign to window object
 // This allows the library to be accessed as window.docxtemplater after loading via loadScript
-(function() {
-    try {
+(function () {
+  // Use setTimeout to ensure all CommonJS modules are fully initialized
+  // This prevents race conditions where require_docxtemplater might not be ready
+  if (typeof window !== 'undefined') {
+    setTimeout(function () {
+      try {
+        // Verify require_docxtemplater is available
+        if (typeof require_docxtemplater !== 'function') {
+          console.error('docxtemplater: require_docxtemplater is not a function. Type:', typeof require_docxtemplater);
+          return;
+        }
+
         var docxtemplaterModule = require_docxtemplater();
+
         // CommonJS module: module.exports = Docxtemplater and module.exports["default"] = Docxtemplater
         // So the module itself IS the Docxtemplater constructor
         if (docxtemplaterModule) {
-            window.docxtemplater = docxtemplaterModule.default || docxtemplaterModule;
+          window.docxtemplater = docxtemplaterModule.default || docxtemplaterModule;
+          console.log('✅ Docxtemplater static resource assigned to window.docxtemplater, type:', typeof window.docxtemplater);
         } else {
-            console.error('docxtemplaterModule is null or undefined');
+          console.error('docxtemplater: docxtemplaterModule is null or undefined');
         }
-    } catch (e) {
-        console.error('Error assigning docxtemplater to window:', e);
-    }
+      } catch (e) {
+        console.error('docxtemplater: Error assigning Docxtemplater to window:', e);
+        console.error('docxtemplater: Error stack:', e?.stack);
+        console.error('docxtemplater: Error message:', e?.message);
+      }
+    }, 0); // Use 0ms delay to defer to next event loop tick
+  } else {
+    console.warn('docxtemplater: window is not defined. Cannot assign to window.docxtemplater.');
+  }
 })();
