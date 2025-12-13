@@ -11,12 +11,10 @@ import getUserSettings from '@salesforce/apex/TemplateController.getUserSettings
 import getChildRelationships from '@salesforce/apex/TemplateController.getChildRelationships';
 import { discoverFields } from 'c/discoveryUtils';
 import { render as renderTemplate } from 'c/templateEngine';
-import PIZZIP from '@salesforce/resourceUrl/pizzip';
-import DOCXTEMPLATER from '@salesforce/resourceUrl/docxtemplater';
-
-const MAX_HTML_LENGTH = 131072; // Max characters for Html_Body__c field
+import PdfjsViewer from 'c/pdfjsViewer';
 
 export default class TemplateEditor extends LightningElement {
+    static renderMode = 'light';
     @api recordId; // Template record Id
 
     @track template = {};
@@ -24,6 +22,9 @@ export default class TemplateEditor extends LightningElement {
     @track isLoading = false;
     @track showPreview = false;
     @track previewHtml = '';
+    @track previewLoading = false;
+    @track previewPdfUrl = null;
+    @track previewPdfBytes = null; // Uint8Array of PDF bytes for pdfjs viewer
     @track queryPlan = null;
     @track discoveredFields = [];
     @track relationships = [];
@@ -36,22 +37,8 @@ export default class TemplateEditor extends LightningElement {
     @track status = 'Draft';
 
     userSettings = {};
-    sampleRecordId = '';
-
-    // Script loading flags (tracked for template reactivity)
-    @track pizzipLoaded = false;
-    @track docxtemplaterLoaded = false;
-    pizzipLoadPromise = null;
-    docxtemplaterLoadPromise = null;
-
-    // Resource URLs for resourceLoader components
-    get pizzipUrl() {
-        return PIZZIP;
-    }
-
-    get docxtemplaterUrl() {
-        return DOCXTEMPLATER;
-    }
+    @track sampleRecordId = '';
+    @track outputFormat = 'PDF'; // 'PDF' or 'DOCX' for Word templates
 
     connectedCallback() {
         this.loadUserSettings();
@@ -62,70 +49,14 @@ export default class TemplateEditor extends LightningElement {
     }
 
     renderedCallback() {
-        // Update preview container when preview HTML changes
-        if (this.showPreview && this.previewHtml) {
+        // Update preview container when preview HTML changes and modal is visible
+        if (this.showPreview && this.previewHtml && !this.previewLoading) {
+            // eslint-disable-next-line no-console
+            console.log('renderedCallback: Calling updatePreviewContainer');
             this.updatePreviewContainer();
         }
     }
 
-    // Event handlers for resourceLoader components
-    handlePizzipLoaded() {
-        this.pizzipLoaded = true;
-        // eslint-disable-next-line no-console
-        console.log('PizZip loaded successfully');
-        // Resolve the promise if it exists
-        if (this.pizzipLoadPromise) {
-            this.pizzipLoadPromise.resolve();
-        }
-    }
-
-    handleDocxtemplaterLoaded() {
-        this.docxtemplaterLoaded = true;
-        // eslint-disable-next-line no-console
-        console.log('Docxtemplater loaded successfully', typeof window.docxtemplater);
-        // Resolve the promise if it exists
-        if (this.docxtemplaterLoadPromise) {
-            this.docxtemplaterLoadPromise.resolve();
-        }
-    }
-
-    handleResourceError(event) {
-        const error = event.detail?.error || 'Unknown error';
-        // eslint-disable-next-line no-console
-        console.error('Error loading resource:', error);
-        this.showToast(
-            'Error',
-            'Failed to load Word template libraries: ' + error,
-            'error'
-        );
-    }
-
-    /**
-     * Wait for libraries to be loaded via resourceLoader components
-     * Returns immediately if already loaded
-     */
-    waitForLibraries() {
-        // If already loaded, return immediately
-        if (this.pizzipLoaded && this.docxtemplaterLoaded) {
-            return Promise.resolve();
-        }
-
-        // Create promises that will be resolved by event handlers
-        const pizzipPromise = this.pizzipLoaded
-            ? Promise.resolve()
-            : new Promise((resolve) => {
-                this.pizzipLoadPromise = { resolve };
-            });
-
-        const docxtemplaterPromise = this.docxtemplaterLoaded
-            ? Promise.resolve()
-            : new Promise((resolve) => {
-                this.docxtemplaterLoadPromise = { resolve };
-            });
-
-        // Wait for both to load
-        return Promise.all([pizzipPromise, docxtemplaterPromise]);
-    }
 
     get isWordTemplate() {
         return this.sourceType === 'Word';
@@ -223,11 +154,19 @@ export default class TemplateEditor extends LightningElement {
     }
 
     handleSampleRecordChange(event) {
-        this.sampleRecordId = event.target.value;
+        this.sampleRecordId = event.detail.value;
+        // eslint-disable-next-line no-console
+        console.log('Sample Record ID changed to:', this.sampleRecordId);
     }
 
     handleStatusChange(event) {
         this.status = event.detail.value;
+    }
+
+    handleOutputFormatChange(event) {
+        this.outputFormat = event.detail.value;
+        // eslint-disable-next-line no-console
+        console.log('Output format changed to:', this.outputFormat);
     }
 
     async handleSourceTypeChange(event) {
@@ -256,13 +195,45 @@ export default class TemplateEditor extends LightningElement {
             let templateText = '';
 
             if (this.isWordTemplate) {
-                this.showToast(
-                    'Error',
-                    'Word templates are not supported yet. Please use HTML templates.',
-                    'error'
-                );
+                // Get the Word document file and extract template text
+                if (!this.recordId) {
+                    this.showToast('Error', 'Template ID is required to load the Word document.', 'error');
                 this.isLoading = false;
                 return;
+                }
+
+
+                const fileData = await getTemplateFile({ templateId: this.recordId });
+
+                if (!fileData || !fileData.base64Data) {
+                    this.showToast('Error', 'Word template file not found. Please upload a Word document first.', 'error');
+                    this.isLoading = false;
+                    return;
+                }
+
+                // Convert base64 to binary
+                const binaryString = atob(fileData.base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // Load into PizZip and extract document.xml
+                const pizzip = new window.PizZip(bytes);
+                const zip = pizzip;
+                const documentXml = zip.files['word/document.xml']?.asText();
+
+                if (!documentXml) {
+                    this.showToast('Error', 'Could not extract document content from Word file.', 'error');
+                    this.isLoading = false;
+                    return;
+                }
+
+                // Extract template text from XML
+                templateText = documentXml
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
             } else {
                 if (!this.htmlBody) {
                     this.showToast('Error', 'HTML body is required', 'error');
@@ -319,7 +290,11 @@ export default class TemplateEditor extends LightningElement {
             if (!this.queryPlan) return;
         }
 
+        // Show spinner but don't open modal yet
         this.isLoading = true;
+        this.previewLoading = true;
+        this.showPreview = false;
+
         try {
             // eslint-disable-next-line no-console
             console.log('📊 SOQL Query:', this.queryPlan.soqlQuery);
@@ -334,18 +309,41 @@ export default class TemplateEditor extends LightningElement {
             // eslint-disable-next-line no-console
             console.log('✅ Fetched Data JSON:', dataJson);
 
-            let html = '';
-
             if (this.isWordTemplate) {
-                html = await this.previewWordTemplate(dataJson);
+                // For Word templates, generate PDF or DOCX based on user selection
+                if (this.outputFormat === 'PDF') {
+                    const pdfBytes = await this.previewWordTemplate(dataJson, 'PDF');
+                    // Store PDF bytes for viewer instead of downloading
+                    this.previewPdfBytes = pdfBytes;
+                    this.previewPdfUrl = null; // Clear old URL if any
+                    this.showPreview = true;
+                    // eslint-disable-next-line no-console
+                    console.log('Word template PDF generated for preview');
             } else {
-                html = await this.compileTemplate(this.htmlBody, dataJson);
+                    // DOCX format - download rendered DOCX directly (no viewer for DOCX)
+                    const docxBytes = await this.previewWordTemplate(dataJson, 'DOCX');
+                    this.downloadDocx(docxBytes, this.template.Name || 'document');
+                    // eslint-disable-next-line no-console
+                    console.log('Word template DOCX generated and downloaded');
+                }
+            } else {
+                // For HTML templates, convert to PDF and show in viewer
+                const htmlContent = await this.compileTemplate(this.htmlBody, dataJson);
+                // eslint-disable-next-line no-console
+                console.log('HTML template compiled, converting to PDF, length:', htmlContent?.length || 0);
+                const pdfBytes = await this.renderPdf(htmlContent);
+                // Store PDF bytes for viewer instead of downloading
+                this.previewPdfBytes = pdfBytes;
+                this.previewPdfUrl = null; // Clear old URL if any
+                this.showPreview = true;
+                // eslint-disable-next-line no-console
+                console.log('HTML template PDF generated for preview');
             }
 
-            this.previewHtml = html;
-            this.showPreview = true;
-            this.updatePreviewContainer();
+            this.previewLoading = false;
         } catch (error) {
+            this.previewLoading = false;
+            this.showPreview = false;
             this.showToast(
                 'Error',
                 'Preview failed: ' + (error.body?.message || error.message || error),
@@ -356,9 +354,344 @@ export default class TemplateEditor extends LightningElement {
         }
     }
 
-    async previewWordTemplate() {
-        throw new Error('Word templates are not supported yet. Please use HTML templates.');
+    /**
+     * Download PDF file
+     * @param {Uint8Array} pdfBytes - PDF file bytes
+     * @param {string} filename - Filename without extension
+     */
+    downloadPdf(pdfBytes, filename) {
+        try {
+            // Validate input
+            if (!pdfBytes) {
+                throw new Error('PDF bytes are empty or undefined');
+            }
+
+            // Ensure pdfBytes is a Uint8Array
+            let bytes = pdfBytes;
+            if (!(bytes instanceof Uint8Array)) {
+                // eslint-disable-next-line no-console
+                console.warn('PDF bytes is not Uint8Array, converting...', typeof bytes);
+                if (Array.isArray(bytes)) {
+                    bytes = new Uint8Array(bytes);
+                } else if (bytes instanceof ArrayBuffer) {
+                    bytes = new Uint8Array(bytes);
+                } else if (typeof bytes === 'string') {
+                    // Handle base64 string - decode it
+                    try {
+                        const binaryString = atob(bytes);
+                        bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+        } catch (error) {
+                        throw new Error('Invalid PDF bytes format: string is not valid base64 - ' + error.message);
+                    }
+                } else {
+                    throw new Error('Invalid PDF bytes format: ' + typeof bytes);
+                }
+            }
+
+            // Validate PDF header
+            if (bytes.length < 4) {
+                throw new Error('PDF bytes too short');
+            }
+
+            // Create blob from PDF bytes
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            
+            // Verify blob size
+            if (blob.size === 0) {
+                throw new Error('Created blob is empty');
+            }
+
+            // Create download link
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${filename || 'document'}.pdf`;
+            link.style.display = 'none';
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up after a short delay to ensure download starts
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            this.showToast('Success', 'PDF downloaded successfully', 'success');
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('PDF download failed:', error);
+            // eslint-disable-next-line no-console
+            console.error('PDF bytes type:', typeof pdfBytes);
+            // eslint-disable-next-line no-console
+            console.error('PDF bytes length:', pdfBytes?.length);
+            this.showToast('Error', 'Failed to download PDF: ' + error.message, 'error');
+        }
     }
+
+    /**
+     * Download DOCX file
+     * @param {Uint8Array} docxBytes - DOCX file bytes
+     * @param {string} filename - Filename without extension
+     */
+    downloadDocx(docxBytes, filename) {
+        try {
+            // Validate input
+            if (!docxBytes) {
+                throw new Error('DOCX bytes are empty or undefined');
+            }
+
+            // Ensure docxBytes is a Uint8Array
+            let bytes = docxBytes;
+            if (!(bytes instanceof Uint8Array)) {
+                // eslint-disable-next-line no-console
+                console.warn('DOCX bytes is not Uint8Array, converting...', typeof bytes);
+                if (Array.isArray(bytes)) {
+                    bytes = new Uint8Array(bytes);
+                } else if (bytes instanceof ArrayBuffer) {
+                    bytes = new Uint8Array(bytes);
+                } else {
+                    throw new Error('Invalid DOCX bytes format: ' + typeof bytes);
+                }
+            }
+
+            // Validate DOCX header (ZIP file signature: PK)
+            if (bytes.length < 4) {
+                throw new Error('DOCX bytes too short');
+            }
+
+            // Create blob from DOCX bytes
+            // Use application/zip since DOCX files are ZIP archives (more compatible than the full MIME type)
+            // The .docx extension in the download filename will ensure proper file association
+            const blob = new Blob([bytes], { type: 'application/zip' });
+            
+            // Verify blob size
+            if (blob.size === 0) {
+                throw new Error('Created blob is empty');
+            }
+
+            // Create download link
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${filename || 'document'}.docx`;
+            link.style.display = 'none';
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up after a short delay to ensure download starts
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            this.showToast('Success', 'DOCX downloaded successfully', 'success');
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('DOCX download failed:', error);
+            // eslint-disable-next-line no-console
+            console.error('DOCX bytes type:', typeof docxBytes);
+            // eslint-disable-next-line no-console
+            console.error('DOCX bytes length:', docxBytes?.length);
+            this.showToast('Error', 'Failed to download DOCX: ' + error.message, 'error');
+        }
+    }
+
+    async previewWordTemplate(dataJson, format = 'PDF') {
+        // Get the template file from the record
+        if (!this.recordId) {
+            throw new Error('Template ID is required to load the Word document.');
+        }
+
+        const fileData = await getTemplateFile({ templateId: this.recordId });
+
+        if (!fileData || !fileData.base64Data) {
+            throw new Error('Word template file not found. Please upload a Word document first.');
+        }
+
+        // Convert base64 to binary
+        const binaryString = atob(fileData.base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        // Load into PizZip and create docxtemplater instance
+        const pizzip = new window.PizZip(bytes);
+        const doc = new window.docxtemplater(pizzip);
+
+        // Parse the data
+            const data = JSON.parse(dataJson);
+
+        // Render the template with data
+        try {
+            doc.render(data);
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Docxtemplater render error:', error);
+            throw new Error('Failed to render Word template: ' + (error.message || error));
+        }
+
+        // Get the rendered ZIP
+        const zip = doc.getZip();
+
+        if (format === 'DOCX') {
+            // Return DOCX bytes directly
+            const docxBytes = zip.generate({ type: 'uint8array' });
+            // eslint-disable-next-line no-console
+            console.log('DOCX generated, bytes length:', docxBytes.length);
+            return docxBytes;
+        }
+
+        // PDF format - convert DOCX to HTML using mammoth, then to PDF using jsPDF
+        // Get the rendered DOCX as Uint8Array
+        const docxBytes = zip.generate({ type: 'uint8array' });
+        
+        // eslint-disable-next-line no-console
+        console.log('Rendered DOCX generated, bytes length:', docxBytes.length);
+
+        // Convert DOCX to HTML using mammoth
+        const mammothResult = await window.mammoth.convertToHtml({ arrayBuffer: docxBytes.buffer });
+        const html = mammothResult.value;
+        console.log('Mammoth HTML:', html);
+        const messages = mammothResult.messages || [];
+
+        // Log any conversion messages
+        if (messages.length > 0) {
+            // eslint-disable-next-line no-console
+            console.log('Mammoth conversion messages:', messages);
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('Converted to HTML using mammoth, length:', html.length);
+
+        // Convert HTML to PDF using jsPDF
+        const pdfBytes = await this.renderPdf(html);
+
+        // eslint-disable-next-line no-console
+        console.log('PDF generated, bytes length:', pdfBytes.length);
+
+        // Return PDF bytes directly (Uint8Array) for download
+        return pdfBytes;
+    }
+
+    async renderPdf(html) {
+        try {
+            // Get jsPDF from window
+            const jsPDF = window.jsPDF || 
+                         (window.jspdf && (window.jspdf.jsPDF || window.jspdf.default)) ||
+                         (typeof window.jspdf === 'function' ? window.jspdf : null);
+            
+            if (!jsPDF || typeof jsPDF !== 'function') {
+                throw new Error('jsPDF library not loaded. Please refresh the page.');
+            }
+
+            // Ensure HTML is a string
+            let htmlContent = html;
+            if (typeof htmlContent !== 'string') {
+                htmlContent = String(htmlContent);
+            }
+            
+            // Clean HTML - remove script tags and other problematic elements
+            htmlContent = htmlContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+            
+            // If mammoth output is a full HTML document, extract the body content
+            if (htmlContent.includes('<body')) {
+                const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                if (bodyMatch && bodyMatch[1]) {
+                    htmlContent = bodyMatch[1].trim();
+                }
+            }
+
+            // Create jsPDF instance (A4 format, portrait)
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Parse HTML and convert to text with line breaks preserved
+            // Create a temporary DOM element to parse HTML
+            const tempDiv = document.createElement('div');
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
+            tempDiv.innerHTML = htmlContent;
+            
+            // Extract text content while preserving line breaks
+            // Replace <br> and </p><p> with newlines
+            const textWithBreaks = tempDiv.innerHTML
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/p>\s*<p>/gi, '\n\n')
+                .replace(/<\/div>\s*<div>/gi, '\n')
+                .replace(/<[^>]+>/g, '') // Remove all remaining HTML tags
+                .replace(/&nbsp;/g, ' ')
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'");
+
+            // Split into lines and add to PDF
+            const lines = textWithBreaks.split('\n');
+            const margin = 20; // 20mm margins
+            const pageWidth = 210 - (margin * 2); // A4 width minus margins
+            let yPosition = margin;
+            const lineHeight = 7; // Line height in mm
+            const fontSize = 12; // Font size in points
+
+            pdf.setFontSize(fontSize);
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (!line) {
+                    // Empty line - add spacing
+                    yPosition += lineHeight * 0.5;
+                } else {
+                    // Check if we need a new page
+                    if (yPosition + lineHeight > 297 - margin) {
+                        pdf.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    // Split long lines to fit page width
+                    const textLines = pdf.splitTextToSize(line, pageWidth);
+                    pdf.text(textLines, margin, yPosition);
+                    yPosition += textLines.length * lineHeight;
+                }
+            }
+
+            // Get PDF as Uint8Array
+            const pdfBytes = pdf.output('arraybuffer');
+            const uint8Array = new Uint8Array(pdfBytes);
+
+            // Validate PDF bytes
+            if (!uint8Array || uint8Array.length === 0) {
+                throw new Error('Generated PDF is empty');
+            }
+
+            // Verify PDF header (PDF files start with %PDF)
+            const header = String.fromCharCode(...uint8Array.slice(0, 4));
+            if (header !== '%PDF') {
+                // eslint-disable-next-line no-console
+                console.warn('PDF header validation failed, but continuing...');
+            }
+
+            return uint8Array;
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('PDF rendering failed:', error);
+            throw new Error('PDF rendering failed: ' + error.message);
+        }
+    }
+
 
     async compileTemplate(htmlTemplate, dataJson) {
         const data = JSON.parse(dataJson);
@@ -372,7 +705,7 @@ export default class TemplateEditor extends LightningElement {
         }
 
         if (this.isWordTemplate && !this.hasTemplateFile && !this.uploadedFile) {
-            this.showToast('Error', 'Word templates are not supported yet', 'error');
+            this.showToast('Error', 'Word template file is required. Please upload a Word document.', 'error');
             return;
         }
 
@@ -394,8 +727,8 @@ export default class TemplateEditor extends LightningElement {
 
                     const fieldsString =
                         this.extractedFields && this.extractedFields.length > 0
-                            ? this.extractedFields.join(', ')
-                            : '';
+                        ? this.extractedFields.join(', ')
+                        : '';
 
                     // eslint-disable-next-line no-console
                     console.log('💾 Saving template with fields:', fieldsString);
@@ -474,21 +807,11 @@ export default class TemplateEditor extends LightningElement {
 
         this.uploadedFile = file;
         this.uploadedFileName = file.name;
+        this.isLoading = true;
 
         try {
             const base64Data = await this.readFileAsBase64(file);
 
-            // Wait for libraries to be loaded via resourceLoader
-            await this.waitForLibraries();
-
-            if (!window.PizZip || !window.docxtemplater) {
-                this.showToast(
-                    'Error',
-                    'Required libraries not loaded. Please refresh the page.',
-                    'error'
-                );
-                return;
-            }
 
             const binaryString = atob(base64Data);
             const bytes = new Uint8Array(binaryString.length);
@@ -509,24 +832,66 @@ export default class TemplateEditor extends LightningElement {
                     .trim();
 
                 if (this.template.Primary_Object__c) {
+                    // Automatically discover fields and build query plan
                     const discovery = discoverFields(
                         templateText,
                         this.template.Primary_Object__c
                     );
+
+                    // Extract field list for backward compatibility
                     let fields = [...discovery.scalarPaths];
                     discovery.collections.forEach(collection => {
                         fields.push(...collection.fieldPaths);
                     });
                     this.extractedFields = [...new Set(fields)].sort();
-                } else {
-                    this.extractedFields = this.extractFieldPatterns(templateText);
-                }
 
-                this.showToast(
-                    'Success',
-                    `File "${file.name}" ready. Found ${this.extractedFields.length} fields.`,
-                    'success'
-                );
+                    // Build query plan and update discoveredFields for UI display
+                    try {
+                        // eslint-disable-next-line no-console
+                        console.log('📤 Auto-discovery payload:', discovery);
+
+                        const payloadJson = JSON.stringify(discovery);
+
+                        const queryPlanJson = await buildQueryPlan({
+                            payloadJson: payloadJson,
+                            templateId: this.recordId
+                        });
+
+                        this.queryPlan = JSON.parse(queryPlanJson);
+
+                        this.discoveredFields = [
+                            ...discovery.scalarPaths.map(p => ({ type: 'Scalar', path: p })),
+                            ...discovery.collections.map(c => ({
+                                type: 'Collection',
+                                path: c.relationshipName,
+                                fields: c.fieldPaths.join(', ')
+                            }))
+                        ];
+
+                        this.showToast(
+                            'Success',
+                            `File "${file.name}" uploaded. Discovered ${this.discoveredFields.length} field(s) automatically.`,
+                            'success'
+                        );
+                    } catch (discoveryError) {
+                        // eslint-disable-next-line no-console
+                        console.error('Failed to build query plan:', discoveryError);
+                        // Still show success for file upload, but warn about discovery
+                        this.showToast(
+                            'Success',
+                            `File "${file.name}" uploaded. Found ${this.extractedFields.length} fields, but query plan generation failed.`,
+                            'warning'
+                        );
+                    }
+                } else {
+                    // No primary object, just extract field patterns
+                    this.extractedFields = this.extractFieldPatterns(templateText);
+                    this.showToast(
+                        'Success',
+                        `File "${file.name}" ready. Found ${this.extractedFields.length} fields. Set Primary Object to enable automatic discovery.`,
+                        'success'
+                    );
+                }
             } else {
                 this.showToast(
                     'Warning',
@@ -544,6 +909,8 @@ export default class TemplateEditor extends LightningElement {
                 'error'
             );
             this.extractedFields = [];
+        } finally {
+            this.isLoading = false;
         }
     }
 
@@ -570,24 +937,136 @@ export default class TemplateEditor extends LightningElement {
     }
 
     updatePreviewContainer() {
+        // eslint-disable-next-line no-console
+        console.log('🔄 updatePreviewContainer called');
+        // eslint-disable-next-line no-console
+        console.log('  - showPreview:', this.showPreview);
+        // eslint-disable-next-line no-console
+        console.log('  - previewHtml length:', this.previewHtml?.length || 0);
+        // eslint-disable-next-line no-console
+        console.log('  - previewLoading:', this.previewLoading);
+
+        // Use a small delay to ensure DOM is ready
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
         setTimeout(() => {
+            // eslint-disable-next-line no-console
+            console.log('  - Looking for container...');
             const container = this.template.querySelector('.preview-container');
-            if (container && this.previewHtml) {
-                container.innerHTML = this.previewHtml;
+            // eslint-disable-next-line no-console
+            console.log('  - Container found:', !!container);
+
+            if (!container) {
+                // eslint-disable-next-line no-console
+                console.error('❌ Preview container not found! Trying again...');
+                // Try again after a longer delay
+                // eslint-disable-next-line @lwc/lwc/no-async-operation
+                setTimeout(() => {
+                    const retryContainer = this.template.querySelector('.preview-container');
+                    // eslint-disable-next-line no-console
+                    console.log('  - Retry: Container found:', !!retryContainer);
+                    if (retryContainer) {
+                        this.populateContainer(retryContainer);
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.error('❌ Container still not found after retry');
+                    }
+                }, 500);
+                return;
             }
-        }, 0);
+
+            this.populateContainer(container);
+        }, 100);
+    }
+
+    populateContainer(container) {
+        // eslint-disable-next-line no-console
+        console.log('📝 populateContainer called');
+
+        if (!this.previewHtml) {
+            // eslint-disable-next-line no-console
+            console.warn('No preview HTML to display');
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
+            container.innerHTML = '<p>No preview content available.</p>';
+            return;
+        }
+
+        // Extract body content if it's a full HTML document
+        let htmlContent = this.previewHtml.trim();
+        // eslint-disable-next-line no-console
+        console.log('  - Original HTML content length:', htmlContent.length);
+
+        // Check if it's a full HTML document
+        if (htmlContent.includes('<body')) {
+            const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+            if (bodyMatch && bodyMatch[1]) {
+                htmlContent = bodyMatch[1].trim();
+                // eslint-disable-next-line no-console
+                console.log('  - Extracted body content, length:', htmlContent.length);
+                // eslint-disable-next-line no-console
+                console.log('  - Body content preview:', htmlContent.substring(0, 200));
+            }
+        }
+
+        // Extract styles
+        const styleMatch = this.previewHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+        let styles = '';
+        if (styleMatch && styleMatch[1]) {
+            styles = styleMatch[1];
+            // eslint-disable-next-line no-console
+            console.log('  - Extracted styles, length:', styles.length);
+        }
+
+        // Clear container first
+        // eslint-disable-next-line @lwc/lwc/no-inner-html
+        container.innerHTML = '';
+        // eslint-disable-next-line no-console
+        console.log('  - Container cleared');
+
+        // Add styles if present
+        if (styles) {
+            const styleEl = document.createElement('style');
+            styleEl.textContent = styles;
+            container.appendChild(styleEl);
+            // eslint-disable-next-line no-console
+            console.log('  - ✅ Added style element');
+        }
+
+        // Add content
+        if (htmlContent) {
+            // Create a wrapper div for the content
+            const contentDiv = document.createElement('div');
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
+            contentDiv.innerHTML = htmlContent;
+            container.appendChild(contentDiv);
+
+            // eslint-disable-next-line no-console
+            console.log('  - ✅ Preview content added to container');
+            // eslint-disable-next-line no-console
+            console.log('  - Content div innerHTML length:', contentDiv.innerHTML.length);
+            // eslint-disable-next-line no-console
+            console.log('  - Container children count:', container.children.length);
+            // eslint-disable-next-line no-console
+            console.log('  - Content div textContent:', contentDiv.textContent?.substring(0, 100));
+        } else {
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
+            container.innerHTML = '<p>No content found in preview.</p>';
+            // eslint-disable-next-line no-console
+            console.warn('  - ⚠️ No HTML content to display after extraction');
+        }
     }
 
     handleClosePreview() {
         this.showPreview = false;
         this.previewHtml = '';
+        this.previewPdfUrl = null;
+        this.previewPdfBytes = null; // Clear PDF bytes
+        this.previewLoading = false;
+    }
 
-        setTimeout(() => {
-            const container = this.template.querySelector('.preview-container');
-            if (container) {
-                container.innerHTML = '';
-            }
-        }, 0);
+    handleDownloadPreview() {
+        if (this.previewPdfBytes) {
+            this.downloadPdf(this.previewPdfBytes, this.template.Name || 'document');
+        }
     }
 
     get discoveredFieldsColumns() {
@@ -600,6 +1079,13 @@ export default class TemplateEditor extends LightningElement {
 
     get relationshipOptions() {
         return this.relationships.map(r => ({ label: r, value: r }));
+    }
+
+    get outputFormatOptions() {
+        return [
+            { label: 'PDF', value: 'PDF' },
+            { label: 'DOCX', value: 'DOCX' }
+        ];
     }
 
     showToast(title, message, variant) {
@@ -622,7 +1108,7 @@ export default class TemplateEditor extends LightningElement {
         const fields = new Set();
 
         // Match {field} or {nested.path}, but not {#...} or {/...}
-        const variableRegex = /\{(?![#\/])([\w.]+)\}/g;
+        const variableRegex = /\{(?![#/])([\w.]+)\}/g;
         let match;
         let matchCount = 0;
 

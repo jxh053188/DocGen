@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>html2pdf</fullName>
-    <cacheControl>Public</cacheControl>
-    <contentType>application/javascript</contentType>
-    <description>html2pdf.js v0.10.1 - Browser-based PDF generation from HTML (includes html2canvas and jsPDF)</description>
-</StaticResource>

@@ -1,13 +1,7 @@
-<template>
-    <!-- Hidden resource loaders - workaround for known Salesforce issue -->
-    <!-- https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
-    <c-resource-loader resource-url={pizzipUrl} onresourceloaded={handlePizzipLoaded}
-        onresourceerror={handleResourceError}></c-resource-loader>
-    <!-- Load docxtemplater only after PizZip is loaded (dependency) -->
-    <template if:true={pizzipLoaded}>
-        <c-resource-loader resource-url={docxtemplaterUrl} onresourceloaded={handleDocxtemplaterLoaded}
-            onresourceerror={handleResourceError}></c-resource-loader>
-    </template>
+<template lwc:render-mode="light">
+    <!-- Hidden wrapper component for loading libraries -->
+    <!-- Workaround for known Salesforce issue: https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
+    <c-docxtemplater-loader></c-docxtemplater-loader>
 
     <lightning-card title={template.Name} icon-name="custom:custom55">
         <div class="slds-p-around_medium">
@@ -90,6 +84,19 @@
                             onchange={handleSampleRecordChange}
                             placeholder="Enter a record ID to preview"></lightning-input>
 
+                        <!-- Output Format Selection for Word Templates -->
+                        <template if:true={isWordTemplate}>
+                            <div class="slds-m-top_small slds-m-bottom_small">
+                                <lightning-radio-group
+                                    label="Output Format"
+                                    options={outputFormatOptions}
+                                    value={outputFormat}
+                                    onchange={handleOutputFormatChange}
+                                    type="radio">
+                                </lightning-radio-group>
+                            </div>
+                        </template>
+
                         <lightning-button label="Preview" variant="brand" onclick={handlePreview} disabled={isLoading}
                             class="slds-m-top_small"></lightning-button>
                     </div>
@@ -115,11 +122,33 @@
                 </header>
 
                 <div class="slds-modal__content slds-p-around_medium"
-                    style="min-height: 400px; max-height: 70vh; overflow-y: auto;">
-                    <div class="preview-container" lwc:dom="manual"></div>
+                    style="min-height: 400px; max-height: 80vh; overflow-y: auto;">
+                    <template if:true={previewLoading}>
+                        <div class="slds-align_absolute-center" style="min-height: 300px;">
+                            <lightning-spinner alternative-text="Generating preview..."></lightning-spinner>
+                        </div>
+                    </template>
+                    <template if:false={previewLoading}>
+                        <!-- PDF Preview using pdfjsViewer -->
+                        <template if:true={previewPdfBytes}>
+                            <c-pdfjs-viewer pdf-bytes={previewPdfBytes} file-name={template.Name}></c-pdfjs-viewer>
+                        </template>
+                        <!-- HTML Preview for HTML templates (fallback) -->
+                        <template if:false={previewPdfBytes}>
+                            <template if:true={previewPdfUrl}>
+                                <iframe src={previewPdfUrl} width="100%" height="600px" style="border: none;"></iframe>
+                            </template>
+                            <template if:false={previewPdfUrl}>
+                                <div class="preview-container"></div>
+                            </template>
+                        </template>
+                    </template>
                 </div>
 
                 <footer class="slds-modal__footer">
+                    <template if:true={previewPdfBytes}>
+                        <lightning-button label="Download PDF" variant="brand" onclick={handleDownloadPreview} class="slds-m-right_small"></lightning-button>
+                    </template>
                     <lightning-button label="Close" onclick={handleClosePreview}></lightning-button>
                 </footer>
             </div>
@@ -127,8 +156,24 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
-    <!-- Loading Spinner -->
+    <!-- Loading Spinner (shown when generating preview) -->
+    <template if:true={previewLoading}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium" style="min-height: 300px;">
+                    <div class="slds-align_absolute-center">
+                        <lightning-spinner alternative-text="Generating preview..."></lightning-spinner>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- Loading Spinner (for other operations) -->
     <template if:true={isLoading}>
-        <lightning-spinner alternative-text="Processing..."></lightning-spinner>
+        <template if:false={previewLoading}>
+            <lightning-spinner alternative-text="Processing..."></lightning-spinner>
+        </template>
     </template>
 </template>

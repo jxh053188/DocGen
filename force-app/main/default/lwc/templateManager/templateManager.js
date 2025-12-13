@@ -9,8 +9,6 @@ import uploadTemplateFile from '@salesforce/apex/TemplateController.uploadTempla
 import getTemplateFile from '@salesforce/apex/TemplateController.getTemplateFile';
 import deleteTemplateFile from '@salesforce/apex/TemplateController.deleteTemplateFile';
 import { discoverFields } from 'c/discoveryUtils';
-import PIZZIP from '@salesforce/resourceUrl/pizzip';
-import DOCXTEMPLATER from '@salesforce/resourceUrl/docxtemplater';
 
 const COLUMNS = [
     { label: 'Name', fieldName: 'Name', type: 'text' },
@@ -40,10 +38,6 @@ export default class TemplateManager extends LightningElement {
 
     columns = COLUMNS;
     wiredTemplatesResult;
-    @track pizzipLoaded = false;
-    @track docxtemplaterLoaded = false;
-    pizzipLoadPromise = null;
-    docxtemplaterLoadPromise = null;
 
     // Form fields
     templateName = '';
@@ -52,15 +46,6 @@ export default class TemplateManager extends LightningElement {
     status = 'Draft';
     htmlBody = '';
     allowedFields = '';
-
-    // Resource URLs for resourceLoader components
-    get pizzipUrl() {
-        return PIZZIP;
-    }
-
-    get docxtemplaterUrl() {
-        return DOCXTEMPLATER;
-    }
 
     get sourceTypeOptions() {
         return [
@@ -77,63 +62,40 @@ export default class TemplateManager extends LightningElement {
         ];
     }
 
-    // Event handlers for resourceLoader components
-    handlePizzipLoaded() {
-        this.pizzipLoaded = true;
-        // eslint-disable-next-line no-console
-        console.log('PizZip loaded successfully');
-        // Resolve the promise if it exists
-        if (this.pizzipLoadPromise) {
-            this.pizzipLoadPromise.resolve();
-        }
-    }
-
-    handleDocxtemplaterLoaded() {
-        this.docxtemplaterLoaded = true;
-        // eslint-disable-next-line no-console
-        console.log('Docxtemplater loaded successfully', typeof window.docxtemplater);
-        // Resolve the promise if it exists
-        if (this.docxtemplaterLoadPromise) {
-            this.docxtemplaterLoadPromise.resolve();
-        }
-    }
-
-    handleResourceError(event) {
-        const error = event.detail?.error || 'Unknown error';
-        // eslint-disable-next-line no-console
-        console.error('Error loading resource:', error);
-        this.showToast(
-            'Error',
-            'Failed to load Word template libraries: ' + error,
-            'error'
-        );
-    }
-
     /**
-     * Wait for libraries to be loaded via resourceLoader components
-     * Returns immediately if already loaded
+     * Wait for required libraries to be available on window
+     * Polls for libraries with a timeout
      */
     waitForLibraries() {
-        // If already loaded, return immediately
-        if (this.pizzipLoaded && this.docxtemplaterLoaded) {
+        const maxAttempts = 50; // 5 seconds max wait (50 * 100ms)
+        const delay = 100; // Check every 100ms
+
+        const checkLibraries = () => {
+            return window.PizZip && window.docxtemplater;
+        };
+
+        // Check immediately first
+        if (checkLibraries()) {
             return Promise.resolve();
         }
 
-        // Create promises that will be resolved by event handlers
-        const pizzipPromise = this.pizzipLoaded 
-            ? Promise.resolve() 
-            : new Promise((resolve) => {
-                this.pizzipLoadPromise = { resolve };
-            });
-
-        const docxtemplaterPromise = this.docxtemplaterLoaded 
-            ? Promise.resolve() 
-            : new Promise((resolve) => {
-                this.docxtemplaterLoadPromise = { resolve };
-            });
-
-        // Wait for both to load
-        return Promise.all([pizzipPromise, docxtemplaterPromise]);
+        // Poll with timeout using recursive setTimeout
+        let attempts = 0;
+        return new Promise((resolve, reject) => {
+            const poll = () => {
+                attempts++;
+                if (checkLibraries()) {
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    reject(new Error('Required libraries not loaded. Please refresh the page.'));
+                } else {
+                    // eslint-disable-next-line @lwc/lwc/no-async-operation
+                    setTimeout(poll, delay);
+                }
+            };
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(poll, delay);
+        });
     }
 
     get modalTitle() {
