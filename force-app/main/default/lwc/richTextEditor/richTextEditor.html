@@ -1,0 +1,42 @@
+<template>
+    <template if:true={showCard}>
+        <lightning-card title={label} icon-name="utility:text">
+            <div class="slds-p-around_medium">
+                <template if:true={showViewer}>
+                    <div class="editor-wrapper">
+                        <iframe 
+                            src={editorURL} 
+                            class="editor-iframe"
+                            onload={handleIframeLoad}
+                            frameborder="0">
+                        </iframe>
+                    </div>
+                </template>
+                <template if:false={showViewer}>
+                    <div class="loading-container">
+                        <lightning-spinner alternative-text="Loading Editor" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+    <template if:false={showCard}>
+        <div class="slds-p-around_medium">
+            <template if:true={showViewer}>
+                <div class="editor-wrapper">
+                    <iframe 
+                        src={editorURL} 
+                        class="editor-iframe"
+                        onload={handleIframeLoad}
+                        frameborder="0">
+                    </iframe>
+                </div>
+            </template>
+            <template if:false={showViewer}>
+                <div class="loading-container">
+                    <lightning-spinner alternative-text="Loading Editor" size="medium"></lightning-spinner>
+                </div>
+            </template>
+        </div>
+    </template>
+</template>

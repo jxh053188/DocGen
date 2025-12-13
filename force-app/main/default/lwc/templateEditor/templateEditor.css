@@ -1,0 +1,24 @@
+.editor-full-width {
+    width: 100%;
+}
+
+.sidebar-container {
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Ensure rich text editor iframe takes full width */
+.editor-full-width .editor-iframe {
+    width: 100%;
+    min-height: 500px;
+}
+
+/* Better spacing for action buttons */
+.slds-m-top_medium {
+    border-top: 1px solid #dddbda;
+    padding-top: 1rem;
+}
+
