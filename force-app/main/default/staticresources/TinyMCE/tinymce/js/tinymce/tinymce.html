@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>TinyMCE Editor</title>
+    <script src="./tinymce.min.js"></script>
+    <style>
+        /* Optional: Ensures the editor fills the iframe */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="tinymce-editor"></textarea>
+
+    <script>
+        // Wait for TinyMCE to load before initializing
+        function initTinyMCE() {
+            if (typeof tinymce === 'undefined') {
+                console.error('TinyMCE is not loaded');
+                setTimeout(initTinyMCE, 100);
+                return;
+            }
+
+            // Use document.location.origin to get the base path for loading resources
+            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            tinymce.init({
+                selector: '#tinymce-editor',
+                license_key: 'gpl',
+                plugins: [
+                    'advlist','autolink', 'autoresize', 'autosave', 'charmap', 'code',
+                    'codesample', 'directionality', 'emoticons', 'fullscreen', 'help', 'image',
+                    'importcss', 'insertdatetime', 'link', 'lists',
+                    'nonbreaking', 'pagebreak', 'preview', 'quickbars', 'save', 'searchreplace',
+                    'table', 'visualblocks', 'visualchars', 'wordcount'
+                ],
+                toolbar_mode: 'floating',
+                height: '100%',
+                menubar: 'file edit view insert format tools table help',
+                toolbar: "undo redo | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code fullscreen preview | save | pagebreak anchor codesample | ltr rtl",
+                setup: function (editor) {
+                    // IMPORTANT: Listen for changes and send them back to the LWC host
+                    editor.on('Change KeyUp Undo Redo', function () {
+                        // Use postMessage to communicate the content back to the parent LWC
+                        window.parent.postMessage(
+                            {
+                                type: 'EDITOR_CONTENT_UPDATE',
+                                content: editor.getContent()
+                            },
+                            '*' // IMPORTANT: Replace '*' with your Salesforce domain for security
+                        );
+                    });
+
+                    editor.on('init', function () {
+                        // Inform the parent LWC that the editor is ready
+                        window.parent.postMessage({ type: 'EDITOR_READY' }, '*');
+                    });
+                }
+            });
+
+            // Function to receive messages from the LWC (e.g., setting initial content)
+            window.addEventListener('message', function (event) {
+                if (event.data.type === 'SET_CONTENT' && window.tinymce && window.tinymce.activeEditor) {
+                    window.tinymce.activeEditor.setContent(event.data.content);
+                }
+            });
+        }
+
+        // Start initialization when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTinyMCE);
+        } else {
+            initTinyMCE();
+        }
+    </script>
+</body>
+
+</html>

@@ -14,7 +14,6 @@ import { render as renderTemplate } from 'c/templateEngine';
 import PdfjsViewer from 'c/pdfjsViewer';
 
 export default class TemplateEditor extends LightningElement {
-    static renderMode = 'light';
     @api recordId; // Template record Id
 
     @track template = {};
@@ -39,6 +38,7 @@ export default class TemplateEditor extends LightningElement {
     userSettings = {};
     @track sampleRecordId = '';
     @track outputFormat = 'PDF'; // 'PDF' or 'DOCX' for Word templates
+    @track sidebarVisible = true; // Sidebar visibility state
 
     connectedCallback() {
         this.loadUserSettings();
@@ -91,6 +91,26 @@ export default class TemplateEditor extends LightningElement {
 
     get showHtmlEditor() {
         return this.isHtmlTemplate;
+    }
+
+    get sidebarVisibleText() {
+        return this.sidebarVisible ? 'Hide Sidebar' : 'Show Sidebar';
+    }
+
+    get sidebarIcon() {
+        return this.sidebarVisible ? 'utility:chevronright' : 'utility:chevronleft';
+    }
+
+    get editorColumnClass() {
+        // Full width when sidebar is hidden, 2/3 width when visible
+        if (this.sidebarVisible) {
+            return 'slds-col slds-size_1-of-1 slds-large-size_2-of-3';
+        }
+        return 'slds-col slds-size_1-of-1';
+    }
+
+    toggleSidebar() {
+        this.sidebarVisible = !this.sidebarVisible;
     }
 
     async loadUserSettings() {
@@ -151,6 +171,10 @@ export default class TemplateEditor extends LightningElement {
 
     handleHtmlChange(event) {
         this.htmlBody = event.target.value;
+    }
+
+    handleRichTextChange(event) {
+        this.htmlBody = event.detail.value || '';
     }
 
     handleSampleRecordChange(event) {

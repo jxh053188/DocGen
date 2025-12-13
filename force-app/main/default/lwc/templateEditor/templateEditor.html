@@ -1,16 +1,15 @@
-<template lwc:render-mode="light">
+<template>
     <!-- Hidden wrapper component for loading libraries -->
     <!-- Workaround for known Salesforce issue: https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
     <c-docxtemplater-loader></c-docxtemplater-loader>
 
     <lightning-card title={template.Name} icon-name="custom:custom55">
         <div class="slds-p-around_medium">
-            <!-- Editor Section -->
-            <div class="slds-grid slds-wrap slds-gutters">
-                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
-                    <!-- Word Template: File Upload/Management -->
+            <!-- Header with Actions and Sidebar Toggle -->
+            <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium">
+                <div class="slds-col">
                     <template if:true={isWordTemplate}>
-                        <!-- File Upload Section (if no file exists) -->
+                        <!-- Word Template: File Upload/Management -->
                         <template if:true={showFileUpload}>
                             <div class="slds-box slds-m-bottom_small">
                                 <h3 class="slds-text-heading_small slds-m-bottom_x-small">Upload Word Template</h3>
@@ -48,16 +47,37 @@
                             </div>
                         </template>
                     </template>
+                </div>
+                <div class="slds-col slds-no-flex">
+                    <lightning-button-icon 
+                        icon-name={sidebarIcon} 
+                        alternative-text={sidebarVisibleText}
+                        onclick={toggleSidebar}
+                        class="slds-m-left_small">
+                    </lightning-button-icon>
+                </div>
+            </div>
 
+            <!-- Main Content Area -->
+            <div class="slds-grid slds-wrap slds-gutters">
+                <!-- Editor Section - Full width when sidebar hidden, 2/3 when visible -->
+                <div class={editorColumnClass}>
                     <!-- HTML Template: HTML Editor -->
                     <template if:true={showHtmlEditor}>
-                        <lightning-textarea label="HTML Template" value={htmlBody} onchange={handleHtmlChange} rows="20"
-                            class="editor-textarea"
-                            placeholder="Enter HTML template with variable syntax (e.g., {Name}, {Opportunities} with {StageName})">
-                        </lightning-textarea>
+                        <div class="slds-m-bottom_medium">
+                            <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+                                <label class="slds-form-element__label slds-no-flex">
+                                    <abbr class="slds-required" title="required">*</abbr> HTML Template
+                                </label>
+                            </div>
+                            <div class="editor-full-width">
+                                <c-rich-text-editor value={htmlBody} onchange={handleRichTextChange} show-card="false"></c-rich-text-editor>
+                            </div>
+                        </div>
                     </template>
 
-                    <div class="slds-m-top_small">
+                    <!-- Action Buttons -->
+                    <div class="slds-m-top_medium">
                         <lightning-button label="Save Template" variant="brand" onclick={handleSave}
                             disabled={isLoading} class="slds-m-right_small"></lightning-button>
                         <lightning-button label="Discover Fields" variant="neutral" onclick={handleDiscoverFields}
@@ -65,50 +85,53 @@
                     </div>
                 </div>
 
-                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
-                    <div class="slds-box">
-                        <h3 class="slds-text-heading_small slds-m-bottom_small">Template Info</h3>
-                        <lightning-combobox label="Source Type" value={sourceType} options={sourceTypeOptions}
-                            onchange={handleSourceTypeChange} disabled={isLoading} class="slds-m-bottom_small">
-                        </lightning-combobox>
-                        <lightning-combobox label="Status" value={status} options={statusOptions}
-                            onchange={handleStatusChange} disabled={isLoading} class="slds-m-bottom_small">
-                        </lightning-combobox>
-                        <p><strong>Primary Object:</strong> {template.Primary_Object__c}</p>
-                        <p><strong>Version:</strong> {template.Version__c}</p>
-                    </div>
+                <!-- Sidebar - Hidden when collapsed, 1/3 width when visible -->
+                <template if:true={sidebarVisible}>
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3 sidebar-container">
+                        <div class="slds-box slds-m-bottom_small">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Template Info</h3>
+                            <lightning-combobox label="Source Type" value={sourceType} options={sourceTypeOptions}
+                                onchange={handleSourceTypeChange} disabled={isLoading} class="slds-m-bottom_small">
+                            </lightning-combobox>
+                            <lightning-combobox label="Status" value={status} options={statusOptions}
+                                onchange={handleStatusChange} disabled={isLoading} class="slds-m-bottom_small">
+                            </lightning-combobox>
+                            <p class="slds-m-top_small"><strong>Primary Object:</strong> {template.Primary_Object__c}</p>
+                            <p><strong>Version:</strong> {template.Version__c}</p>
+                        </div>
 
-                    <div class="slds-box slds-m-top_small">
-                        <h3 class="slds-text-heading_small slds-m-bottom_small">Preview</h3>
-                        <lightning-input label="Sample Record ID" value={sampleRecordId}
-                            onchange={handleSampleRecordChange}
-                            placeholder="Enter a record ID to preview"></lightning-input>
+                        <div class="slds-box slds-m-bottom_small">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Preview</h3>
+                            <lightning-input label="Sample Record ID" value={sampleRecordId}
+                                onchange={handleSampleRecordChange}
+                                placeholder="Enter a record ID to preview"></lightning-input>
 
-                        <!-- Output Format Selection for Word Templates -->
-                        <template if:true={isWordTemplate}>
-                            <div class="slds-m-top_small slds-m-bottom_small">
-                                <lightning-radio-group
-                                    label="Output Format"
-                                    options={outputFormatOptions}
-                                    value={outputFormat}
-                                    onchange={handleOutputFormatChange}
-                                    type="radio">
-                                </lightning-radio-group>
+                            <!-- Output Format Selection for Word Templates -->
+                            <template if:true={isWordTemplate}>
+                                <div class="slds-m-top_small slds-m-bottom_small">
+                                    <lightning-radio-group
+                                        label="Output Format"
+                                        options={outputFormatOptions}
+                                        value={outputFormat}
+                                        onchange={handleOutputFormatChange}
+                                        type="radio">
+                                    </lightning-radio-group>
+                                </div>
+                            </template>
+
+                            <lightning-button label="Preview" variant="brand" onclick={handlePreview} disabled={isLoading}
+                                class="slds-m-top_small"></lightning-button>
+                        </div>
+
+                        <template if:true={discoveredFields.length}>
+                            <div class="slds-box">
+                                <h3 class="slds-text-heading_small slds-m-bottom_small">Discovered Fields</h3>
+                                <lightning-datatable key-field="path" data={discoveredFields}
+                                    columns={discoveredFieldsColumns} hide-checkbox-column></lightning-datatable>
                             </div>
                         </template>
-
-                        <lightning-button label="Preview" variant="brand" onclick={handlePreview} disabled={isLoading}
-                            class="slds-m-top_small"></lightning-button>
                     </div>
-
-                    <template if:true={discoveredFields.length}>
-                        <div class="slds-box slds-m-top_small">
-                            <h3 class="slds-text-heading_small slds-m-bottom_small">Discovered Fields</h3>
-                            <lightning-datatable key-field="path" data={discoveredFields}
-                                columns={discoveredFieldsColumns} hide-checkbox-column></lightning-datatable>
-                        </div>
-                    </template>
-                </div>
+                </template>
             </div>
         </div>
     </lightning-card>
