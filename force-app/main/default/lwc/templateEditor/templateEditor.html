@@ -1,52 +1,10 @@
 <template>
-    <!-- Hidden wrapper component for loading libraries -->
-    <!-- Workaround for known Salesforce issue: https://help.salesforce.com/s/issue?id=a028c00000gAxQiAAK -->
-    <c-docxtemplater-loader></c-docxtemplater-loader>
-
     <lightning-card title={template.Name} icon-name="custom:custom55">
         <div class="slds-p-around_medium">
             <!-- Header with Actions and Sidebar Toggle -->
             <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium">
                 <div class="slds-col">
-                    <template if:true={isWordTemplate}>
-                        <!-- Word Template: File Upload/Management -->
-                        <template if:true={showFileUpload}>
-                            <div class="slds-box slds-m-bottom_small">
-                                <h3 class="slds-text-heading_small slds-m-bottom_x-small">Upload Word Template</h3>
-                                <p class="slds-text-body_small slds-m-bottom_small">
-                                    Upload a .docx file with template syntax
-                                </p>
-                                <lightning-input type="file" accept=".docx" label="Word Document"
-                                    onchange={handleFileUpload}>
-                                </lightning-input>
-                                <template if:true={uploadedFileName}>
-                                    <p class="slds-text-body_small slds-m-top_x-small slds-text-color_success">
-                                        ✓ File ready: {uploadedFileName}
-                                    </p>
-                                </template>
-                            </div>
-                        </template>
-
-                        <!-- File Info Section (if file exists) -->
-                        <template if:true={showFileInfo}>
-                            <div class="slds-box slds-m-bottom_small">
-                                <h3 class="slds-text-heading_small slds-m-bottom_x-small">Word Template File</h3>
-                                <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
-                                    <div>
-                                        <lightning-icon icon-name="doctype:word" size="small"
-                                            class="slds-m-right_x-small"></lightning-icon>
-                                        <span class="slds-text-body_regular">{templateFileName}</span>
-                                    </div>
-                                    <lightning-button-icon icon-name="utility:delete" variant="destructive"
-                                        alternative-text="Delete file" onclick={handleDeleteFile} disabled={isLoading}>
-                                    </lightning-button-icon>
-                                </div>
-                                <p class="slds-text-body_small slds-text-color_weak">
-                                    To replace this file, delete it first and upload a new one.
-                                </p>
-                            </div>
-                        </template>
-                    </template>
+                    <!-- Empty space for alignment -->
                 </div>
                 <div class="slds-col slds-no-flex">
                     <lightning-button-icon 
@@ -105,19 +63,6 @@
                             <lightning-input label="Sample Record ID" value={sampleRecordId}
                                 onchange={handleSampleRecordChange}
                                 placeholder="Enter a record ID to preview"></lightning-input>
-
-                            <!-- Output Format Selection for Word Templates -->
-                            <template if:true={isWordTemplate}>
-                                <div class="slds-m-top_small slds-m-bottom_small">
-                                    <lightning-radio-group
-                                        label="Output Format"
-                                        options={outputFormatOptions}
-                                        value={outputFormat}
-                                        onchange={handleOutputFormatChange}
-                                        type="radio">
-                                    </lightning-radio-group>
-                                </div>
-                            </template>
 
                             <lightning-button label="Preview" variant="brand" onclick={handlePreview} disabled={isLoading}
                                 class="slds-m-top_small"></lightning-button>

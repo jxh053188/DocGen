@@ -31,34 +31,14 @@
                         required></lightning-input>
 
                     <lightning-combobox label="Source Type" value={sourceType} options={sourceTypeOptions}
-                        data-field="sourceType" onchange={handleInputChange}></lightning-combobox>
+                        data-field="sourceType" onchange={handleInputChange} disabled></lightning-combobox>
 
                     <lightning-combobox label="Status" value={status} options={statusOptions} data-field="status"
                         onchange={handleInputChange}></lightning-combobox>
 
-                    <template if:true={showFileUpload}>
-                        <div class="slds-form-element">
-                            <label class="slds-form-element__label">Upload DOCX Template</label>
-                            <div class="slds-form-element__control">
-                                <lightning-input type="file" label="" accept=".docx"
-                                    onchange={handleFileUpload}></lightning-input>
-                                <template if:true={uploadedFileName}>
-                                    <div class="slds-text-body_small slds-m-top_x-small">
-                                        Selected file: <strong>{uploadedFileName}</strong>
-                                    </div>
-                                </template>
-                                <div class="slds-text-body_small slds-text-color_weak slds-m-top_x-small">
-                                    Upload a Word document with template syntax
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template if:true={showHtmlEditor}>
-                        <lightning-textarea label="HTML Body" value={htmlBody} data-field="htmlBody"
-                            onchange={handleInputChange} rows="10" required
-                            placeholder="Enter HTML template with template syntax"></lightning-textarea>
-                    </template>
+                    <lightning-textarea label="HTML Body" value={htmlBody} data-field="htmlBody"
+                        onchange={handleInputChange} rows="10" required
+                        placeholder="Enter HTML template with template syntax"></lightning-textarea>
 
                     <lightning-textarea label="Allowed Fields (optional)" value={allowedFields}
                         data-field="allowedFields" onchange={handleInputChange} rows="5"

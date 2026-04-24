@@ -3,7 +3,6 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
 import getTemplatesForObject from '@salesforce/apex/TemplateController.getTemplatesForObject';
 import getTemplate from '@salesforce/apex/TemplateController.getTemplate';
-import getTemplateFile from '@salesforce/apex/TemplateController.getTemplateFile';
 import buildQueryPlan from '@salesforce/apex/TemplateController.buildQueryPlan';
 import fetchData from '@salesforce/apex/TemplateController.fetchData';
 import savePdf from '@salesforce/apex/TemplateController.savePdf';
@@ -97,12 +96,8 @@ export default class GenerateDocumentAction extends LightningElement {
             // 1. Get template
             const template = await getTemplate({ templateId: this.selectedTemplateId });
 
-            // 2. Check template type and process accordingly
-            if (template.Source_Type__c === 'Word') {
-                await this.processWordTemplate(template);
-            } else {
-                await this.processHtmlTemplate(template);
-            }
+            // 2. Process HTML template
+            await this.processHtmlTemplate(template);
 
             // Show preview
             this.pdfUrl = 'data:application/pdf;base64,' + this.pdfBase64;
@@ -144,9 +139,6 @@ export default class GenerateDocumentAction extends LightningElement {
         this.pdfBase64 = await this.renderPdf(html);
     }
 
-    async processWordTemplate(template) {
-        throw new Error('Word templates are not supported yet. Please use HTML templates.');
-    }
 
 
 
